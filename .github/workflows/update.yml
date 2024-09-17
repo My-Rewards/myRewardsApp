@@ -1,6 +1,8 @@
 name: preview
-on: pull_request
-
+on:
+  push:
+    branches:
+      - master # or specify the branch you want to trigger the workflow
 jobs:
   update:
     name: EAS Update
