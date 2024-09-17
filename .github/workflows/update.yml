@@ -21,10 +21,7 @@ jobs:
           cache: 'npm'
 
       - name: 🧱 Build
-        run: npm
+        run: npm install
 
-      - name: 🚧 Type Check
-        run: npm run type-check
-
-      - name: 🛟 Lint Check
-        run: npm run lint-check
+      - name: 🚧 Testing
+        run: npm test
