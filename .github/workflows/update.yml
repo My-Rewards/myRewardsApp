@@ -1,42 +1,30 @@
-name: preview
+name: CI
+
 on:
   push:
-    branches:
-      - master # or specify the branch you want to trigger the workflow
+    branches: [master]
+  pull_request:
+    branches: [master]
+
 jobs:
-  update:
-    name: EAS Update
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
+
     steps:
-      - name: Check for EXPO_TOKEN
-        run: |
-          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
-            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
-            exit 1
-          fi
+      - name: 🗂️ Checkout
+        uses: actions/checkout@v3
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: ⚙️ Setup Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-          cache: npm
+          node-version: '14'
+          cache: 'yarn'
 
-      - name: Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: 🧱 Build
+        run: yarn
 
-      - name: Install dependencies
-        run: npm install
+      - name: 🚧 Type Check
+        run: npm run type-check
 
-      - name: Create preview
-        uses: expo/expo-github-action/preview@v8
-        with:
-          command: eas update --auto
+      - name: 🛟 Lint Check
+        run: npm run lint-check
