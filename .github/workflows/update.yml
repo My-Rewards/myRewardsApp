@@ -18,10 +18,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '14'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: 🧱 Build
-        run: yarn
+        run: npm
 
       - name: 🚧 Type Check
         run: npm run type-check
