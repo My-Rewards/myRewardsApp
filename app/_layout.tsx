@@ -1,9 +1,32 @@
-import { Stack } from "expo-router";
+import { Slot, Stack} from 'expo-router';
+import { SessionProvider } from '../auth/ctx';
+import React from 'react';
 
-export default function RootLayout() {
+export default function Root() {
   return (
-    <Stack>
-      <Stack.Screen name="index" />
-    </Stack>
+    <SessionProvider>
+      <Stack>
+        <Stack.Screen name={'landingScreen'}
+         options={{
+          headerShown:false
+          }} />
+
+        <Stack.Screen name={'sign-in'} 
+        options={{
+          headerShown:false
+          }} />
+
+        <Stack.Screen name={'sign-up'} 
+        options={{
+          headerShown:false
+          }} />
+        
+        <Stack.Screen name={'(app)'} 
+        options={{
+          headerShown:false,
+          animation:'none'
+          }} />
+      </Stack>
+    </SessionProvider>
   );
 }
