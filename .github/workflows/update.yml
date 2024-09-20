@@ -26,14 +26,10 @@ jobs:
         run: npm install
 
       - name: Configure Amplify
-        env:
-          AWS_ACCESS_KEY_ID: XXXX
-          AWS_SECRET_ACCESS_KEY: XXXX
-          AWS_REGION: us-east-1
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off headless 
-          amplify configure headless --accessKeyId $AWS_ACCESS_KEY_ID --secretAccessKey $AWS_SECRET_ACCESS_KEY --region $AWS_REGION
+          amplify configure headless --accessKeyId $${{secrets.AWS_ACCESS_KEY_ID}} --secretAccessKey ${{secrets.AWS_SECRET_ACCESS_KEY}}--region ${{secrets.AWS_REGION}}
           amplify init --envName dev
           amplify push
 
