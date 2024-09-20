@@ -25,15 +25,57 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: Configure Amplify
-        run: |
-          npm install -g @aws-amplify/cli
-          amplify configure --usage-data-off
-          amplify init --appId ${{ secrets.AMPLIFY_APP_ID }} --envName dev --yes
-          amplify push --yes
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Check Amplify Environments
-        run: amplify env list
+      - name: Configure and Pull Amplify
+        run: |
+          set -e
+          IFS='|'
+
+          REACTCONFIG="{\
+          \"SourceDir\":\"src\",\
+          \"DistributionDir\":\"build\",\
+          \"BuildCommand\":\"npm run-script build\",\
+          \"StartCommand\":\"npm run-script start\"\
+          }"
+
+          AWSCLOUDFORMATIONCONFIG="{\
+          \"configLevel\":\"project\",\
+          \"useProfile\":false,\
+          \"profileName\":\"default\",\
+          \"accessKeyId\":\"${{ secrets.AWS_ACCESS_KEY_ID }}\",\
+          \"secretAccessKey\":\"${{ secrets.AWS_SECRET_ACCESS_KEY }}\",\
+          \"region\":\"${{ secrets.AWS_REGION }}\"\
+          }"
+
+          AMPLIFY="{\
+          \"projectName\":\"headlessProjectName\",\
+          \"appId\":\"${{ secrets.AMPLIFY_APP_ID }}\",\
+          \"envName\":\"dev\",\
+          \"defaultEditor\":\"code\"\
+          }"
+
+          FRONTEND="{\
+          \"frontend\":\"javascript\",\
+          \"framework\":\"react\",\
+          \"config\":$REACTCONFIG\
+          }"
+
+          PROVIDERS="{\
+          \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
+          }"
+
+          npm install -g @aws-amplify/cli
+          amplify pull \
+          --amplify $AMPLIFY \
+          --frontend $FRONTEND \
+          --providers $PROVIDERS \
+          --yes
 
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
