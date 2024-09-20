@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⚙️ Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: 'npm'
+
+      - name: 🧱 Installing Dependenices
+        run: npm install
+
+      - name: 🚧 Testing
+        run: npm test
