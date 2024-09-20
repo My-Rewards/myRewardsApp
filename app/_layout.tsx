@@ -16,17 +16,14 @@ export default function Root() {
           headerShown:false,
           animation:'fade'
           }} />
-
         <Stack.Screen name={'sign-in'} 
         options={{
           headerShown:false
           }} />
-
         <Stack.Screen name={'sign-up'} 
         options={{
           headerShown:false
           }} />
-        
         <Stack.Screen name={'(app)'} 
         options={{
           headerShown:false,
