@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "myRewards",
-    "slug": "myRewards",
+    "slug": "myrewardsapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,12 +14,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.myRewards"
+      "bundleIdentifier": "com.anonymous.myRewards",
+      "runtimeVersion": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "web": {
@@ -32,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4e3dda5a-96f6-4d5f-89fe-af470de180a8"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8"
+    },
+    "owner": "myrewards"
   }
 }
