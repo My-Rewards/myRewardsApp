@@ -71,10 +71,3 @@ jobs:
           
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
-        
-      - name: ⏪ Revert changes on failure
-        if: failure()
-        run: |
-          git fetch origin
-          git reset --hard origin/master
-          git push origin development --force
