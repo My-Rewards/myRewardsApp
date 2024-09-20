@@ -28,10 +28,11 @@ jobs:
       - name: Configure Amplify
         run: |
           npm install -g @aws-amplify/cli
-          amplify configure --usage-data-off headless 
-          amplify configure headless --accessKeyId $${{secrets.AWS_ACCESS_KEY_ID}} --secretAccessKey ${{secrets.AWS_SECRET_ACCESS_KEY}}--region ${{secrets.AWS_REGION}}
-          amplify init --envName dev
-          amplify push
+          amplify configure --usage-data-off
+          amplify init --amplify '{"envName":"dev"}' \
+                      --providers '{"awscloudformation":{"configLevel":"general","useProfile":false,"accessKeyId":"${{ secrets.AWS_ACCESS_KEY_ID }}","secretAccessKey":"${{ secrets.AWS_SECRET_ACCESS_KEY }}","region":"${{ secrets.AWS_REGION }}"}}' \
+                      --yes
+          amplify push --yes
 
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
