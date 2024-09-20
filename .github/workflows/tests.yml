@@ -1,4 +1,4 @@
-name: CI
+name: Dependencies Check
 
 on:
   push:
@@ -11,14 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          cache-dependency-path: subdir/package-lock.json
+          node-version: 20
           cache: 'npm'
-
-      - name: 🧱 Installing Dependenices
-        run: npm install
-
-      - name: 🚧 Testing
-        run: npm test
+      - run: npm ci
+      - run: npm test
