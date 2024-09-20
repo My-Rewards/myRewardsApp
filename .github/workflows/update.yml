@@ -29,8 +29,48 @@ jobs:
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
-          amplify env list
-          amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName dev --yes
+
+          set -e
+          IFS='|'
+
+          REACTCONFIG="{\
+          \"SourceDir\":\"src\",\
+          \"DistributionDir\":\"build\",\
+          \"BuildCommand\":\"npm run-script build\",\
+          \"StartCommand\":\"npm run-script start\"\
+          }"
+
+          AWSCLOUDFORMATIONCONFIG="{\
+          \"configLevel\":\"project\",\
+          \"useProfile\":false,\
+          \"profileName\":\"default\",\
+          \"accessKeyId\":\"${{ secrets.AWS_ACCESS_KEY_ID }}\",\
+          \"secretAccessKey\":\"${{ secrets.AWS_SECRET_ACCESS_KEY }}\",\
+          \"region\":\"${{ secrets.AWS_REGION }}\"\
+          }"
+
+          AMPLIFY="{\
+          \"projectName\":\"myRewardsApp\",\
+          \"appId\":\"${{ secrets.AMPLIFY_APP_ID }}\",\
+          \"envName\":\"dev\",\
+          \"defaultEditor\":\"code\"\
+          }"
+
+          FRONTEND="{\
+          \"frontend\":\"javascript\",\
+          \"framework\":\"react-native\",\
+          \"config\":$REACTCONFIG\
+          }"
+
+          PROVIDERS="{\
+          \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
+          }"
+
+          amplify pull \
+          --amplify $AMPLIFY \
+          --frontend $FRONTEND \
+          --providers $PROVIDERS \
+          --yes
 
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
