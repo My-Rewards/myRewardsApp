@@ -17,5 +17,5 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
           node-version: 20
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --verbose
       - run: npm test
