@@ -41,7 +41,7 @@ jobs:
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
           amplify env list 
-          amplify init --appId ${{secrets.AMPLIFY_APP_ID}}                        
+          amplify init --appId ${{secrets.AMPLIFY_APP_ID}} --yes
           amplify pull
           
       - name: 🚀 Create update
