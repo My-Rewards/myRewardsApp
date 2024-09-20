@@ -35,23 +35,39 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: configure amplify
-        uses: ambientlight/amplify-cli-action@0.3.0
-        with:
-          amplify_command: configure
-          amplify_env: dev
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-
       - name: Configure Amplify
         run: |
           aws amplify list-apps
           npm install -g @aws-amplify/cli
-          amplify pull
-          amplify configure --usage-data-off
-          amplify env list 
+          
+          #!/bin/bash
+          set -e
+          IFS='|'
+
+          AWSCLOUDFORMATIONCONFIG="{\
+          \"configLevel\":\"general\",\
+          \"useProfile\":false,\
+          \"profileName\":\"${AWS_PROFILE:-default}\",\
+          \"region\":\"${{secrets.AWS_REGION}}\"\
+          }"
+
+          AMPLIFY="{\
+          \"projectName\":\"ReliefBackend\",\
+          \"appId\":\"${{secrets.AMPLIFY_APP_ID}}\",\
+          \"envName\":\"dev\",\
+          \"defaultEditor\":\"none\"\
+          }"
+
+          PROVIDERS="{\
+          \"awscloudformation\":$AWSCLOUDFORMATIONCONFIG\
+          }"
+
+          echo "running: amplify pull..."
+
+          amplify pull \
+          --amplify $AMPLIFY \
+          --providers $PROVIDERS \
+          --yes
           
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
