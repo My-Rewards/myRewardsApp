@@ -1,14 +1,19 @@
-import { useContext, createContext, type PropsWithChildren, useState } from 'react';
-import { useStorageState } from './useStorageState';
+import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
+import { signIn, signUp, fetchAuthSession, signOut } from 'aws-amplify/auth'
+import { userSignIn, userSignUp} from '@/types/auth';
 
 const AuthContext = createContext<{
-  signIn: () => Promise<boolean>; // Make signIn return a promise to handle async operations
+  signIn: (profile: userSignIn) => Promise<boolean>; 
+  signUp: (profile: userSignUp) => Promise<boolean>; 
   signOut: () => void;
+  validSession: () => Promise<boolean>; 
   session?: string | null;
   isLoading: boolean;
 }>({
   signIn: async () => false,
-  signOut: () => null,
+  signUp: async () => false,
+  signOut: async () => null,
+  validSession: async () => false,
   session: null,
   isLoading: false,
 });
@@ -26,32 +31,99 @@ export function useSession() {
 }
 
 export function SessionProvider({ children }: PropsWithChildren) {
-  const [[isLoading, session], setSession] = useStorageState('session');
-  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [session, setSession] = useState<string|null>();
+  const [fetching, setFetching] = useState(false);
+
+  const checkUserSession = async () => {
+    setFetching(true);
+    try {
+      const currentSession = await fetchAuthSession();
+      if(currentSession.tokens?.idToken){
+        setSession(currentSession.tokens?.idToken.toString());
+      }else{
+        setSession(null);
+      }
+    } catch (error) {
+      setSession(null);
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    checkUserSession(); // Run on component mount
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        signIn: async () => {
-          setIsSigningIn(true); // Start loading state for sign-in
-          try {
-            // Simulate an async sign-in process (e.g., API call)
-            await new Promise((resolve) => setTimeout(resolve, 300)); // Replace with actual sign-in logic
-            setSession('xxx'); // Assuming 'xxx' is a valid session token
+        signIn: async (profile:userSignIn) => {
+          setFetching(true); 
 
-            return true; // Indicate success
+          try {
+            const data = await signIn({
+              username:profile.email,
+              password: profile.password,
+              options: {
+                userAttributes: {
+                  email:profile.email,
+                },
+                autoSignIn: true
+              }
+            });
+
+            await checkUserSession();
+            
+            setFetching(false);
+            
+            return data.isSignedIn;
+        
           } catch (error) {
-            console.error('Sign-in failed:', error);
-            return false; // Indicate failure
-          } finally {
-            setIsSigningIn(false); // Stop loading state after sign-in
+            console.log('error signing up:', error);
+            setFetching(false);
+
+            return false;
+
           }
         },
+
+        signUp: async (profile:userSignUp) => {
+            try {
+            // Simulate an async sign-in process (e.g., API call)
+            const data = await signUp({
+              username:profile.email,
+              password: profile.password,
+              options: {
+                userAttributes: {
+                  email:profile.email,
+                },
+              }
+            });
+
+            console.log(data)
+
+            if(!data.userId) return false;
+
+            // Creating User Data
+
+            return true;
+          } catch (error) {
+
+            console.error('Sign-in failed:', error);
+            return false;
+
+          }
+        },
+        validSession:async () =>{
+          checkUserSession();
+          return session !== null;
+        },
         signOut: () => {
-          setSession(null); // Clear the session
+          signOut();
+          setSession(null);
         },
         session,
-        isLoading: isLoading || isSigningIn, // Combine both loading states
+        isLoading: fetching
       }}>
       {children}
     </AuthContext.Provider>

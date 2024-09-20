@@ -1,21 +1,122 @@
 import { router } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Animated, Easing, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
+import { userSignIn } from '@/types/auth';
+import { useState, useEffect } from 'react';
+import { LoadingScreen } from './loadingScreen';
 
 export default function SignIn() {
-  const { signIn } = useSession();
-  
+  const { signIn, isLoading } = useSession();
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('thisIsATest');
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [loadingScreen, setLoadingScreen] = useState(false);
+
+  const userSignIn: userSignIn = { email, password };
+
+  const signInFunc = async () => {
+    signIn(userSignIn).then((success) => {
+      if (success) {
+        router.replace('/');
+      } else {
+        setLoadingScreen(false)
+        // Handle failed sign-in here
+      }
+    });
+  };
+
+  useEffect(() => {
+    let animationDuration = 200;    
+    if (isLoading) {
+      setLoadingScreen(true)
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: animationDuration,
+        easing: Easing.ease,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isLoading]);
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text
-        onPress={async () => {
-          const success = signIn();
-          // Navigate after signing in. You may want to tweak this to ensure sign-in is
-          // successful before navigating.
-          router.replace('/');
-        }}>
-        Sign In
-      </Text>
+    <View style={styles.container}>
+      {loadingScreen && (
+        <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
+          <LoadingScreen />
+        </Animated.View>
+      )}
+        <View style={styles.contentContainer}>
+          <Text style={styles.headerText}>Sign In</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.button} onPress={signInFunc}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { router.back() }}>
+            <Text>Back</Text>
+          </TouchableOpacity>
+        </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    position: 'relative',
+  },
+  headerText: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    width: '100%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginVertical: 8,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  contentContainer:{
+    flex:1, 
+    width:'100%',
+    alignItems:'center',
+    justifyContent:'center'
+  }
+});
