@@ -12,7 +12,7 @@ jobs:
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
         with:
-          cache-dependency-path: subdir/package-lock.json
+          cache-dependency-path: "**/package-lock.json"
           node-version: 20
           cache: 'npm'
 
