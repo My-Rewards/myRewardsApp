@@ -25,18 +25,11 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       - name: Configure Amplify
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
-          aamplify init --appId ${{secrets.AMPLIFY_APP_ID}}  --envName dev 
+          amplify init --appId ${{secrets.AMPLIFY_APP_ID}}  --envName dev 
           amplify push --yes
 
       - name: Check Amplify Environments
