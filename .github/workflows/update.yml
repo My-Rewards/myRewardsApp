@@ -25,14 +25,20 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
+      - name: Set AWS SDK load config
+        run: export AWS_SDK_LOAD_CONFIG=1
+
       - name: Configure Amplify
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
           amplify init --amplify '{"envName":"dev"}' \
-                      --providers '{"awscloudformation":{"configLevel":"general","useProfile":false,"accessKeyId":"${{ secrets.AWS_ACCESS_KEY_ID }}","secretAccessKey":"${{ secrets.AWS_SECRET_ACCESS_KEY }}","region":"${{ secrets.AWS_REGION }}"}}' \
-                      --yes
+                       --providers '{"awscloudformation":{"configLevel":"general","useProfile":false,"accessKeyId":"${{ secrets.AWS_ACCESS_KEY_ID }}","secretAccessKey":"${{ secrets.AWS_SECRET_ACCESS_KEY }}","region":"${{ secrets.AWS_REGION }}"}}' \
+                       --yes
           amplify push --yes
+
+      - name: Check Amplify Environments
+        run: amplify env list
 
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
