@@ -25,13 +25,11 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: Check Amplify Environments
-        run: amplify env list
-
       - name: Configure Amplify
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
+          amplify env list
           amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName dev --yes
 
       - name: 🚀 Create update
