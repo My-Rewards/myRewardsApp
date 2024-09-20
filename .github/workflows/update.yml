@@ -39,10 +39,9 @@ jobs:
         run: |
           aws amplify list-apps
           npm install -g @aws-amplify/cli
-          amplify init --appId ${{secrets.AMPLIFY_APP_ID}} --yes
+          amplify pull
           amplify configure --usage-data-off
           amplify env list 
-          amplify pull
           
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
