@@ -29,7 +29,7 @@ jobs:
         run: |
           npm install -g @aws-amplify/cli
           amplify configure --usage-data-off
-          amplify init --appId ${{secrets.AMPLIFY_APP_ID}}  --envName dev 
+          amplify init --appId ${{ secrets.AMPLIFY_APP_ID }} --envName dev --yes
           amplify push --yes
 
       - name: Check Amplify Environments
