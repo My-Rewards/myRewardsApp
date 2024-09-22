@@ -35,6 +35,27 @@ npm run reset-project
 
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
+## Setting up Amplify 🚧
+
+1. [Install/Setup AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html)
+
+2. Install Amplify CLI
+```bash
+npm i @aws-amplify/cli
+```
+
+## Setting up Xcode 🚧
+
+Downloading the newest iOS for mobile development
+```bash
+xcodebuild -downloadPlatform iOS
+```
+
+Check Xcode is installed properly
+```bash
+xcode-select --install
+```
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:
@@ -48,15 +69,3 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-## Setting up Xcode 🚧
-
-Downloading the newest iOS for mobile development
-```bash
-xcodebuild -downloadPlatform iOS
-```
-
-Check Xcode is installed properly
-```bash
-xcode-select --install
-```
