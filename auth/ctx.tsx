@@ -51,7 +51,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   useEffect(() => {
-    checkUserSession(); // Run on component mount
+    checkUserSession(); 
   }, []);
 
   return (
@@ -61,6 +61,15 @@ export function SessionProvider({ children }: PropsWithChildren) {
           setFetching(true); 
 
           try {
+
+            // is Authenticated
+            const userSession = await fetchAuthSession();
+
+            if(userSession.credentials){
+              setFetching(false);
+              return true;
+            }
+
             const data = await signIn({
               username:profile.email,
               password: profile.password,
@@ -83,7 +92,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setFetching(false);
 
             return false;
-
           }
         },
 
@@ -103,8 +111,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
             console.log(data)
 
             if(!data.userId) return false;
-
-            // Creating User Data
 
             return true;
           } catch (error) {
