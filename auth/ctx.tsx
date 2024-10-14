@@ -2,23 +2,29 @@ import { useContext, createContext, type PropsWithChildren, useState, useEffect 
 import { signIn, signUp, fetchAuthSession, signOut } from 'aws-amplify/auth'
 import { userSignIn, userSignUp} from '@/types/auth';
 
+// TODO: create DynamoDBClient (create only if authenticating user from unauthenticated)
+
+/* 
+  Serves to check authentication inclosing the app, each time a new screen is triggered this code is referenced and checks
+  to see if the user is still autenticated.
+  if not authenticated -> redirect to landing screen
+  if authenticated -> return sub to retrieve user info
+*/
+
 const AuthContext = createContext<{
   signIn: (profile: userSignIn) => Promise<boolean>; 
   signUp: (profile: userSignUp) => Promise<boolean>; 
   signOut: () => void;
-  validSession: () => Promise<boolean>; 
   session?: string | null;
   isLoading: boolean;
 }>({
   signIn: async () => false,
   signUp: async () => false,
   signOut: async () => null,
-  validSession: async () => false,
   session: null,
   isLoading: false,
 });
 
-// This hook can be used to access the user session info.
 export function useSession() {
   const value = useContext(AuthContext);
   if (process.env.NODE_ENV !== 'production') {
@@ -38,8 +44,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
     setFetching(true);
     try {
       const currentSession = await fetchAuthSession();
-      if(currentSession.tokens?.idToken){
-        setSession(currentSession.tokens?.idToken.toString());
+      if(currentSession.tokens?.idToken && currentSession.userSub){
+        setSession(currentSession.userSub);
       }else{
         setSession(null);
       }
@@ -60,15 +66,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (profile:userSignIn) => {
           setFetching(true); 
 
-          try {
-
+          try{
             // is Authenticated
             const userSession = await fetchAuthSession();
 
-            if(userSession.credentials){
+            if(userSession && userSession.credentials){
               setFetching(false);
               return true;
             }
+
+          }catch(error){
+            setFetching(false);
+          }
+          try {
 
             const data = await signIn({
               username:profile.email,
@@ -88,13 +98,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
             return data.isSignedIn;
         
           } catch (error) {
-            console.log('error signing up:', error);
             setFetching(false);
-
             return false;
           }
         },
-
         signUp: async (profile:userSignUp) => {
             try {
             // Simulate an async sign-in process (e.g., API call)
@@ -114,15 +121,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
             return true;
           } catch (error) {
-
-            console.error('Sign-in failed:', error);
             return false;
-
           }
-        },
-        validSession:async () =>{
-          checkUserSession();
-          return session !== null;
         },
         signOut: () => {
           signOut();

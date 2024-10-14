@@ -6,10 +6,16 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { LoadingScreen } from '../loadingScreen';
 
+/* 
+  App itself (redirect back to landingScreen from here if needed)
+
+  Tips:
+  - Default screen needs to be named index (index.tsx)
+*/
+
 export default function AppLayout() {
   const { session, isLoading } = useSession();
   const colorScheme = useColorScheme();
-  console.log(isLoading)
 
   if (isLoading) {
     return LoadingScreen()
