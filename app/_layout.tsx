@@ -4,6 +4,10 @@ import React from 'react';
 import { Amplify } from 'aws-amplify';
 import amplifyconfig from '../src/amplifyconfiguration.json';
 
+/* 
+  Main App screen components landing screen & app itself
+*/
+
 export default function Root() {
 
   Amplify.configure(amplifyconfig);

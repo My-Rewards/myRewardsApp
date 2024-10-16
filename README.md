@@ -13,6 +13,12 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 2. Start the app
 
    ```bash
+    ./run.sh
+   ```
+
+2.1 Manually running simulator
+
+   ```bash
     npx expo run:ios --device or npx expo start
    ```
 
