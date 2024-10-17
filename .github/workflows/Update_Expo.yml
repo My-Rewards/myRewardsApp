@@ -25,9 +25,6 @@ jobs:
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: 📦 Install dependencies
-        run: npm install
-
       - name: ☁️ Configure AWS credentials ☁️
         uses: aws-actions/configure-aws-credentials@v4
         with:
