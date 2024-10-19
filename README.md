@@ -4,22 +4,70 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
-1. Install dependencies
+##### 1. Install dependencies
 
-   ```bash
+   ```
    npm install
    ```
 
-2. Start the app
+## Setting up Amplify 🚧
 
-   ```bash
+#### 1. [Install/Setup AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html)
+
+```
+npm i @aws-amplify/cli@v2
+```
+
+#### 2. Install Amplify CLI
+```
+npm install -g @aws-amplify/cli
+```
+
+## Setting up Xcode 🚧
+
+Downloading the newest iOS for mobile development
+```
+xcodebuild -downloadPlatform iOS
+```
+
+Check Xcode is installed properly
+```
+xcode-select --install
+```
+
+## Running Code
+
+##### Setting up simulator
+
+##### 1.5 setup environment variables
+
+create a .env file with the following info
+
+which  can be found under both prod and beta account under Cognito resource
+  ```
+  USER_POOL_ID_BETA=xxxxx
+  WEB_CLIENT_ID_BETA=xxxxx
+  COGNITO_DOMAIN_BETA=xxxxx
+  IDENTITY_POOL_ID_BETA=xxxxx
+
+  USER_POOL_ID_PROD=yyyyy
+  WEB_CLIENT_ID_PROD=yyyyyy
+  IDENTITY_POOL_ID_PROD=yyyyy
+  COGNITO_DOMAIN_PROD=yyyyyy
+
+  AWS_REGION=us-east-1
+  ```
+
+##### 2. Start the app
+
+   ```
     ./run.sh
    ```
 
-2.1 Manually running simulator
+##### 2.1 Manually running simulator (in case run.sh doesn't work)
 
    ```bash
-    npx expo run:ios --device or npx expo start
+    npx expo run:ios or npx expo start
    ```
 
 In the output, you'll find options to open the app in a
@@ -31,36 +79,8 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Setting up Amplify 🚧
-
-1. [Install/Setup AWS CLI](https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html)
-
-2. Install Amplify CLI
-```bash
-npm i @aws-amplify/cli
-```
-
-## Setting up Xcode 🚧
-
-Downloading the newest iOS for mobile development
-```bash
-xcodebuild -downloadPlatform iOS
-```
-
-Check Xcode is installed properly
-```bash
-xcode-select --install
-```
 
 ## Learn more
 
