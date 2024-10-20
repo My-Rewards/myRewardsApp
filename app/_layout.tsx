@@ -1,7 +1,7 @@
 import {Stack} from 'expo-router';
 import { SessionProvider } from '../auth/ctx';
 import React from 'react';
-import { Amplify, ResourcesConfig } from 'aws-amplify';
+import {Amplify} from 'aws-amplify';
 import {amplifyConfiguration} from './amplify-config'
 
 
@@ -10,6 +10,7 @@ import {amplifyConfiguration} from './amplify-config'
 */
 
 export default function Root() {
+
 
   Amplify.configure(amplifyConfiguration());
 
