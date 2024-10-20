@@ -1,4 +1,6 @@
-export const amplifyConfiguration = () => {
+import { ResourcesConfig } from "aws-amplify"
+
+export const amplifyConfiguration = ():ResourcesConfig => {
     if(process.env.NODE_ENV === 'production'){
         return{
           Auth: {
