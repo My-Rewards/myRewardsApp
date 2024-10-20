@@ -37,34 +37,30 @@ xcode-select --install
 
 ## Running Code
 
-##### Setting up simulator
+### AWS Credentials
 
-##### 1.5 setup environment variables
+In order to use cdk you need to have an AWS credential, many ways to do this...
 
-create a .env file with the following info
+**Through AWS Portal (Reccomended)**
 
-which  can be found under both prod and beta account under Cognito resource
-  ```
-  USER_POOL_ID_BETA=xxxxx
-  WEB_CLIENT_ID_BETA=xxxxx
-  COGNITO_DOMAIN_BETA=xxxxx
-  IDENTITY_POOL_ID_BETA=xxxxx
+go to your AWS Portal and select **Access Keys** for pipeline account
 
-  USER_POOL_ID_PROD=yyyyy
-  WEB_CLIENT_ID_PROD=yyyyyy
-  IDENTITY_POOL_ID_PROD=yyyyy
-  COGNITO_DOMAIN_PROD=yyyyyy
+Copy option 1 into terminal
 
-  AWS_REGION=us-east-1
-  ```
+ex:
+```
+export AWS_ACCESS_KEY_ID= xxxxx
+export AWS_SECRET_ACCESS_KEY= xxxxx
+export AWS_SESSION_TOKEN= xxxxx
+```
 
-##### 2. Start the app
+##### 1. Start the app
 
    ```
     ./run.sh
    ```
 
-##### 2.1 Manually running simulator (in case run.sh doesn't work)
+##### 1.1 Manually running simulator (in case run.sh doesn't work)
 
    ```bash
     npx expo run:ios or npx expo start
