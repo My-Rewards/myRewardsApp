@@ -1,8 +1,9 @@
 import {Stack} from 'expo-router';
 import { SessionProvider } from '../auth/ctx';
 import React from 'react';
-import { Amplify } from 'aws-amplify';
-import amplifyconfig from '../src/amplifyconfiguration.json';
+import {Amplify} from 'aws-amplify';
+import {amplifyConfiguration} from './amplify-config'
+
 
 /* 
   Main App screen components landing screen & app itself
@@ -10,7 +11,8 @@ import amplifyconfig from '../src/amplifyconfiguration.json';
 
 export default function Root() {
 
-  Amplify.configure(amplifyconfig);
+
+  Amplify.configure(amplifyConfiguration());
 
   return (
     <SessionProvider>

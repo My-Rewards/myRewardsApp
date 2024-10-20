@@ -70,7 +70,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             // is Authenticated
             const userSession = await fetchAuthSession();
 
-            if(userSession && userSession.credentials){
+            if(userSession && userSession.userSub){
               setFetching(false);
               return true;
             }
