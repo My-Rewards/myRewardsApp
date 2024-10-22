@@ -1,59 +1,52 @@
 import { router } from 'expo-router';
-import { Animated, Easing, Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import {Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
 import { userSignUp } from '@/types/auth';
-import { LoadingScreen } from './loadingScreen';
+import { useProps } from './LoadingProp/propsProvider';
 
 export default function SignUp() {
   const { signUp, isLoading } = useSession();
+  const { triggerLoadingScreen, alert } = useProps();
+  
   const [email, setEmail] = useState('test@gmail.com');
   const [password, setPassword] = useState('thisIsATest');
   const [passwordDup, setPasswordDup] = useState('thisIsATest');
   const [fn, setFn] = useState('test');
   const [ln, setLn] = useState('test');
-  const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity is 0
-  const [loadingScreen, setLoadingScreen] = useState(false)
 
-  const userSignUp: userSignUp = {
-    email, 
-    password,
+
+  useEffect(()=>{
+    triggerLoadingScreen({isLoading})
+  }, [isLoading])
+
+  const userSignUpData: userSignUp = {
+    email: email, 
+    password: password,
     firstName: fn,
     lastName: ln,
   };
 
+
   const signUpFunc = async () => {
-    signUp(userSignUp).then((success)=>{
-      if (success){
-        router.replace('/');
-      }
-      else{
-        setLoadingScreen(false);
-        // error signing in
-      }
-    });
+    signUp(userSignUpData).then((success)=>{
+       if (success){
+        router.replace({
+          pathname: '/verificationScreen',
+          params: {
+            email: userSignUpData.email,
+            password: userSignUpData.password
+          }
+        });
+       }
+       else{
+          alert('Invalid Email', ` ${email} is already in use`, 'error')
+        }
+     });
   }
-
-
-  useEffect(() => {
-    if (isLoading) {
-      setLoadingScreen(true)
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }).start();
-    } 
-  }, [isLoading]);
 
   return (
     <View style={styles.container}>
-      {loadingScreen && (
-        <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
-          <LoadingScreen />
-        </Animated.View>
-      )}
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Sign Up</Text>
           <TextInput
@@ -78,10 +71,10 @@ export default function SignUp() {
             onChangeText={setPasswordDup}
             secureTextEntry
           />
-          <TouchableOpacity style={styles.button} onPress={signUpFunc}>
+          <TouchableOpacity style={styles.button} onPress={signUpFunc} disabled={isLoading}>
             <Text style={styles.buttonText}>Create Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { router.back() }}>
+          <TouchableOpacity onPress={()=>{ router.back() }} disabled={isLoading}>
             <Text>Back</Text>
           </TouchableOpacity>
         </View>

@@ -1,10 +1,9 @@
-import { Text, useColorScheme, View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
-
 import { useSession } from '../../auth/ctx';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { LoadingScreen } from '../loadingScreen';
+import { LoadingScreenDefault } from '../loadingScreen';
 
 /* 
   App itself (redirect back to landingScreen from here if needed)
@@ -18,7 +17,7 @@ export default function AppLayout() {
   const colorScheme = useColorScheme();
 
   if (isLoading) {
-    return LoadingScreen()
+    return LoadingScreenDefault()
   }
 
   if (!session) {
