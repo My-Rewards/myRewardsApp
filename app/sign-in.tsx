@@ -2,49 +2,38 @@ import { router } from 'expo-router';
 import { Animated, Easing, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
 import { userSignIn } from '@/types/auth';
-import { useState, useEffect } from 'react';
-import { LoadingScreen } from './loadingScreen';
+import { useEffect, useState } from 'react';
+import { useProps } from './LoadingProp/propsProvider';
 
 export default function SignIn() {
   const { signIn, isLoading } = useSession();
   const [email, setEmail] = useState('test@gmail.com');
   const [password, setPassword] = useState('thisIsATest');
-  const [fadeAnim] = useState(new Animated.Value(0));
   const [loadingScreen, setLoadingScreen] = useState(false);
+  const { triggerLoadingScreen, alert } = useProps();
 
   const userSignIn: userSignIn = { email, password };
 
+  useEffect(()=>{
+    triggerLoadingScreen({isLoading})
+  }, [isLoading])
+
   const signInFunc = async () => {
-    signIn(userSignIn).then((success) => {
-      if (success) {
+    signIn(userSignIn).then((status) => {
+      if (status === 'success') {
         router.replace('/');
-      } else {
+      } else if (status === 'unverified'){
+        router.replace('/verificationScreen')
+      }
+        else {
         setLoadingScreen(false)
-        // Handle failed sign-in here
+        alert('Invalid Credentials', 'Please try again', 'error')
       }
     });
   };
 
-  useEffect(() => {
-    let animationDuration = 200;    
-    if (isLoading) {
-      setLoadingScreen(true)
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: animationDuration,
-        easing: Easing.ease,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [isLoading]);
-
   return (
     <View style={styles.container}>
-      {loadingScreen && (
-        <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
-          <LoadingScreen />
-        </Animated.View>
-      )}
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Sign In</Text>
           <TextInput

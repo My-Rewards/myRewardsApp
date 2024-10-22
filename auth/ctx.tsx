@@ -12,13 +12,13 @@ import { userSignIn, userSignUp} from '@/types/auth';
 */
 
 const AuthContext = createContext<{
-  signIn: (profile: userSignIn) => Promise<boolean>; 
+  signIn: (profile: userSignIn) => Promise<string>; 
   signUp: (profile: userSignUp) => Promise<boolean>; 
   signOut: () => void;
   session?: string | null;
   isLoading: boolean;
 }>({
-  signIn: async () => false,
+  signIn: async () => 'error',
   signUp: async () => false,
   signOut: async () => null,
   session: null,
@@ -72,14 +72,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
             if(userSession && userSession.userSub){
               setFetching(false);
-              return true;
+              return 'success';
             }
 
           }catch(error){
             setFetching(false);
+            return 'error';
           }
           try {
-
             const data = await signIn({
               username:profile.email,
               password: profile.password,
@@ -95,14 +95,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
             
             setFetching(false);
             
-            return data.isSignedIn;
+            return data.isSignedIn?'success':'error';
         
           } catch (error) {
             setFetching(false);
-            return false;
+            return 'error';
           }
         },
         signUp: async (profile:userSignUp) => {
+          setFetching(true); 
+
             try {
             // Simulate an async sign-in process (e.g., API call)
             const data = await signUp({
@@ -114,13 +116,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
                 },
               }
             });
+            
+            setFetching(false); 
+            if(!data.userId) return false; else return true;
 
-            console.log(data)
-
-            if(!data.userId) return false;
-
-            return true;
           } catch (error) {
+            setFetching(false); 
             return false;
           }
         },
