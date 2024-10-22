@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - development
+      - master
 jobs:
   update:
     runs-on: ubuntu-latest
