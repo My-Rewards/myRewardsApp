@@ -106,13 +106,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
           setFetching(true); 
 
             try {
-            // Simulate an async sign-in process (e.g., API call)
             const data = await signUp({
               username:profile.email,
               password: profile.password,
               options: {
                 userAttributes: {
                   email:profile.email,
+                  'custom:role': 'customer',
                 },
               }
             });
