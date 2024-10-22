@@ -86,6 +86,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
               options: {
                 userAttributes: {
                   email:profile.email,
+                  'custom:role': 'customer'
                 },
                 autoSignIn: true
               }
@@ -94,7 +95,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             await checkUserSession();
             
             setFetching(false);
-            
+
             return data.isSignedIn?'success':'error';
         
           } catch (error) {
@@ -121,6 +122,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             if(!data.userId) return false; else return true;
 
           } catch (error) {
+            console.log(error)
             setFetching(false); 
             return false;
           }
