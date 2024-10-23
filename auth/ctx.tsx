@@ -1,6 +1,6 @@
 import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut } from 'aws-amplify/auth'
-import { userSignIn, userSignUp} from '@/types/auth';
+import { userSignIn, userSignUp} from '@/params/auth';
 
 // TODO: create DynamoDBClient (create only if authenticating user from unauthenticated)
 
@@ -42,23 +42,30 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const checkUserSession = async () => {
     setFetching(true);
-    try {
-      const currentSession = await fetchAuthSession();
-      if(currentSession.tokens?.idToken && currentSession.userSub){
-        setSession(currentSession.userSub);
-      }else{
-        setSession(null);
-      }
-    } catch (error) {
-      setSession(null);
-    } finally {
-      setFetching(false);
-    }
+
+    // REMOVE THIS WHEN DONE TESTING
+    setSession('testToken');
+    setFetching(false);
+    // 
+
+    // UNCOMMENT THIS AFTER TESTING
+    // try {
+    //   const currentSession = await fetchAuthSession();
+    //   if(currentSession.tokens?.idToken && currentSession.userSub){
+    //     setSession(currentSession.userSub);
+    //   }else{
+    //     setSession(null);
+    //   }
+    // } catch (error) {
+    //   setSession(null);
+    // } finally {
+    //   setFetching(false);
+    // }
   };
 
-  useEffect(() => {
-    checkUserSession(); 
-  }, []);
+  // useEffect(() => {
+  //   checkUserSession(); 
+  // }, []);
 
   return (
     <AuthContext.Provider
@@ -66,6 +73,17 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (profile:userSignIn) => {
           setFetching(true); 
 
+          // REMOVE THIS AFTER TESTING
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              setFetching(false); 
+              checkUserSession();
+
+              resolve('success'); // Return true after the delay
+            }, 1000);
+          });
+          // 
+          
           try{
             // is Authenticated
             const userSession = await fetchAuthSession();
@@ -102,10 +120,20 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setFetching(false);
             return 'error';
           }
+            
         },
         signUp: async (profile:userSignUp) => {
           setFetching(true); 
 
+          // REMOVE WHEN DONE TEXTING
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              setFetching(false); 
+              resolve(true); // Return true after the delay
+            }, 1000);
+          });
+          // 
+          
             try {
             const data = await signUp({
               username:profile.email,

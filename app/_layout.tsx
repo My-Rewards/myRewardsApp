@@ -9,7 +9,7 @@ import { PropsProvider } from './LoadingProp/propsProvider';
   Main App screen components landing screen & app itself
 */
 
-Amplify.configure(amplifyConfiguration());
+Amplify.configure(amplifyConfiguration);
 
 export default function Root() {
 

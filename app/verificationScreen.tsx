@@ -2,7 +2,7 @@ import { useSession } from "@/auth/ctx";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, AppState, AppStateStatus, Button} from "react-native"
-import { userSignIn } from '@/types/auth';
+import { userSignIn } from '@/params/auth';
 import { useProps } from "./LoadingProp/propsProvider";
 
 export default function verificationScreen(){

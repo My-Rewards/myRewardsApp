@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import {Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
-import { userSignUp } from '@/types/auth';
+import { userSignUp } from '@/params/auth';
 import { useProps } from './LoadingProp/propsProvider';
 
 export default function SignUp() {

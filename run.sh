@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# Get configuration
+
+# Fetch parameters from SSM
+echo "Fethcing AWS Parameters"
+PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1)
+
+# Extract the values using jq
+USER_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/userPoolId").Value')
+WEB_CLIENT_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/webClientId").Value')
+COGNITO_DOMAIN=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/cognitoDomain").Value')
+IDENTITY_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/identityPoolId").Value')
+
+echo "EXPO_PUBLIC_USER_POOL_ID=$USER_POOL_ID" > .env
+echo "EXPO_PUBLIC_WEB_CLIENT_ID=$WEB_CLIENT_ID" >> .env
+echo "EXPO_PUBLIC_COGNITO_DOMAIN=$COGNITO_DOMAIN" >> .env
+echo "EXPO_PUBLIC_IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> .env
+echo "EXPO_PUBLIC_AWS_REGION=us-east-1" >> .env
+
+echo ".env file updated successfully!"
+
 # Detect the operating system
 os="$(uname)"
 default_platform=""
