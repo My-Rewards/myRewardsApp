@@ -1,5 +1,6 @@
 ![Update Expo Workflow Status](https://github.com/My-Rewards/myRewardsApp/actions/workflows/Update_Expo.yml/badge.svg)
 
+![Update Expo Workflow Status](https://github.com/My-Rewards/myRewardsApp/actions/workflows/Update_Expo_Prod.yml/badge.svg)
 
 # myRewards app
 
