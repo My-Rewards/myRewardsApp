@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Animated, Easing, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
-import { userSignIn } from '@/types/auth';
+import { userSignIn } from '@/params/auth';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
 

@@ -1,6 +1,6 @@
 import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut } from 'aws-amplify/auth'
-import { userSignIn, userSignUp} from '@/types/auth';
+import { userSignIn, userSignUp} from '@/params/auth';
 
 // TODO: create DynamoDBClient (create only if authenticating user from unauthenticated)
 
@@ -83,9 +83,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             }, 1000);
           });
           // 
-
-          // UNCOMMENT THIS AFTER TESTING
-          /*
+          
           try{
             // is Authenticated
             const userSession = await fetchAuthSession();
@@ -122,7 +120,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setFetching(false);
             return 'error';
           }
-            */
+            
         },
         signUp: async (profile:userSignUp) => {
           setFetching(true); 
@@ -135,28 +133,27 @@ export function SessionProvider({ children }: PropsWithChildren) {
             }, 1000);
           });
           // 
-
-          // UNCOMMENT THIS AFTER TESTING
-          //   try {
-          //   const data = await signUp({
-          //     username:profile.email,
-          //     password: profile.password,
-          //     options: {
-          //       userAttributes: {
-          //         email:profile.email,
-          //         'custom:role': 'customer',
-          //       },
-          //     }
-          //   });
+          
+            try {
+            const data = await signUp({
+              username:profile.email,
+              password: profile.password,
+              options: {
+                userAttributes: {
+                  email:profile.email,
+                  'custom:role': 'customer',
+                },
+              }
+            });
             
-          //   setFetching(false); 
-          //   if(!data.userId) return false; else return true;
+            setFetching(false); 
+            if(!data.userId) return false; else return true;
 
-          // } catch (error) {
-          //   console.log(error)
-          //   setFetching(false); 
-          //   return false;
-          // }
+          } catch (error) {
+            console.log(error)
+            setFetching(false); 
+            return false;
+          }
         },
         signOut: () => {
           signOut();
