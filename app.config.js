@@ -1,20 +1,20 @@
 export default () => {
-    const isProd = process.env.APP_ENV === 'production';
+    const isProd = process.env.APP_ENV === 'prod';
 
     if(!isProd){
         return {
-            name: 'myRewards',
+            name: 'myRewardsApp',
             ios: {
               bundleIdentifier: isProd ? 'com.my.app' : 'com.anonymous.myRewards',
             },
             extra: {
               eas: {
-                projectId: "e06129e6-3069-486e-8da0-02654828d330"
+                projectId: "4e3dda5a-96f6-4d5f-89fe-af470de180a8"
               }
             },
             owner: "myrewards",
             updates: {
-                "url": "https://u.expo.dev/e06129e6-3069-486e-8da0-02654828d330"
+                "url": "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8"
               },
               runtimeVersion: {
                 "policy": "appVersion"
@@ -31,7 +31,7 @@ export default () => {
 
     }else{
         return {
-            name: 'myRewards-Prod',
+            name: 'myRewardsApp-Prod',
             ios: {
               bundleIdentifier: isProd ? 'com.my.app' : 'com.anonymous.myRewards',
             },
@@ -42,7 +42,7 @@ export default () => {
             },
             owner: "myrewards",
             updates: {
-                "url": "https://u.expo.dev/e06129e6-3069-486e-8da0-02654828d330"
+                "url": "https://u.expo.dev/988bf54c-1d84-4d0b-a539-7be1ee48f0dd"
               },
             runtimeVersion: {
                 "policy": "appVersion"
