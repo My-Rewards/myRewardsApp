@@ -1,3 +1,7 @@
+![Update Expo Workflow Status](https://github.com/My-Rewards/myRewardsApp/actions/workflows/Update_Expo.yml/badge.svg)
+
+![Update Expo Workflow Status](https://github.com/My-Rewards/myRewardsApp/actions/workflows/Update_Expo_Prod.yml/badge.svg)
+
 # myRewards app
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
