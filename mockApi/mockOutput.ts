@@ -1,0 +1,1 @@
+// In order to speed development any apis that dont exist can be mocked here for development and frontend implementation
