@@ -12,7 +12,21 @@ export default () => {
                 projectId: "e06129e6-3069-486e-8da0-02654828d330"
               }
             },
-            owner: "myrewards"
+            owner: "myrewards",
+            updates: {
+                "url": "https://u.expo.dev/e06129e6-3069-486e-8da0-02654828d330"
+              },
+              runtimeVersion: {
+                "policy": "appVersion"
+              },
+              android: {
+                "runtimeVersion": {
+                  "policy": "appVersion"
+                }
+              },
+              ios: {
+                "runtimeVersion": "1.0.0"
+              }
           };
 
     }else{
@@ -26,7 +40,21 @@ export default () => {
                 projectId: "988bf54c-1d84-4d0b-a539-7be1ee48f0dd"
               }
             },
-            owner: "myrewards"
+            owner: "myrewards",
+            updates: {
+                "url": "https://u.expo.dev/e06129e6-3069-486e-8da0-02654828d330"
+              },
+            runtimeVersion: {
+                "policy": "appVersion"
+              },
+              android: {
+                "runtimeVersion": {
+                  "policy": "appVersion"
+                }
+              },
+              ios: {
+                "runtimeVersion": "1.0.0"
+              }
           };
     }
   };
