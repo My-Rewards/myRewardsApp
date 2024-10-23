@@ -12,10 +12,10 @@ WEB_CLIENT_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsA
 COGNITO_DOMAIN=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/cognitoDomain").Value')
 IDENTITY_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/identityPoolId").Value')
 
-echo "EXPO_PUBLIC_USER_POOL_ID_BETA=$USER_POOL_ID" > .env
-echo "EXPO_PUBLIC_WEB_CLIENT_ID_BETA=$WEB_CLIENT_ID" >> .env
-echo "EXPO_PUBLIC_COGNITO_DOMAIN_BETA=$COGNITO_DOMAIN" >> .env
-echo "EXPO_PUBLIC_IDENTITY_POOL_ID_BETA=$IDENTITY_POOL_ID" >> .env
+echo "EXPO_PUBLIC_USER_POOL_ID=$USER_POOL_ID" > .env
+echo "EXPO_PUBLIC_WEB_CLIENT_ID=$WEB_CLIENT_ID" >> .env
+echo "EXPO_PUBLIC_COGNITO_DOMAIN=$COGNITO_DOMAIN" >> .env
+echo "EXPO_PUBLIC_IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> .env
 echo "EXPO_PUBLIC_AWS_REGION=us-east-1" >> .env
 
 echo ".env file updated successfully!"
