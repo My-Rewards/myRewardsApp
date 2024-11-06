@@ -4,6 +4,9 @@ import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
 import { userSignUp } from '@/params/auth';
 import { useProps } from './LoadingProp/propsProvider';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
+
+// Sign Up + Sign In button currently mocking signing In to not exceed amplify 50 sign up daily limit for free tier
 
 export default function SignUp() {
   const { signUp, isLoading } = useSession();
@@ -77,6 +80,11 @@ export default function SignUp() {
           <TouchableOpacity onPress={()=>{ router.back() }} disabled={isLoading}>
             <Text>Back</Text>
           </TouchableOpacity>
+          <GoogleSigninButton
+        size={GoogleSigninButton.Size.Standard}
+        color={GoogleSigninButton.Color.Light}
+        onPress={() => {console.log('sign Up with google')}}
+      />
         </View>
     </View>
   );
