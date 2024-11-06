@@ -1,9 +1,12 @@
 import { router } from 'expo-router';
-import { Animated, Easing, Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
 import { userSignIn } from '@/params/auth';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
+
+// Sign Up + Sign In button currently mocking signing In to not exceed amplify 50 sign up daily limit for free tier
 
 export default function SignIn() {
   const { signIn, isLoading } = useSession();
@@ -57,6 +60,11 @@ export default function SignIn() {
           <TouchableOpacity onPress={() => { router.back() }}>
             <Text>Back</Text>
           </TouchableOpacity>
+          <GoogleSigninButton
+        size={GoogleSigninButton.Size.Standard}
+        color={GoogleSigninButton.Color.Light}
+        onPress={() => {console.log('sign in with google')}}
+      />
         </View>
     </View>
   );
@@ -107,5 +115,5 @@ const styles = StyleSheet.create({
     width:'100%',
     alignItems:'center',
     justifyContent:'center'
-  }
+  },
 });
