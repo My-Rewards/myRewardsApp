@@ -77,8 +77,8 @@ export default function SignUp() {
           <TouchableOpacity style={styles.button} onPress={signUpFunc} disabled={isLoading}>
             <Text style={styles.buttonText}>Create Account</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{ router.back() }} disabled={isLoading}>
-            <Text>Back</Text>
+          <TouchableOpacity onPress={()=>{ router.replace('/sign-in') }} disabled={isLoading}>
+            <Text>Already have an Account? Sign In</Text>
           </TouchableOpacity>
           <GoogleSigninButton
         size={GoogleSigninButton.Size.Standard}

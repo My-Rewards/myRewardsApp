@@ -21,7 +21,7 @@ export default function AppLayout() {
   }
 
   if (!session) {
-    return <Redirect href="/landingScreen" />;
+    return <Redirect href="/sign-in" />;
   }
 
   return (
