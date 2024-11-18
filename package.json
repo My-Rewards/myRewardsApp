@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "production": "eas build --auto-submit"
+    "production": "eas build --auto-submit",
+    "run": "./run.sh"
   },
   "jest": {
     "preset": "jest-expo"
