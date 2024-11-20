@@ -3,7 +3,7 @@
 # Get configuration
 
 # Fetch parameters from SSM
-echo "Fethcing AWS Parameters"
+echo "Fetching AWS Parameters"
 PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1)
 
 # Extract the values using jq
