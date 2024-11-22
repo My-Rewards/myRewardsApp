@@ -1,89 +1,91 @@
 import { router } from 'expo-router';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import {Text, View, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
 import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
 import { userSignUp } from '@/params/auth';
 import { useProps } from './LoadingProp/propsProvider';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
+// Sign Up + Sign In button currently mocking signing In to not exceed amplify 50 sign up daily limit for free tier
+
 export default function SignUp() {
   const { signUp, isLoading } = useSession();
   const { triggerLoadingScreen, alert } = useProps();
+  
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('thisIsATest');
+  const [passwordDup, setPasswordDup] = useState('thisIsATest');
+  const [fn, setFn] = useState('test');
+  const [ln, setLn] = useState('test');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordDup, setPasswordDup] = useState('');
 
-  useEffect(() => {
-    triggerLoadingScreen({ isLoading });
-  }, [isLoading]);
+  useEffect(()=>{
+    triggerLoadingScreen({isLoading})
+  }, [isLoading])
 
-  const userSignUpData = {
-    email: email,
+  const userSignUpData: userSignUp = {
+    email: email, 
     password: password,
-    firstName: 'FirstName',
-    lastName: 'LastName',
+    firstName: fn,
+    lastName: ln,
   };
 
+
   const signUpFunc = async () => {
-    signUp(userSignUpData).then((success) => {
-      if (success) {
+    signUp(userSignUpData).then((success)=>{
+       if (success){
         router.replace({
           pathname: '/verificationScreen',
           params: {
             email: userSignUpData.email,
-            password: userSignUpData.password,
-          },
+            password: userSignUpData.password
+          }
         });
-      } else {
-        alert('Invalid Email', `${email} is already in use`, 'error');
-      }
-    });
-  };
+       }
+       else{
+          alert('Invalid Email', ` ${email} is already in use`, 'error')
+        }
+     });
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.contentContainer}>
-      <Image source={require('../assets/images/myRewardsLogo.png')} style={styles.logo} />
-      <Text style={styles.titleText}>Login to your account</Text>
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity onPress={() => { /* Navigate to forgot password */ }}>
-          <Text style={styles.linkText}>Forgot password? Click here</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.signInButton} onPress={signUpFunc} disabled={isLoading}>
-          <Text style={styles.signInButtonText}>sign in</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.orText}>or sign in with</Text>
-        
-        <GoogleSigninButton
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Light}
-          onPress={() => { console.log('sign in with Google'); }}
-        />
-
-        <TouchableOpacity onPress={() => { /* Navigate to sign up */ }}>
-          <Text style={styles.footerText}>Don’t have an account? <Text style={styles.signUpLinkText}>Sign up</Text></Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.contentContainer}>
+          <Text style={styles.headerText}>Sign Up</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password Confirmation"
+            value={passwordDup}
+            onChangeText={setPasswordDup}
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.button} onPress={signUpFunc} disabled={isLoading}>
+            <Text style={styles.buttonText}>Create Account</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=>{ router.back() }} disabled={isLoading}>
+            <Text>Back</Text>
+          </TouchableOpacity>
+          <GoogleSigninButton
+        size={GoogleSigninButton.Size.Standard}
+        color={GoogleSigninButton.Color.Light}
+        onPress={() => {console.log('sign Up with google')}}
+      />
+        </View>
     </View>
   );
 }
@@ -91,70 +93,47 @@ export default function SignUp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAF3ED',
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  contentContainer: {
-    width: '100%',
     alignItems: 'center',
+    padding: 16,
+    position: 'relative',
   },
-  logo: {
-    resizeMode: 'contain',
-    marginBottom: 30, 
-  },
-  titleText: {
-    fontSize: 29,
-    fontWeight: '700',
-    lineHeight: 39.61,
-    textAlign: 'center',
-    color: '#F98B4E',
-    fontFamily: 'Avenir Next',
-    marginBottom: 20,  
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#D8C1A0',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 10, // Spacing between email and password boxes
-  },
-  linkText: {
-    color: '#F98B4E',
-    textAlign: 'left', // Align text to the left
-    width: '100%',
-    marginTop: 5,      // Space between password input and "Forgot password?" link
+  headerText: {
+    fontSize: 24,
     marginBottom: 20,
   },
-  signInButton: {
-    backgroundColor: '#F35E43',
+  input: {
+    height: 40,
     width: '100%',
-    height: 50,
-    borderRadius: 8,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginVertical: 8,
+  },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 8,
+    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
   },
-  signInButtonText: {
-    color: '#ffffff',
+  buttonText: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
-    fontFamily: 'Avenir Next'
   },
-  orText: {
-    color: '#F98B4E',
-    marginVertical: 10,
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
-  footerText: {
-    color: '#F35E43',
-    fontFamily: 'Avenir Next',
-    marginTop: 20,
-  },
-  signUpLinkText: {
-    color: '#F98B4E',
-    fontWeight: 'bold',
-  },
+  contentContainer:{
+    flex:1, 
+    width:'100%',
+    alignItems:'center',
+    justifyContent:'center'
+  }
 });
