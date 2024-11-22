@@ -1,75 +1,71 @@
 import { router } from 'expo-router';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
 import { userSignIn } from '@/params/auth';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
+// Sign Up + Sign In button currently mocking signing In to not exceed amplify 50 sign up daily limit for free tier
+
 export default function SignIn() {
   const { signIn, isLoading } = useSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('thisIsATest');
+  const [loadingScreen, setLoadingScreen] = useState(false);
   const { triggerLoadingScreen, alert } = useProps();
 
-  useEffect(() => {
-    triggerLoadingScreen({ isLoading });
-  }, [isLoading]);
+  const userSignIn: userSignIn = { email, password };
+
+  useEffect(()=>{
+    triggerLoadingScreen({isLoading})
+  }, [isLoading])
 
   const signInFunc = async () => {
-    signIn({ email, password }).then((status) => {
+    signIn(userSignIn).then((status) => {
       if (status === 'success') {
         router.replace('/');
-      } else if (status === 'unverified') {
-        router.replace('/verificationScreen');
-      } else {
-        alert('Invalid Credentials', 'Please try again', 'error');
+      } else if (status === 'unverified'){
+        router.replace('/verificationScreen')
+      }
+        else {
+        setLoadingScreen(false)
+        alert('Invalid Credentials', 'Please try again', 'error')
       }
     });
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: "/path/to/MyRewardsLogo.png" }}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.headerText}>Login to your account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TouchableOpacity onPress={() => router.push('/forgot-password')}>
-        <Text style={styles.forgotPassword}>Forgot password? Click here</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.signInButton} onPress={signInFunc}>
-        <Text style={styles.signInButtonText}>sign in</Text>
-      </TouchableOpacity>
-      <Text style={styles.orText}>or sign in with</Text>
-      <GoogleSigninButton
+        <View style={styles.contentContainer}>
+          <Text style={styles.headerText}>Sign In</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.button} onPress={signInFunc}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { router.back() }}>
+            <Text>Back</Text>
+          </TouchableOpacity>
+          <GoogleSigninButton
         size={GoogleSigninButton.Size.Standard}
         color={GoogleSigninButton.Color.Light}
-        onPress={() => console.log('sign in with google')}
-        style={styles.googleButton}
+        onPress={() => {console.log('sign in with google')}}
       />
-      <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => router.push('/sign-up')}>
-          <Text style={styles.signUpLink}>Sign up</Text>
-        </TouchableOpacity>
-      </View>
+        </View>
     </View>
   );
 }
@@ -80,78 +76,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#F8F6F1', // "primary off white" color
-  },
-  logo: {
-    width: 200,
-    height: 60,
-    marginBottom: 20,
+    position: 'relative',
   },
   headerText: {
     fontSize: 24,
-    fontWeight: '700', // Ensures bold text
-    color: '#FF6B4A',
-    marginBottom: 30,
-    textAlign: 'center',
-    fontFamily: 'Avenir Next', // Ensure this font is loaded
+    marginBottom: 20,
   },
   input: {
-    height: 50,
-    width: '90%',
+    height: 40,
+    width: '100%',
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderColor: '#E8E8E8',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    fontSize: 16,
-    fontFamily: 'Avenir Next', // Ensure this font is loaded
-    backgroundColor: '#FFF', // Matches design with white background for input fields
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginVertical: 8,
   },
-  forgotPassword: {
-    color: '#FF6B4A',
-    fontSize: 14,
-    alignSelf: 'flex-start',
-    marginLeft: '5%',
-    marginBottom: 20,
-    textDecorationLine: 'underline', // Underline to match design
-  },
-  signInButton: {
-    backgroundColor: '#FF6B4A',
-    paddingVertical: 12,
-    borderRadius: 25, // Rounded button edges
-    width: '90%', // Matches button width in design
+  button: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 8,
+    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15,
   },
-  signInButtonText: {
+  buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Avenir Next',
-    textTransform: 'lowercase', // Matches lowercase text from design
   },
-  orText: {
-    color: '#666',
-    fontSize: 14,
-    marginVertical: 15,
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
-  googleButton: {
-    width: '90%',
-    height: 48,
-    marginBottom: 30,
-  },
-  signUpContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
-  },
-  signUpText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  signUpLink: {
-    color: '#FF6B4A',
-    fontSize: 14,
-    textDecorationLine: 'underline', // Underline to match design
+  contentContainer:{
+    flex:1, 
+    width:'100%',
+    alignItems:'center',
+    justifyContent:'center'
   },
 });

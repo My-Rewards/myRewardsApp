@@ -17,7 +17,17 @@ export default function Root() {
     <PropsProvider>
       <SessionProvider>
           <Stack>
-          <Stack.Screen name={'sign-in'} 
+            <Stack.Screen name={'landingScreen'}
+            options={{
+              headerShown:false,
+              animation:'fade'
+              }} />
+            <Stack.Screen name={'verificationScreen'} 
+            options={{
+              headerShown:false,
+              animation:'slide_from_right'
+              }} />
+            <Stack.Screen name={'sign-in'} 
             options={{
               headerShown:false
               }} />
@@ -29,11 +39,6 @@ export default function Root() {
             options={{
               headerShown:false,
               animation:'fade'
-              }} />
-            <Stack.Screen name={'verificationScreen'} 
-            options={{
-              headerShown:false,
-              animation:'slide_from_right'
               }} />
           </Stack>
       </SessionProvider>
