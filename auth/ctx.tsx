@@ -77,7 +77,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
               setFetching(false); 
               checkUserSession();
 
-              resolve('error'); // Return true after the delay
+              resolve('success'); // Return true after the delay
             }, 1000);
           });
           // 
