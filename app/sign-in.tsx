@@ -23,7 +23,7 @@ export default function SignIn() {
       } else if (status === 'unverified') {
         router.replace('/verificationScreen');
       } else {
-        alert('Invalid Credentials', 'Please try again', 'error');
+        alert('', 'Invalid email or password', 'error');
       }
     });
   };
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#F8F6F1', // "primary off white" color
+    backgroundColor: '#F8F6F1', 
   },
   logo: {
     width: 200,
@@ -89,11 +89,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 24,
-    fontWeight: '700', // Ensures bold text
+    fontWeight: '700', 
     color: '#FF6B4A',
     marginBottom: 30,
     textAlign: 'center',
-    fontFamily: 'Avenir Next', // Ensure this font is loaded
+    fontFamily: 'Avenir Next', 
   },
   input: {
     height: 50,
@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
-    fontFamily: 'Avenir Next', // Ensure this font is loaded
-    backgroundColor: '#FFF', // Matches design with white background for input fields
+    fontFamily: 'Avenir Next', 
+    backgroundColor: '#FFF', 
   },
   forgotPassword: {
     color: '#FF6B4A',
@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginLeft: '5%',
     marginBottom: 20,
-    textDecorationLine: 'underline', // Underline to match design
+    textDecorationLine: 'underline',
   },
   signInButton: {
     backgroundColor: '#FF6B4A',
     paddingVertical: 12,
-    borderRadius: 25, // Rounded button edges
-    width: '90%', // Matches button width in design
+    borderRadius: 12,
+    width: '90%', 
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 15,

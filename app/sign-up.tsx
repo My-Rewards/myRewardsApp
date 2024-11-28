@@ -2,7 +2,6 @@ import { router } from 'expo-router';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
-import { userSignUp } from '@/params/auth';
 import { useProps } from './LoadingProp/propsProvider';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
@@ -44,8 +43,7 @@ export default function SignUp() {
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
-      <Image source={require('../assets/images/myRewardsLogo.png')} style={styles.logo} />
-      <Text style={styles.titleText}>Login to your account</Text>
+      <Text style={styles.titleText}>Welcome!</Text>
         
         <TextInput
           style={styles.input}
@@ -80,8 +78,8 @@ export default function SignUp() {
           onPress={() => { console.log('sign in with Google'); }}
         />
 
-        <TouchableOpacity onPress={() => { /* Navigate to sign up */ }}>
-          <Text style={styles.footerText}>Don’t have an account? <Text style={styles.signUpLinkText}>Sign up</Text></Text>
+        <TouchableOpacity onPress={() => { router.back() }}>
+          <Text style={styles.footerText}>Already have an account? <Text style={styles.signUpLinkText}>Sign In</Text></Text>
         </TouchableOpacity>
       </View>
     </View>
