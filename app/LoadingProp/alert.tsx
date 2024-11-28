@@ -119,9 +119,10 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
   alertBox: {
-    borderRadius: 10,
+    borderRadius: 20,
     opacity:0.8,
     padding: 15,
+    paddingVertical:20,
     width: '100%',
     shadowColor: 'black',
     display:'flex',
@@ -135,10 +136,10 @@ const style = StyleSheet.create({
     shadowRadius: 4
   },
   successColor:{
-    backgroundColor:'#4cb340'
+    backgroundColor:'#407C9C'
   },
   errorColor:{
-    backgroundColor: '#d13232',
+    backgroundColor: '#EF5E43',
   },
   title: {
     fontWeight: 'bold',

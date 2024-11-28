@@ -3,6 +3,7 @@
 # Fetch available SSO profiles from the AWS config file
 echo "Fetching available SSO profiles..."
 
+
 if [[ ! -f ~/.aws/config ]]; then
     echo "AWS config file not found. Please configure AWS CLI with 'aws configure sso'."
     exit 1
