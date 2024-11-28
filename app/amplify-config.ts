@@ -9,7 +9,7 @@ export const amplifyConfiguration:ResourcesConfig = {
       loginWith: { 
         oauth: {
           domain: process.env.EXPO_PUBLIC_COGNITO_DOMAIN||'',
-          scopes: ['openid','email','profile','aws.cognito.signin.user.admin'],
+          scopes: ['openid','email','profile'],
           redirectSignIn: ['exp://127.0.0.1:19000/--/'],
           redirectSignOut: ['exp://127.0.0.1:19000/--/'],
           responseType: 'code',

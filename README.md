@@ -2,6 +2,17 @@
 
 ![Prod Workflow Status](https://github.com/My-Rewards/myRewardsApp/actions/workflows/Update_Expo_Prod.yml/badge.svg?branch=master)
 
+## This App requires SSO autenthication with AWS to run
+
+[Setting up SSO](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html#sso-configure-profile-token-auto-sso)
+
+To authenticate with SSO follow instructions in portal.
+Run the below to configure sso Profile
+
+```
+aws configure sso
+```
+
 # myRewards app
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -63,11 +74,9 @@ export AWS_SESSION_TOKEN= xxxxx
    ```
     ./run.sh
    ```
-
-##### 1.1 Manually running simulator (in case run.sh doesn't work)
-
-   ```bash
-    npx expo run:ios or npx expo start
+or 
+   ```
+    npm run-script run
    ```
 
 In the output, you'll find options to open the app in a
