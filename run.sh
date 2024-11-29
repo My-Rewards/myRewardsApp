@@ -43,6 +43,7 @@ echo "EXPO_PUBLIC_WEB_CLIENT_ID=$WEB_CLIENT_ID" >> .env
 echo "EXPO_PUBLIC_COGNITO_DOMAIN=$COGNITO_DOMAIN" >> .env
 echo "EXPO_PUBLIC_IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> .env
 echo "EXPO_PUBLIC_AWS_REGION=us-east-1" >> .env
+echo "APP_ENV=dev" >> .env
 
 echo ".env file updated successfully!"
 

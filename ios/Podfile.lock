@@ -14,6 +14,8 @@ PODS:
   - EXConstants (16.0.2):
     - ExpoModulesCore
   - EXJSONUtils (0.13.1)
+  - EXLocation (17.0.1):
+    - ExpoModulesCore
   - EXManifests (0.14.3):
     - ExpoModulesCore
   - Expo (51.0.38):
@@ -150,7 +152,7 @@ PODS:
     - FBLazyVector (= 0.74.6)
     - RCTRequired (= 0.74.6)
     - React-Core (= 0.74.6)
-  - ReachabilitySwift (5.2.3)
+  - ReachabilitySwift (5.2.4)
   - React (0.74.6):
     - React-Core (= 0.74.6)
     - React-Core/DevSupport (= 0.74.6)
@@ -1378,6 +1380,7 @@ DEPENDENCIES:
   - EASClient (from `../node_modules/expo-eas-client/ios`)
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - EXJSONUtils (from `../node_modules/expo-json-utils/ios`)
+  - EXLocation (from `../node_modules/expo-location/ios`)
   - EXManifests (from `../node_modules/expo-manifests/ios`)
   - Expo (from `../node_modules/expo`)
   - "ExpoAdapterGoogleSignIn (from `../node_modules/@react-native-google-signin/google-signin/expo/ios`)"
@@ -1482,6 +1485,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-constants/ios"
   EXJSONUtils:
     :path: "../node_modules/expo-json-utils/ios"
+  EXLocation:
+    :path: "../node_modules/expo-location/ios"
   EXManifests:
     :path: "../node_modules/expo-manifests/ios"
   Expo:
@@ -1648,6 +1653,7 @@ SPEC CHECKSUMS:
   EASClient: 1509a9a6b48b932ec61667644634daf2562983b8
   EXConstants: 409690fbfd5afea964e5e9d6c4eb2c2b59222c59
   EXJSONUtils: 30c17fd9cc364d722c0946a550dfbf1be92ef6a4
+  EXLocation: 43e9b582ca63a23c6f0a18d8cbe2145b3a388b55
   EXManifests: c1fab4c3237675e7b0299ea8df0bcb14baca4f42
   Expo: 9b6666ef2fedcfc89c5b9be2aa1ce12b81f9e7f5
   ExpoAdapterGoogleSignIn: da10ae7e7c1d73a10c2facebcdfe5ebea8e073ce
@@ -1675,7 +1681,7 @@ SPEC CHECKSUMS:
   RCTDeprecation: 5f1d7e1f8ef6c53f0207e3ac0d0ca23575e8a6ab
   RCTRequired: dcfd24ece09940bbf24b7c2974f4eb68a9baee55
   RCTTypeSafety: 3d65944055cc73f3bb28c3f05c7eaff2bb7ceb83
-  ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
+  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
   React: c5e9f3c07a890a7e2a1ec9b79faa5c53dd7aee01
   React-callinvoker: 9ac986dbbd0e1b3463cb740b12c0b37dbcd15fed
   React-Codegen: f5bd8446ba2b7d4a7bb4b25e137f44f286eb98f7
@@ -1733,6 +1739,6 @@ SPEC CHECKSUMS:
   sqlite3: 02d1f07eaaa01f80a1c16b4b31dfcbb3345ee01a
   Yoga: 4f4f07a17818e76d1b04edc01b68b6d49a682100
 
-PODFILE CHECKSUM: ed238e4d02ec6689061e4ee65c97c9a32116208c
+PODFILE CHECKSUM: 58b4a8ba6c3c553e9c51330e80f47f74318ec42a
 
 COCOAPODS: 1.15.2

@@ -5,6 +5,8 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { LoadingScreenDefault } from '../loadingScreen';
 import {AppData} from '../../app-data/appData'
 import { color_pallete } from '@/constants/Colors';
+import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import React from 'react';
 
 /* 
   App itself (redirect back to landingScreen from here if needed)
@@ -29,9 +31,9 @@ export default function AppLayout() {
       <Tabs
         screenOptions={{
           headerShown: true,
-          headerStyle: [styles.header,{borderBottomColor:color_pallete[2]}],
+          headerStyle: [styles.header],
           headerTitleAlign: 'left',
-          headerTitleStyle: [styles.headerText,{color:color_pallete[2]}],
+          headerTitleStyle: [styles.headerText],
           tabBarStyle: {
             backgroundColor: color_pallete[0],
             paddingTop:5,
@@ -99,6 +101,12 @@ export default function AppLayout() {
               Map
             </Text>
           ),
+          header: () => (
+            <View style={[styles.header, {paddingBottom:5}]}>
+              <SafeAreaView />
+              <Text style={styles.headerText}>Map</Text>
+            </View>
+          )
         }}
       />
       <Tabs.Screen
@@ -143,6 +151,12 @@ export default function AppLayout() {
               Plans
             </Text>
           ),
+          header: () => (
+            <View style={[styles.header, {paddingBottom:5}]}>
+              <SafeAreaView />
+              <Text style={styles.headerText}>Rewards</Text>
+            </View>
+          )
         }}
       />
       <Tabs.Screen
@@ -163,12 +177,20 @@ export default function AppLayout() {
               Profile
             </Text>
           ),
+          header: () => (
+            <View style={[styles.header, {paddingBottom:5}]}>
+              <SafeAreaView />
+              <Text style={styles.headerText}>Profile</Text>
+            </View>
+          )
         }}
       />
     </Tabs>
   </AppData>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   header:{
@@ -181,13 +203,15 @@ const styles = StyleSheet.create({
     shadowOffset:{
       height:5,
       width:0
-    }
+    },
+    borderBottomColor:color_pallete[2],
   },
   headerText:{
     fontSize: 30,
     paddingLeft:'4%', 
     fontWeight: 'bold',
-    fontFamily:'Avenir Next'
+    fontFamily:'Avenir Next',
+    color:color_pallete[2],
   },
   searchBar:{
     display:'flex',
@@ -199,12 +223,12 @@ const styles = StyleSheet.create({
     borderColor: color_pallete[3],
     borderWidth:2,
     borderRadius:10,
-    gap:5
+    gap:5,
   },
   searchBarText:{
     fontFamily:'Avenir Next',
     fontSize:15,
     display:'flex',
-    flex:1
+    flex:1,
   }
 })

@@ -9,6 +9,7 @@ import { PropsProvider } from './LoadingProp/propsProvider';
   Main App screen components landing screen & app itself
 */
 
+console.warn = () => {};
 Amplify.configure(amplifyConfiguration);
 
 export default function Root() {
@@ -19,7 +20,8 @@ export default function Root() {
         <Stack>
           <Stack.Screen name={'sign-in'} 
             options={{
-              headerShown:false
+              headerShown:false,
+              animation:'none'
               }} />
             <Stack.Screen name={'sign-up'} 
             options={{

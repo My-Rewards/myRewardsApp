@@ -1,17 +1,282 @@
-import { Text, View } from 'react-native';
-import { useSession } from '../../auth/ctx';
+import { color_pallete } from '@/constants/Colors';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, Image, Animated, PanResponder, Dimensions } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import { ExpandedShop } from './page2/shopPreview';
+import * as Location from 'expo-location';
+import { useProps } from '../LoadingProp/propsProvider';
 
-export default function page2() {
-  const { signOut } = useSession();
+
+const { height } = Dimensions.get('window');
+const MODAL_COLLAPSED_HEIGHT = height * 0.4;
+const MODAL_EXPANDED_HEIGHT = height * 0.8;
+const MAP_COLLAPSED_HEIGHT = height * 0.61;
+const MAP_EXPANDED_HEIGHT = height * 0.21;
+
+export type PinPointProps = {
+  latitude: number;
+  longitude: number;
+  id:string;
+  name:string;
+  description:string;
+  logo:string
+  onPress: () => void;
+};
+
+
+export default function CustomMap() {
+  const { alert } = useProps();
+
+  const [selectedPin, setSelectedPin] = useState<PinPointProps | null>(null);
+  const translateY = useRef(new Animated.Value(height)).current;
+  const mapHeight = useRef(new Animated.Value(height)).current;
+  const [isExpanded, setIsExpanded] = useState(false); 
+  const [region, setRegion] = useState({
+    latitude: 28.5384,
+    longitude: -81.3789,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+
+  useEffect(() => {
+    async function getCurrentLocation() {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        alert('', 'Enable Access to your Location in Settings', 'error');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,      
+      })
+    }
+
+    getCurrentLocation();
+  }, []);
+
+  useEffect(()=>{
+    if(isExpanded && selectedPin){
+      setRegion({
+        latitude: selectedPin.latitude,
+        longitude: selectedPin.longitude,
+        latitudeDelta: 0.006,
+        longitudeDelta: 0.006,   
+      })
+    }
+  },[isExpanded])
+
+  const openModal = (selectedPin:PinPointProps) => {
+    setSelectedPin(selectedPin);
+    setIsExpanded(false);
+
+    Animated.timing(translateY, {
+      toValue: height - MODAL_COLLAPSED_HEIGHT,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(mapHeight, {
+      toValue: MAP_COLLAPSED_HEIGHT,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(translateY, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setSelectedPin(null));
+    Animated.timing(mapHeight, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gestureState) => {
+      if (!isExpanded && gestureState.dy > 0) {
+        translateY.setValue(height - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
+        mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
+      }
+    },
+    onPanResponderRelease: (_, gestureState) => {
+      if (gestureState.dy > 100) {
+        closeModal();
+      } else if (!isExpanded && gestureState.dy < -50) {
+        Animated.timing(translateY, {
+          toValue: height - MODAL_EXPANDED_HEIGHT,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => (setIsExpanded(true)));
+        Animated.timing(mapHeight, {
+          toValue: MAP_EXPANDED_HEIGHT,
+          duration: 300,
+          useNativeDriver: false,
+        }).start(() => (setIsExpanded(true)));
+      } else {
+        Animated.timing(translateY, {
+          toValue: isExpanded ? height - MODAL_EXPANDED_HEIGHT : height - MODAL_COLLAPSED_HEIGHT,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+        Animated.timing(mapHeight, {
+          toValue: isExpanded ? height : MAP_COLLAPSED_HEIGHT,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      }
+    },
+  });
+
+  const PinPoint: React.FC<PinPointProps> = ({ latitude, longitude, onPress }) => (
+    <Marker coordinate={{ latitude, longitude }} onPress={onPress}>
+      <View style={styles.marker}>
+        <View style={styles.circle}>
+          <Image
+            source={require('@/assets/images/MyRewardsLogo2.png')}
+            style={{ width: '60%', height: '60%' }}
+          />
+        </View>
+        <View style={styles.pin} />
+      </View>
+    </Marker>
+  );
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>This is the Second Page</Text>
-      <Text
-        onPress={() => {
-          signOut();
-        }}>
-        Sign Out
-      </Text>
+    <View style={{ flex: 1 }}>
+      <Animated.View style={[styles.mapContainer, { height: mapHeight }]}>
+        <MapView
+          style={styles.map}
+          region={region}
+          showsUserLocation
+          showsMyLocationButton
+          onStartShouldSetResponder={() => false}
+          >
+            {/* PinPoints hardcoded for designing/testing */}
+          <PinPoint
+            latitude={37.7749}
+            longitude={-122.4194}
+            logo={'https://picsum.photos/200'}
+            id={'24hHsk345m'}
+            name={'Brolic Brunches'}
+            description={'Yummy food everyday'}
+            onPress={() =>
+              openModal({
+                latitude: 37.7749,
+                longitude: -122.4194,
+                logo: 'https://picsum.photos/200',
+                id: '24hHsk345m',
+                name: 'Brolic Brunches',
+                description: 'Yummy food everyday',
+                onPress: () => {},
+              })
+            }
+          />
+        <PinPoint
+          latitude={37.7819}
+          longitude={-122.4114}
+          logo={'https://picsum.photos/200'}
+          id={'24hHsk346m'}
+          name={'Alpha Artichokes'}
+          description={'Delicious food every day'}
+          onPress={() =>
+            openModal({
+              latitude: 37.7819,
+              longitude: -122.4114,
+              logo: 'https://picsum.photos/200',
+              id: '24hHsk346m',
+              name: 'Alpha Artichokes',
+              description: 'Delicious food every day',
+              onPress: () => {},
+            })
+          }
+        />
+        <PinPoint
+          latitude={37.7919}
+          longitude={-122.4144}
+          logo={'https://picsum.photos/200'}
+          id={'24hHsk346m'}
+          name={'Beta Breaky'}
+          description={'Crispy Food for the Hungry'}
+          onPress={() =>
+            openModal({
+              latitude: 37.7919,
+              longitude: -122.4144,
+              logo: 'https://picsum.photos/200',
+              id: '24hHsk346m',
+              name: 'Beta Breaky',
+              description: 'Crispy Food for the Hungry',
+              onPress: () => {},
+            })
+          }
+        />
+        </MapView>
+      </Animated.View>
+      {selectedPin && (
+        <Animated.View
+          style={[styles.bottomModal, { transform: [{ translateY }] }]}
+          {...panResponder.panHandlers}
+        >
+          <ExpandedShop 
+           selectedPin={selectedPin}
+           isExpanded={isExpanded}
+           closeModal={closeModal}/>
+        </Animated.View>
+      )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  mapContainer: {
+    width: '100%',
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  marker: {
+    alignItems: 'center',
+  },
+  circle: {
+    width: 40,
+    height: 40,
+    backgroundColor: color_pallete[1],
+    borderRadius: 20,
+    borderColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pin: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 15,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: color_pallete[1],
+    marginTop: -5,
+  },
+  bottomModal: {
+    position: 'absolute',
+    width: '100%',
+    height: MODAL_EXPANDED_HEIGHT,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  }
+});

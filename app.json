@@ -15,7 +15,16 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.myRewards",
-      "runtimeVersion": "1.0.0"
+      "runtimeVersion": "1.0.0",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch",
+          "remote-notification"
+        ],
+        "NSLocationWhenInUseUsageDescription": "This app requires access to your location when open.",
+        "deploymentTarget": "14"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -32,7 +41,12 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-localization",
+      "expo-location",
+      {
+        "locationAlwaysAndWhenInUsePermission": "Allow MyRewards to use your location."
+      }
     ],
     "experiments": {
       "typedRoutes": true
