@@ -1,9 +1,10 @@
-import { useColorScheme, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TextInput, SafeAreaView } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { useSession } from '../../auth/ctx';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { LoadingScreenDefault } from '../loadingScreen';
+import {AppData} from '../../app-data/appData'
+import { color_pallete } from '@/constants/Colors';
 
 /* 
   App itself (redirect back to landingScreen from here if needed)
@@ -14,7 +15,6 @@ import { LoadingScreenDefault } from '../loadingScreen';
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
-  const color_pallete = ['#FBC19F', '#F35E43', '#7F513A'];
 
   if (isLoading) {
     return LoadingScreenDefault();
@@ -25,30 +25,13 @@ export default function AppLayout() {
   }
 
   return (
-    <Tabs
+    <AppData>
+      <Tabs
         screenOptions={{
           headerShown: true,
-          headerStyle: {
-            backgroundColor: 'whitesmoke',
-            elevation: 0,
-            shadowOpacity: 0.1,
-            borderBottomColor:color_pallete[2],
-            borderBottomWidth:2,
-            shadowColor:'black',
-            shadowRadius:3,
-            shadowOffset:{
-              height:5,
-              width:0
-            }
-          },
+          headerStyle: [styles.header,{borderBottomColor:color_pallete[2]}],
           headerTitleAlign: 'left',
-          headerTitleStyle: {
-            fontSize: 30,
-            paddingLeft:'4%', 
-            fontWeight: 'bold',
-            color: color_pallete[2],
-            fontFamily:'Avenir Next'
-          },
+          headerTitleStyle: [styles.headerText,{color:color_pallete[2]}],
           tabBarStyle: {
             backgroundColor: color_pallete[0],
             paddingTop:5,
@@ -65,6 +48,25 @@ export default function AppLayout() {
           title: 'Discover',
           tabBarIcon: ({ focused }) => (
             <TabBarIcon name={'menu'} color={focused?'white':color_pallete[1]} />
+          ),
+          header: ()=>(            
+          <View style={[styles.header, {borderBottomColor:color_pallete[2]}]}>
+            <SafeAreaView/>
+            <Text
+              style={[styles.headerText, {color:color_pallete[2]}]}>
+              Discover
+            </Text>
+            <View style={styles.searchBar}>
+              <TextInput
+                placeholder="Search"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                style={styles.searchBarText}
+                placeholderTextColor={color_pallete[4]}
+              />
+              <TabBarIcon name={'search'} color={color_pallete[3]} />
+            </View>
+          </View>
           ),
           tabBarLabel: ({ focused, color }) => (
             <Text
@@ -164,5 +166,45 @@ export default function AppLayout() {
         }}
       />
     </Tabs>
+  </AppData>
   );
 }
+
+const styles = StyleSheet.create({
+  header:{
+    backgroundColor: 'whitesmoke',
+    elevation: 0,
+    shadowOpacity: 0.1,
+    borderBottomWidth:2,
+    shadowColor:'black',
+    shadowRadius:3,
+    shadowOffset:{
+      height:5,
+      width:0
+    }
+  },
+  headerText:{
+    fontSize: 30,
+    paddingLeft:'4%', 
+    fontWeight: 'bold',
+    fontFamily:'Avenir Next'
+  },
+  searchBar:{
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    padding:8,
+    margin:10,
+    marginHorizontal:15,
+    borderColor: color_pallete[3],
+    borderWidth:2,
+    borderRadius:10,
+    gap:5
+  },
+  searchBarText:{
+    fontFamily:'Avenir Next',
+    fontSize:15,
+    display:'flex',
+    flex:1
+  }
+})

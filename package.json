@@ -48,7 +48,8 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "^15.8.0",
     "react-native-swipe-gestures": "^1.0.5",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "react-native-maps": "1.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

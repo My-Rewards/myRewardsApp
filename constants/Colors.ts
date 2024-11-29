@@ -6,6 +6,8 @@
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+export const color_pallete = ['#FBC19F', '#F35E43', '#7F513A', 'rgba(249, 139, 78, 1)','rgba(249, 139, 78, 0.5)']
+
 export const Colors = {
   light: {
     text: '#11181C',

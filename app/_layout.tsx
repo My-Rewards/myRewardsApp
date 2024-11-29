@@ -16,7 +16,7 @@ export default function Root() {
   return (
     <PropsProvider>
       <SessionProvider>
-          <Stack>
+        <Stack>
           <Stack.Screen name={'sign-in'} 
             options={{
               headerShown:false
