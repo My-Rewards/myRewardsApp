@@ -10,6 +10,18 @@ type ExpandedShopProps = {
     closeModal: () => void;
   };
 
+type ShopPreviewProps = {
+  latitude: number;
+  longitude: number;
+  id:string;
+  name:string;
+  description:string;
+  logo:string;
+  banner:string;
+  plan:null|any;
+  
+}
+
 export const ExpandedShop = ({ selectedPin, closeModal, isExpanded }: ExpandedShopProps) => {
     const [shopId, setShopId] = useState('')
 

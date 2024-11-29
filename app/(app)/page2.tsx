@@ -5,13 +5,16 @@ import MapView, { Marker } from 'react-native-maps';
 import { ExpandedShop } from './page2/shopPreview';
 import * as Location from 'expo-location';
 import { useProps } from '../LoadingProp/propsProvider';
-
+import * as Svg from 'react-native-svg';
+import { whiteHandStar } from '@/assets/images/MR-logos';
 
 const { height } = Dimensions.get('window');
-const MODAL_COLLAPSED_HEIGHT = height * 0.4;
-const MODAL_EXPANDED_HEIGHT = height * 0.8;
-const MAP_COLLAPSED_HEIGHT = height * 0.61;
-const MAP_EXPANDED_HEIGHT = height * 0.21;
+const usableHeight= height-100;
+
+const MODAL_COLLAPSED_HEIGHT = usableHeight * 0.4;
+const MODAL_EXPANDED_HEIGHT = usableHeight * 0.8;
+const MAP_COLLAPSED_HEIGHT = usableHeight * 0.61;
+const MAP_EXPANDED_HEIGHT = usableHeight * 0.21;
 
 export type PinPointProps = {
   latitude: number;
@@ -28,8 +31,8 @@ export default function CustomMap() {
   const { alert } = useProps();
 
   const [selectedPin, setSelectedPin] = useState<PinPointProps | null>(null);
-  const translateY = useRef(new Animated.Value(height)).current;
-  const mapHeight = useRef(new Animated.Value(height)).current;
+  const translateY = useRef(new Animated.Value(usableHeight)).current;
+  const mapHeight = useRef(new Animated.Value(usableHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
   const [region, setRegion] = useState({
     latitude: 28.5384,
@@ -75,7 +78,7 @@ export default function CustomMap() {
     setIsExpanded(false);
 
     Animated.timing(translateY, {
-      toValue: height - MODAL_COLLAPSED_HEIGHT,
+      toValue: usableHeight - MODAL_COLLAPSED_HEIGHT,
       duration: 300,
       useNativeDriver: true,
     }).start();
@@ -88,12 +91,12 @@ export default function CustomMap() {
 
   const closeModal = () => {
     Animated.timing(translateY, {
-      toValue: height,
+      toValue: usableHeight,
       duration: 300,
       useNativeDriver: true,
     }).start(() => setSelectedPin(null));
     Animated.timing(mapHeight, {
-      toValue: height,
+      toValue: usableHeight,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -103,7 +106,7 @@ export default function CustomMap() {
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, gestureState) => {
       if (!isExpanded && gestureState.dy > 0) {
-        translateY.setValue(height - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
+        translateY.setValue(usableHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
         mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
       }
     },
@@ -112,7 +115,7 @@ export default function CustomMap() {
         closeModal();
       } else if (!isExpanded && gestureState.dy < -50) {
         Animated.timing(translateY, {
-          toValue: height - MODAL_EXPANDED_HEIGHT,
+          toValue: usableHeight - MODAL_EXPANDED_HEIGHT,
           duration: 300,
           useNativeDriver: true,
         }).start(() => (setIsExpanded(true)));
@@ -123,12 +126,12 @@ export default function CustomMap() {
         }).start(() => (setIsExpanded(true)));
       } else {
         Animated.timing(translateY, {
-          toValue: isExpanded ? height - MODAL_EXPANDED_HEIGHT : height - MODAL_COLLAPSED_HEIGHT,
+          toValue: isExpanded ? usableHeight - MODAL_EXPANDED_HEIGHT : usableHeight - MODAL_COLLAPSED_HEIGHT,
           duration: 300,
           useNativeDriver: true,
         }).start();
         Animated.timing(mapHeight, {
-          toValue: isExpanded ? height : MAP_COLLAPSED_HEIGHT,
+          toValue: isExpanded ? usableHeight : MAP_COLLAPSED_HEIGHT,
           duration: 300,
           useNativeDriver: false,
         }).start();
@@ -140,9 +143,11 @@ export default function CustomMap() {
     <Marker coordinate={{ latitude, longitude }} onPress={onPress}>
       <View style={styles.marker}>
         <View style={styles.circle}>
-          <Image
-            source={require('@/assets/images/MyRewardsLogo2.png')}
-            style={{ width: '60%', height: '60%' }}
+          <Svg.SvgXml
+            color='white'
+            xml={whiteHandStar}
+            width="62%"
+            height="62%"
           />
         </View>
         <View style={styles.pin} />
@@ -151,7 +156,7 @@ export default function CustomMap() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor:'white'}}>
       <Animated.View style={[styles.mapContainer, { height: mapHeight }]}>
         <MapView
           style={styles.map}
@@ -180,44 +185,44 @@ export default function CustomMap() {
               })
             }
           />
-        <PinPoint
-          latitude={37.7819}
-          longitude={-122.4114}
-          logo={'https://picsum.photos/200'}
-          id={'24hHsk346m'}
-          name={'Alpha Artichokes'}
-          description={'Delicious food every day'}
-          onPress={() =>
-            openModal({
-              latitude: 37.7819,
-              longitude: -122.4114,
-              logo: 'https://picsum.photos/200',
-              id: '24hHsk346m',
-              name: 'Alpha Artichokes',
-              description: 'Delicious food every day',
-              onPress: () => {},
-            })
-          }
-        />
-        <PinPoint
-          latitude={37.7919}
-          longitude={-122.4144}
-          logo={'https://picsum.photos/200'}
-          id={'24hHsk346m'}
-          name={'Beta Breaky'}
-          description={'Crispy Food for the Hungry'}
-          onPress={() =>
-            openModal({
-              latitude: 37.7919,
-              longitude: -122.4144,
-              logo: 'https://picsum.photos/200',
-              id: '24hHsk346m',
-              name: 'Beta Breaky',
-              description: 'Crispy Food for the Hungry',
-              onPress: () => {},
-            })
-          }
-        />
+          <PinPoint
+            latitude={37.7819}
+            longitude={-122.4114}
+            logo={'https://picsum.photos/200'}
+            id={'24hHsk346m'}
+            name={'Alpha Artichokes'}
+            description={'Delicious food every day'}
+            onPress={() =>
+              openModal({
+                latitude: 37.7819,
+                longitude: -122.4114,
+                logo: 'https://picsum.photos/200',
+                id: '24hHsk346m',
+                name: 'Alpha Artichokes',
+                description: 'Delicious food every day',
+                onPress: () => {},
+              })
+            }
+          />
+          <PinPoint
+            latitude={37.7919}
+            longitude={-122.4144}
+            logo={'https://picsum.photos/200'}
+            id={'24hHsk346m'}
+            name={'Beta Breaky'}
+            description={'Crispy Food for the Hungry'}
+            onPress={() =>
+              openModal({
+                latitude: 37.7919,
+                longitude: -122.4144,
+                logo: 'https://picsum.photos/200',
+                id: '24hHsk346m',
+                name: 'Beta Breaky',
+                description: 'Crispy Food for the Hungry',
+                onPress: () => {},
+              })
+            }
+          />
         </MapView>
       </Animated.View>
       {selectedPin && (
