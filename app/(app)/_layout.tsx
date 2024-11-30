@@ -142,11 +142,11 @@ export default function AppLayout() {
           title: 'Rewards',
           tabBarIcon: ({ focused }) => (
             <SvgXml
-            xml={whtieStar}
-            height="100%"
-            width="100%"
-            color={focused?'white':color_pallete[1]}
-          />
+              xml={whtieStar}
+              height="100%"
+              width="100%"
+              color={focused?'white':color_pallete[1]}
+            />
           ),
           
           tabBarLabel: ({ focused, color }) => (
@@ -163,7 +163,15 @@ export default function AppLayout() {
           header: () => (
             <View style={[styles.header2, {paddingBottom:5}]}>
               <SafeAreaView />
-              <Text style={styles.headerText}>My Plans</Text>
+              <View style={styles.planHeader}>
+                <SvgXml
+                  xml={whtieStar}
+                  height='40'
+                  width="40"
+                  color={color_pallete[1]}
+                />
+                <Text style={styles.headerText2}>My Plans</Text>
+              </View>
             </View>
           )
         }}
@@ -226,6 +234,12 @@ const styles = StyleSheet.create({
     fontFamily:'Avenir Next',
     color:color_pallete[2],
   },
+  headerText2:{
+    fontSize: 30,
+    fontWeight: 'bold',
+    fontFamily:'Avenir Next',
+    color:color_pallete[2],
+  },
   searchBar:{
     display:'flex',
     flexDirection:'row',
@@ -243,5 +257,12 @@ const styles = StyleSheet.create({
     fontSize:15,
     display:'flex',
     flex:1,
+  },
+  planHeader:{
+    display:'flex',
+    flexDirection:'row',
+    gap:5,
+    paddingLeft:'4%', 
+
   }
 })

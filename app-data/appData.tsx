@@ -23,12 +23,12 @@ const DataContext = createContext<{
     radiusShops: null,
     discoverShops: null,
     region:
-        {
-            latitude: 28.5384,
-            longitude: -81.3789,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-        },
+      {
+        latitude: 28.5384,
+        longitude: -81.3789,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      },
     shop: null,
     profile:null,
     isLoading: false,
@@ -48,7 +48,7 @@ const DataContext = createContext<{
     const { alert } = useProps();
 
     const [radiusShops, setRadiusShops] = useState<shops[]|null>();
-    const [discoverShops, setDiscoverShopd] = useState<shops[]|null>();
+    const [discoverShops, setDiscoverShops] = useState<shops[]|null>();
 
     const [shop, setShop] = useState<shop|null>();
     const [profile, setProfile] = useState<Profile|null>();
@@ -87,7 +87,7 @@ const DataContext = createContext<{
         if(!discoverShops){
             // Replace mock API with API here
             mockDiscoverProfile().then((shops)=>{
-                setDiscoverShopd(shops)
+              setDiscoverShops(shops)
              })
             .catch((error) => {
                 console.error('Error fetching shops:', error);
@@ -114,23 +114,37 @@ const DataContext = createContext<{
             fetchDiscoverShops: async (user_id:string, filterOption:number) => {
                 // Fetch + Update shops DiscoverShops given closet/popularity
                 // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
-
                 try {
                     let shops;
                     switch (filterOption) {
                       case 0:
-                        shops = await mockDiscoverProfile(); // Replace with nearby API call
+                        mockDiscoverProfile().then((shops)=>{
+                          setDiscoverShops(shops)
+                       })
+                      .catch((error) => {
+                          console.error('Error fetching shops:', error);
+                        }); // Replace with nearby API call
                         break;
                       case 1:
-                        shops = await mockDiscoverProfile(); // Replace with popular API call
+                        mockDiscoverProfile().then((shops)=>{
+                          setDiscoverShops(shops)
+                       })
+                      .catch((error) => {
+                          console.error('Error fetching shops:', error);
+                        }); // Replace with popular API call
                         break;
                       case 2:
-                        shops = await mockDiscoverProfile(); // Replace with favorite API call
+                        mockDiscoverProfile().then((shops)=>{
+                          setDiscoverShops(shops)
+                       })
+                      .catch((error) => {
+                          console.error('Error fetching shops:', error);
+                        }); // Replace with favorite API call
                         break;
                       default:
                         throw new Error("Invalid filter option");
                     }
-                    setDiscoverShopd(shops);
+                    setDiscoverShops(shops);
                   } catch (error) {
                     console.error("Error fetching shops:", error);
                   }

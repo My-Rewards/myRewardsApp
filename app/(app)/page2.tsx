@@ -65,7 +65,6 @@ export default function CustomMap() {
 
   const openModal = (selectedPin:shops) => {
     setSelectedPin(selectedPin);
-    setIsExpanded(false);
 
     Animated.timing(translateY, {
       toValue: usableHeight - MODAL_COLLAPSED_HEIGHT,
@@ -80,16 +79,18 @@ export default function CustomMap() {
   };
 
   const closeModal = () => {
+    setIsExpanded(false);
+
     Animated.timing(translateY, {
       toValue: usableHeight,
       duration: 300,
       useNativeDriver: true,
-    }).start(() => setSelectedPin(null));
+    }).start();
     Animated.timing(mapHeight, {
       toValue: usableHeight,
       duration: 300,
       useNativeDriver: false,
-    }).start();
+    }).start(() => setSelectedPin(null));
   };
 
   const panResponder = PanResponder.create({
@@ -157,6 +158,7 @@ export default function CustomMap() {
           style={styles.map}
           region={region}
           showsUserLocation
+          scrollEnabled={!isExpanded}
           showsMyLocationButton
           onStartShouldSetResponder={() => false}
           >
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: color_pallete[1],
     borderRadius: 20,
     borderWidth:2,
-    borderColor: 'black',
+    borderColor: color_pallete[2],
     justifyContent: 'center',
     alignItems: 'center',
   },

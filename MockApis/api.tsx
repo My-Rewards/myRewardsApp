@@ -161,10 +161,10 @@ export const mockProfile = (): Promise<Profile> => {
       });
   }
 
-  export const mockPlans = (): Promise<Plan> => {
+  export const mockPlans = (): Promise<Plan[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
-          const sampleProfile: Plan = {
+          const samplePlan: Plan[] = [{
             reward_plan: {
                 road_map: {
                   "3": [
@@ -186,9 +186,35 @@ export const mockProfile = (): Promise<Profile> => {
               },
               visits: 5,
               spent: 120,
-              organization_id: "org12345"
-          };
-          resolve(sampleProfile);
+              organization_id: "org12345",
+              name:'Los Tacos'
+          }, 
+          {
+            reward_plan: {
+                road_map: {
+                  "4": [
+                    { type: "cost", value: 6 },
+                    { type: "percentage", value: 12 }
+                  ],
+                  "6": [
+                    { type: "cost", value: 12 },
+                    { type: "percentage", value: 22 }
+                  ]
+                },
+                exp_rewards: {
+                  expenditure: "150",
+                  rewardsOptions: [
+                    { type: "cost", value: 25 },
+                    { type: "percentage", value: 45 }
+                  ]
+                }
+              },
+              visits: 5,
+              spent: 0,
+              organization_id: "org304",
+              name:'Los Tacos'
+          }];
+          resolve(samplePlan);
         }, 2000);
       });
   }

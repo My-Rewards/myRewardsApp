@@ -72,4 +72,5 @@ export interface ShopHour {
     visits:number,
     spent:number,
     organization_id:string
+    name:string
   }
