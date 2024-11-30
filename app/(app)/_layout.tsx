@@ -36,11 +36,13 @@ export default function AppLayout() {
           headerTitleAlign: 'left',
           headerTitleStyle: [styles.headerText],
           tabBarStyle: {
+            position:'relative',
             backgroundColor: color_pallete[0],
             paddingTop:5,
             height:87, //88 because 85 + 3 (border)
             borderTopColor:color_pallete[1],
             borderTopWidth:2,
+            zIndex:99,
           },
           tabBarItemStyle:{gap:5}
         }}
@@ -53,7 +55,7 @@ export default function AppLayout() {
             <TabBarIcon name={'menu'} color={focused?'white':color_pallete[1]} />
           ),
           header: ()=>(            
-          <View style={[styles.header, {borderBottomColor:color_pallete[2]}]}>
+          <View style={styles.header2}>
             <SafeAreaView/>
             <Text
               style={[styles.headerText, {color:color_pallete[2]}]}>
@@ -146,6 +148,7 @@ export default function AppLayout() {
             color={focused?'white':color_pallete[1]}
           />
           ),
+          
           tabBarLabel: ({ focused, color }) => (
             <Text
               style={{
@@ -158,9 +161,9 @@ export default function AppLayout() {
             </Text>
           ),
           header: () => (
-            <View style={[styles.header, {paddingBottom:5}]}>
+            <View style={[styles.header2, {paddingBottom:5}]}>
               <SafeAreaView />
-              <Text style={styles.headerText}>Rewards</Text>
+              <Text style={styles.headerText}>My Plans</Text>
             </View>
           )
         }}
@@ -196,8 +199,6 @@ export default function AppLayout() {
   );
 }
 
-
-
 const styles = StyleSheet.create({
   header:{
     backgroundColor: 'whitesmoke',
@@ -211,6 +212,12 @@ const styles = StyleSheet.create({
       width:0
     },
     borderBottomColor:color_pallete[2],
+  },
+  header2:{
+    backgroundColor: 'whitesmoke',
+    elevation: 0,
+    borderBottomWidth:2,
+    borderBottomColor:color_pallete[0],
   },
   headerText:{
     fontSize: 30,

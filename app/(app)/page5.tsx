@@ -5,7 +5,7 @@ export default function page5() {
   const { signOut } = useSession();
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>This is the scanning page</Text>
+      <Text>This is the Profile page</Text>
       <Text
         onPress={() => {
           signOut();

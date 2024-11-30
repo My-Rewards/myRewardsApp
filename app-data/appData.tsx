@@ -1,26 +1,27 @@
-import { mockShopRadius } from '@/MockApis/api';
+import { mockDiscoverProfile, mockShopRadius } from '@/MockApis/api';
 import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
+import { Profile, regionProp, shop, shops } from './data-types';
 
 const DataContext = createContext<{
-    fetchShopsByRadius: (radius:number, location: {longitude:string, latitude:string}) => void; 
-    fetchShopsByPopular: (location: {longitude:string, latitude:string}) => void; 
-    fetchShopsByLiked: (location: {longitude:string, latitude:string}) => void; 
-    fetchProfile: (id:string) => void; 
+    fetchShopsByRadius: (user_id:string, radius:number) => void; 
+    fetchDiscoverShops: (user_id:string, filterOption:number) => void; 
+    fetchProfile: (user_id:string) => void; 
     setRegion:(location:regionProp) => void;
     region:regionProp;
     radiusShops?: shops[] | null;
+    discoverShops?: shops[] | null;
     shop?: shop | null;
     profile: any|null;
     isLoading: boolean;
     }>({
     fetchShopsByRadius: async () => null,
-    fetchShopsByPopular: async () => null,
-    fetchShopsByLiked: async () => null,
+    fetchDiscoverShops: async () => null,
     fetchProfile: async () => null,
     setRegion: async () => null,
     radiusShops: null,
+    discoverShops: null,
     region:
         {
             latitude: 28.5384,
@@ -47,8 +48,10 @@ const DataContext = createContext<{
     const { alert } = useProps();
 
     const [radiusShops, setRadiusShops] = useState<shops[]|null>();
+    const [discoverShops, setDiscoverShopd] = useState<shops[]|null>();
+
     const [shop, setShop] = useState<shop|null>();
-    const [profile, setProfile] = useState<shops[]|null>();
+    const [profile, setProfile] = useState<Profile|null>();
     const [region, setRegion] = useState({
         latitude: 28.5384,
         longitude: -81.3789,
@@ -57,7 +60,6 @@ const DataContext = createContext<{
       });
 
     const [fetching, setFetching] = useState(false);
-
 
       useEffect(() => {
         async function getCurrentLocation() {
@@ -80,39 +82,63 @@ const DataContext = createContext<{
         getCurrentLocation();
       }, []);
 
+
       useEffect(() => {
+        if(!discoverShops){
+            // Replace mock API with API here
+            mockDiscoverProfile().then((shops)=>{
+                setDiscoverShopd(shops)
+             })
+            .catch((error) => {
+                console.error('Error fetching shops:', error);
+              });
+        }
         if (!radiusShops) {
-          console.log('Fetching radius shops...');
-          setFetching(true);
-          mockShopRadius()
+            // Replace mock API with API here
+            mockShopRadius()
             .then((shops) => {
               setRadiusShops(shops);
-              setFetching(false);
             })
             .catch((error) => {
               console.error('Error fetching shops:', error);
-              setFetching(false);
             });
         }
-      }, [radiusShops, ]);
+      }, [radiusShops, discoverShops, profile]);
   
     return (
       <DataContext.Provider
         value={{
-            fetchShopsByRadius: async (radius:number, location: {longitude:string, latitude:string}) => {
+            fetchShopsByRadius: async (user_id:string, radius:number) => {
                 // Fetch + Update shops radiusShops given location
             },
-            fetchShopsByLiked: async (location: {longitude:string, latitude:string}) => {
+            fetchDiscoverShops: async (user_id:string, filterOption:number) => {
                 // Fetch + Update shops DiscoverShops given closet/popularity
                 // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
+
+                try {
+                    let shops;
+                    switch (filterOption) {
+                      case 0:
+                        shops = await mockDiscoverProfile(); // Replace with nearby API call
+                        break;
+                      case 1:
+                        shops = await mockDiscoverProfile(); // Replace with popular API call
+                        break;
+                      case 2:
+                        shops = await mockDiscoverProfile(); // Replace with favorite API call
+                        break;
+                      default:
+                        throw new Error("Invalid filter option");
+                    }
+                    setDiscoverShopd(shops);
+                  } catch (error) {
+                    console.error("Error fetching shops:", error);
+                  }
             },
-            fetchShopsByPopular: async (location: {longitude:string, latitude:string}) => {
-                // Fetch + Update shops DiscoverShops given closet/popularity
-                // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
-            },
-            fetchProfile: async (id:string) => {},
+            fetchProfile: async (user_id:string) => {},
             setRegion: async (location:regionProp) => {setRegion(location)},
             radiusShops,
+            discoverShops,
             shop,
             region,
             profile,

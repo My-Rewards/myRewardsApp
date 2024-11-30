@@ -8,6 +8,7 @@ import { useProps } from '../LoadingProp/propsProvider';
 import {SvgXml} from 'react-native-svg';
 import { whiteHandStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
+import { shops } from '@/app-data/data-types';
 
 const { height } = Dimensions.get('window');
 const usableHeight= height-100;
@@ -22,8 +23,8 @@ export type PinPointProps = shops & {
 };
 
 export default function CustomMap() {
-  const { alert, triggerLoadingScreen } = useProps();
-  const { fetchShopsByRadius, radiusShops, isLoading, region, setRegion } = localData();
+  const { alert } = useProps();
+  const { radiusShops, isLoading, region, setRegion } = localData();
 
   const [selectedPin, setSelectedPin] = useState<shops | null>(null);
   const translateY = useRef(new Animated.Value(usableHeight)).current;
