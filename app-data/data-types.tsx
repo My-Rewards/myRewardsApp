@@ -1,4 +1,11 @@
-interface ShopHour {
+    interface regionProp {    
+        latitude: number,
+        longitude: number,
+        latitudeDelta: number,
+        longitudeDelta: number
+    }
+    
+    interface ShopHour {
     day: string;
     open: string | null;
     close: string | null;
@@ -8,6 +15,9 @@ interface ShopHour {
     id: string; 
     organization_id: string; 
     location_id: string;
+    logo:string;
+    name:string;
+    description:string;
     geohash: string;
     latitude: number;
     longitude: number;
@@ -25,6 +35,10 @@ interface ShopHour {
     title: string; 
     logo: string; 
     banner: string;
+  }
+
+  interface profile{
+
   }
   
   

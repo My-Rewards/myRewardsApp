@@ -5,7 +5,7 @@ import { PinPointProps } from '../page2';
 import { useEffect, useState } from 'react';
 
 type ExpandedShopProps = {
-    selectedPin: PinPointProps;
+    selectedPin: shops;
     isExpanded:boolean;
     closeModal: () => void;
   };
@@ -19,7 +19,7 @@ type ShopPreviewProps = {
   logo:string;
   banner:string;
   plan:null|any;
-  
+
 }
 
 export const ExpandedShop = ({ selectedPin, closeModal, isExpanded }: ExpandedShopProps) => {

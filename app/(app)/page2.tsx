@@ -5,8 +5,9 @@ import MapView, { Marker } from 'react-native-maps';
 import { ExpandedShop } from './page2/shopPreview';
 import * as Location from 'expo-location';
 import { useProps } from '../LoadingProp/propsProvider';
-import * as Svg from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import { whiteHandStar } from '@/assets/images/MR-logos';
+import { localData } from '@/app-data/appData';
 
 const { height } = Dimensions.get('window');
 const usableHeight= height-100;
@@ -16,30 +17,18 @@ const MODAL_EXPANDED_HEIGHT = usableHeight * 0.8;
 const MAP_COLLAPSED_HEIGHT = usableHeight * 0.61;
 const MAP_EXPANDED_HEIGHT = usableHeight * 0.21;
 
-export type PinPointProps = {
-  latitude: number;
-  longitude: number;
-  id:string;
-  name:string;
-  description:string;
-  logo:string
+export type PinPointProps = shops & {
   onPress: () => void;
 };
 
-
 export default function CustomMap() {
-  const { alert } = useProps();
+  const { alert, triggerLoadingScreen } = useProps();
+  const { fetchShopsByRadius, radiusShops, isLoading, region, setRegion } = localData();
 
-  const [selectedPin, setSelectedPin] = useState<PinPointProps | null>(null);
+  const [selectedPin, setSelectedPin] = useState<shops | null>(null);
   const translateY = useRef(new Animated.Value(usableHeight)).current;
   const mapHeight = useRef(new Animated.Value(usableHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
-  const [region, setRegion] = useState({
-    latitude: 28.5384,
-    longitude: -81.3789,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  });
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -73,7 +62,7 @@ export default function CustomMap() {
     }
   },[isExpanded])
 
-  const openModal = (selectedPin:PinPointProps) => {
+  const openModal = (selectedPin:shops) => {
     setSelectedPin(selectedPin);
     setIsExpanded(false);
 
@@ -139,11 +128,15 @@ export default function CustomMap() {
     },
   });
 
-  const PinPoint: React.FC<PinPointProps> = ({ latitude, longitude, onPress }) => (
-    <Marker coordinate={{ latitude, longitude }} onPress={onPress}>
+  const PinPoint: React.FC<PinPointProps> = (info) => {
+    const latitude = info.latitude;
+    const longitude = info.longitude;
+
+    return(
+      <Marker coordinate={{ latitude, longitude }} onPress={info.onPress}>
       <View style={styles.marker}>
-        <View style={styles.circle}>
-          <Svg.SvgXml
+        <View style={selectedPin?.id == info.id ? styles.circleSelected : styles.circle}>
+          <SvgXml
             color='white'
             xml={whiteHandStar}
             width="62%"
@@ -153,7 +146,8 @@ export default function CustomMap() {
         <View style={styles.pin} />
       </View>
     </Marker>
-  );
+    )
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor:'white'}}>
@@ -166,63 +160,23 @@ export default function CustomMap() {
           onStartShouldSetResponder={() => false}
           >
             {/* PinPoints hardcoded for designing/testing */}
-          <PinPoint
-            latitude={37.7749}
-            longitude={-122.4194}
-            logo={'https://picsum.photos/200'}
-            id={'24hHsk345m'}
-            name={'Brolic Brunches'}
-            description={'Yummy food everyday'}
-            onPress={() =>
-              openModal({
-                latitude: 37.7749,
-                longitude: -122.4194,
-                logo: 'https://picsum.photos/200',
-                id: '24hHsk345m',
-                name: 'Brolic Brunches',
-                description: 'Yummy food everyday',
-                onPress: () => {},
-              })
-            }
-          />
-          <PinPoint
-            latitude={37.7819}
-            longitude={-122.4114}
-            logo={'https://picsum.photos/200'}
-            id={'24hHsk346m'}
-            name={'Alpha Artichokes'}
-            description={'Delicious food every day'}
-            onPress={() =>
-              openModal({
-                latitude: 37.7819,
-                longitude: -122.4114,
-                logo: 'https://picsum.photos/200',
-                id: '24hHsk346m',
-                name: 'Alpha Artichokes',
-                description: 'Delicious food every day',
-                onPress: () => {},
-              })
-            }
-          />
-          <PinPoint
-            latitude={37.7919}
-            longitude={-122.4144}
-            logo={'https://picsum.photos/200'}
-            id={'24hHsk346m'}
-            name={'Beta Breaky'}
-            description={'Crispy Food for the Hungry'}
-            onPress={() =>
-              openModal({
-                latitude: 37.7919,
-                longitude: -122.4144,
-                logo: 'https://picsum.photos/200',
-                id: '24hHsk346m',
-                name: 'Beta Breaky',
-                description: 'Crispy Food for the Hungry',
-                onPress: () => {},
-              })
-            }
-          />
+          {radiusShops?.map((shop) => {
+            return (
+              <PinPoint
+                key={shop.id}
+                latitude={shop.latitude}
+                longitude={shop.longitude}
+                logo={shop.logo}
+                id={shop.id}
+                name={shop.name}
+                description={shop.description}
+                organization_id={shop.id} 
+                location_id={shop.location_id} 
+                geohash={shop.geohash} 
+                onPress={() => openModal(shop)}
+              />
+            );
+          })}
         </MapView>
       </Animated.View>
       {selectedPin && (
@@ -251,12 +205,23 @@ const styles = StyleSheet.create({
   marker: {
     alignItems: 'center',
   },
+  circleSelected: {
+    width: 40,
+    height: 40,
+    backgroundColor: color_pallete[1],
+    borderRadius: 20,
+    borderWidth:2,
+    borderColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   circle: {
     width: 40,
     height: 40,
     backgroundColor: color_pallete[1],
     borderRadius: 20,
-    borderColor: '#fff',
+    borderWidth:2,
+    borderColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },

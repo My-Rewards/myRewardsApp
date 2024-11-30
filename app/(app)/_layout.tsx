@@ -5,8 +5,9 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { LoadingScreenDefault } from '../loadingScreen';
 import {AppData} from '../../app-data/appData'
 import { color_pallete } from '@/constants/Colors';
-import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
+import {SvgXml} from 'react-native-svg';
 import React from 'react';
+import { whtieStar } from '@/assets/images/MR-logos';
 
 /* 
   App itself (redirect back to landingScreen from here if needed)
@@ -138,7 +139,12 @@ export default function AppLayout() {
         options={{
           title: 'Rewards',
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon name={'book'} color={focused?'white':color_pallete[1]} />
+            <SvgXml
+            xml={whtieStar}
+            height="100%"
+            width="100%"
+            color={focused?'white':color_pallete[1]}
+          />
           ),
           tabBarLabel: ({ focused, color }) => (
             <Text
