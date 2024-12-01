@@ -1,6 +1,6 @@
 import { color_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, PanResponder, Dimensions } from 'react-native';
+import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { ExpandedShop } from './page2/shopPreview';
 import * as Location from 'expo-location';
@@ -9,14 +9,9 @@ import {SvgXml} from 'react-native-svg';
 import { whiteHandStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
 import { shops } from '@/app-data/data-types';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const { height } = Dimensions.get('window');
-const usableHeight= height-100;
-
-const MODAL_COLLAPSED_HEIGHT = usableHeight * 0.4;
-const MODAL_EXPANDED_HEIGHT = usableHeight * 0.8;
-const MAP_COLLAPSED_HEIGHT = usableHeight * 0.61;
-const MAP_EXPANDED_HEIGHT = usableHeight * 0.21;
 
 export type PinPointProps = shops & {
   onPress: () => void;
@@ -24,11 +19,24 @@ export type PinPointProps = shops & {
 
 export default function CustomMap() {
   const { alert } = useProps();
-  const { radiusShops, isLoading, region, setRegion } = localData();
+  const { radiusShops, isLoading, region, setRegion, locateMe } = localData();
+  const [containerHeight, setContainerHeight] = useState(1);
+
+  if(containerHeight === 0){
+    return(
+      <View style={{flex:1, width:'100%', height:'100%', backgroundColor:'white'}}/>
+    )
+  }
+
+  const MODAL_COLLAPSED_HEIGHT = containerHeight * 0.35;
+  const MODAL_EXPANDED_HEIGHT = containerHeight * 0.8;
+  const MAP_COLLAPSED_HEIGHT = containerHeight * 0.66;
+  const MAP_EXPANDED_HEIGHT = containerHeight * 0.21;
+
 
   const [selectedPin, setSelectedPin] = useState<shops | null>(null);
-  const translateY = useRef(new Animated.Value(usableHeight)).current;
-  const mapHeight = useRef(new Animated.Value(usableHeight)).current;
+  const translateY = useRef(new Animated.Value(containerHeight)).current;
+  const mapHeight = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
 
   useEffect(() => {
@@ -63,69 +71,81 @@ export default function CustomMap() {
     }
   },[isExpanded])
 
-  const openModal = (selectedPin:shops) => {
-    setSelectedPin(selectedPin);
+  useEffect(()=>{
+    translateY.setValue(containerHeight);
+    mapHeight.setValue(containerHeight);
+  },[containerHeight])
 
-    Animated.timing(translateY, {
-      toValue: usableHeight - MODAL_COLLAPSED_HEIGHT,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-    Animated.timing(mapHeight, {
-      toValue: MAP_COLLAPSED_HEIGHT,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
+  const openModal = (selectedPin?:shops) => {
+    if(selectedPin){
+      setSelectedPin(selectedPin);
+    }
+
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: containerHeight - MODAL_COLLAPSED_HEIGHT,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(mapHeight, {
+        toValue: MAP_COLLAPSED_HEIGHT,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start();
   };
 
   const closeModal = () => {
-    setIsExpanded(false);
-
-    Animated.timing(translateY, {
-      toValue: usableHeight,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-    Animated.timing(mapHeight, {
-      toValue: usableHeight,
-      duration: 300,
-      useNativeDriver: false,
-    }).start(() => setSelectedPin(null));
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: containerHeight,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(mapHeight, {
+        toValue: containerHeight,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start(() => {
+      setIsExpanded(false);
+      setSelectedPin(null);
+    });
   };
+
+  const expandFull = () =>{
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: containerHeight - MODAL_EXPANDED_HEIGHT,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(mapHeight, {
+        toValue: MAP_EXPANDED_HEIGHT,
+        duration: 200,
+        useNativeDriver: false,
+      }),
+    ]).start(() => setIsExpanded(true));
+  }
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 0) {
-        translateY.setValue(usableHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
+      if (!isExpanded && gestureState.dy > 0 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10)) {
+        translateY.setValue(containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
         mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
+      } else if(!isExpanded && gestureState.dy > 0 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10)){
+        translateY.setValue(containerHeight);
+        mapHeight.setValue(containerHeight);
       }
     },
     onPanResponderRelease: (_, gestureState) => {
-      if (gestureState.dy > 100) {
+      if (!isExpanded && gestureState.dy > 100) {
         closeModal();
       } else if (!isExpanded && gestureState.dy < -50) {
-        Animated.timing(translateY, {
-          toValue: usableHeight - MODAL_EXPANDED_HEIGHT,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(() => (setIsExpanded(true)));
-        Animated.timing(mapHeight, {
-          toValue: MAP_EXPANDED_HEIGHT,
-          duration: 300,
-          useNativeDriver: false,
-        }).start(() => (setIsExpanded(true)));
-      } else {
-        Animated.timing(translateY, {
-          toValue: isExpanded ? usableHeight - MODAL_EXPANDED_HEIGHT : usableHeight - MODAL_COLLAPSED_HEIGHT,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-        Animated.timing(mapHeight, {
-          toValue: isExpanded ? usableHeight : MAP_COLLAPSED_HEIGHT,
-          duration: 300,
-          useNativeDriver: false,
-        }).start();
+        expandFull()
+      }else{
+        openModal()
       }
     },
   });
@@ -152,13 +172,25 @@ export default function CustomMap() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor:'white'}}>
-      <Animated.View style={[styles.mapContainer, { height: mapHeight }]}>
+    <View 
+      style={{ flex: 1, backgroundColor:'white', width:'100%', height:'100%'}}
+      onLayout={(event) => {
+        const { height: newHeight } = event.nativeEvent.layout;
+        translateY.setValue(newHeight);
+        mapHeight.setValue(newHeight);
+        setContainerHeight(newHeight)
+      }}>
+      <Animated.View 
+      style={[styles.mapContainer, { height: mapHeight }]} 
+      pointerEvents={isExpanded ? "box-only" : "auto"}
+      >
         <MapView
           style={styles.map}
           region={region}
           showsUserLocation
           scrollEnabled={!isExpanded}
+          zoomEnabled={!isExpanded}
+          rotateEnabled={!isExpanded}
           showsMyLocationButton
           onStartShouldSetResponder={() => false}
           >
@@ -181,10 +213,19 @@ export default function CustomMap() {
             );
           })}
         </MapView>
+        {!isExpanded &&  
+        <TouchableOpacity 
+          style={styles.crossHairButton}
+          onPress={() => {
+            locateMe()
+          }}>
+            <FontAwesome6 name={'location-crosshairs'} size={30} color={'black'} />
+        </TouchableOpacity>
+        }
       </Animated.View>
       {selectedPin && (
         <Animated.View
-          style={[styles.bottomModal, { transform: [{ translateY }] }]}
+          style={[styles.bottomModal, { transform: [{ translateY }], height:isExpanded?MODAL_EXPANDED_HEIGHT:MODAL_COLLAPSED_HEIGHT}]}
           {...panResponder.panHandlers}
         >
           <ExpandedShop 
@@ -242,7 +283,6 @@ const styles = StyleSheet.create({
   bottomModal: {
     position: 'absolute',
     width: '100%',
-    height: MODAL_EXPANDED_HEIGHT,
     backgroundColor: 'white',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -251,5 +291,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+  },
+  crossHairButton:{
+    position:'absolute',
+    bottom:0,
+    right:0,
+    margin:15
   }
 });

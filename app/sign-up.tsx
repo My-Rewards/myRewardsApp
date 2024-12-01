@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';

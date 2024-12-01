@@ -1,4 +1,12 @@
-import { StyleSheet, View, Text, TextInput, SafeAreaView } from 'react-native';
+import { 
+  StyleSheet, 
+  View, 
+  Text, 
+  TextInput, 
+  SafeAreaView, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { useSession } from '../../auth/ctx';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
@@ -8,6 +16,7 @@ import { color_pallete } from '@/constants/Colors';
 import {SvgXml} from 'react-native-svg';
 import React from 'react';
 import { whtieStar } from '@/assets/images/MR-logos';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /* 
   App itself (redirect back to landingScreen from here if needed)
@@ -18,6 +27,10 @@ import { whtieStar } from '@/assets/images/MR-logos';
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
+
+  // check if iphone is new era or old era iphone
+  const insets = useSafeAreaInsets();
+  const hasSafeArea = (insets.bottom > 0); 
 
   if (isLoading) {
     return LoadingScreenDefault();
@@ -35,15 +48,7 @@ export default function AppLayout() {
           headerStyle: [styles.header],
           headerTitleAlign: 'left',
           headerTitleStyle: [styles.headerText],
-          tabBarStyle: {
-            position:'relative',
-            backgroundColor: color_pallete[0],
-            paddingTop:5,
-            height:87, //88 because 85 + 3 (border)
-            borderTopColor:color_pallete[1],
-            borderTopWidth:2,
-            zIndex:99,
-          },
+          tabBarStyle: [hasSafeArea?styles.newEraNavbar:styles.oldEraNavbar],
           tabBarItemStyle:{gap:5}
         }}
       >
@@ -55,23 +60,24 @@ export default function AppLayout() {
             <TabBarIcon name={'menu'} color={focused?'white':color_pallete[1]} />
           ),
           header: ()=>(            
-          <View style={styles.header2}>
-            <SafeAreaView/>
-            <Text
-              style={[styles.headerText, {color:color_pallete[2]}]}>
-              Discover
-            </Text>
-            <View style={styles.searchBar}>
-              <TextInput
-                placeholder="Search"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                style={styles.searchBarText}
-                placeholderTextColor={color_pallete[4]}
-              />
-              <TabBarIcon name={'search'} color={color_pallete[3]} />
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.header2}>
+              <SafeAreaView />
+              <Text style={[styles.headerText, { color: color_pallete[2] }]}>
+                Discover
+              </Text>
+              <View style={styles.searchBar}>
+                <TextInput
+                  placeholder="Search"
+                  autoCapitalize="none"
+                  keyboardType="default"
+                  style={styles.searchBarText}
+                  placeholderTextColor={color_pallete[4]}
+                />
+                <TabBarIcon name={'search'} color={color_pallete[3]} />
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
           ),
           tabBarLabel: ({ focused, color }) => (
             <Text
@@ -264,5 +270,24 @@ const styles = StyleSheet.create({
     gap:5,
     paddingLeft:'4%', 
 
+  },
+  newEraNavbar:{
+    position:'relative',
+    backgroundColor: color_pallete[0],
+    paddingTop:5,
+    height:87, //88 because 85 + 3 (border)
+    borderTopColor:color_pallete[1],
+    borderTopWidth:2,
+    zIndex:99,
+  },
+  oldEraNavbar:{
+    position:'relative',
+    backgroundColor: color_pallete[0],
+    paddingTop:5,
+    paddingBottom:10,
+    height:77, //88 because 85 + 3 (border)
+    borderTopColor:color_pallete[1],
+    borderTopWidth:2,
+    zIndex:99,
   }
 })

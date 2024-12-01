@@ -3,6 +3,8 @@ import { Plan, Profile, shop, shops } from "@/app-data/data-types";
 // These functions are intended to mock the API outputs with a mock Delay for frontend 
 // Development while the real APIs are being created
 
+// When APIS are ready create them here then replace the mock with the real APIs
+
 export const mockShop = (): Promise<shop> => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -187,7 +189,8 @@ export const mockProfile = (): Promise<Profile> => {
               visits: 5,
               spent: 120,
               organization_id: "org12345",
-              name:'Los Tacos'
+              name:'Los Tacos',
+              id:'341Dig'
           }, 
           {
             reward_plan: {
@@ -202,7 +205,7 @@ export const mockProfile = (): Promise<Profile> => {
                   ]
                 },
                 exp_rewards: {
-                  expenditure: "150",
+                  expenditure: "100",
                   rewardsOptions: [
                     { type: "cost", value: 25 },
                     { type: "percentage", value: 45 }
@@ -211,8 +214,9 @@ export const mockProfile = (): Promise<Profile> => {
               },
               visits: 5,
               spent: 0,
-              organization_id: "org304",
-              name:'Los Tacos'
+              organization_id: "org334",
+              name:'Beta Breaky',
+              id:'34nDi3'
           }];
           resolve(samplePlan);
         }, 2000);
