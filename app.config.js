@@ -3,6 +3,7 @@ export default () => {
 
   return {
     name: 'MyRewards',
+    slug:'myrewardsapp',
     ios: {
       bundleIdentifier: isProd ? 'com.my.app' : 'com.anonymous.myRewards',
       icon: './assets/images/MyRewardsLogo1.png',

@@ -3,10 +3,10 @@ import { color_pallete } from '@/constants/Colors';
 import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import { PinPointProps } from '../page2';
 import { useEffect, useState } from 'react';
-import { shops } from '@/app-data/data-types';
+import { shopPreview } from '@/app-data/data-types';
 
 type ExpandedShopProps = {
-    selectedPin: shops;
+    selectedPin: shopPreview;
     isExpanded:boolean;
     closeModal: () => void;
   };

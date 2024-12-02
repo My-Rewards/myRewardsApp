@@ -3,17 +3,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { ExpandedShop } from './page2/shopPreview';
-import * as Location from 'expo-location';
 import { useProps } from '../LoadingProp/propsProvider';
 import {SvgXml} from 'react-native-svg';
 import { whiteHandStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
-import { shops } from '@/app-data/data-types';
+import { shopPreview } from '@/app-data/data-types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const { height } = Dimensions.get('window');
 
-export type PinPointProps = shops & {
+export type PinPointProps = shopPreview & {
   onPress: () => void;
 };
 
@@ -34,49 +33,41 @@ export default function CustomMap() {
   const MAP_EXPANDED_HEIGHT = containerHeight * 0.21;
 
 
-  const [selectedPin, setSelectedPin] = useState<shops | null>(null);
+  const [selectedPin, setSelectedPin] = useState<shopPreview | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const mapHeight = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
 
-  useEffect(() => {
-    async function getCurrentLocation() {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        alert('', 'Enable Access to your Location in Settings', 'error');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,      
-      })
-    }
-
-    getCurrentLocation();
-  }, []);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(()=>{
-    if(isExpanded && selectedPin){
-      setRegion({
+    if(isExpanded && selectedPin && mapRef.current){
+      mapRef.current.animateToRegion({
         latitude: selectedPin.latitude,
         longitude: selectedPin.longitude,
         latitudeDelta: 0.006,
-        longitudeDelta: 0.006,   
-      })
+        longitudeDelta: 0.006,
+      }, 500); // Animation duration in ms
     }
   },[isExpanded])
+
+  useEffect(()=>{
+    if(mapRef.current){
+      mapRef.current.animateToRegion({
+        latitude: region.latitude,
+        longitude: region.longitude,
+        latitudeDelta: region.latitudeDelta,
+        longitudeDelta: region.longitudeDelta,
+      }, 100);
+    }
+  },[region])
 
   useEffect(()=>{
     translateY.setValue(containerHeight);
     mapHeight.setValue(containerHeight);
   },[containerHeight])
 
-  const openModal = (selectedPin?:shops) => {
+  const openModal = (selectedPin?:shopPreview) => {
     if(selectedPin){
       setSelectedPin(selectedPin);
     }
@@ -107,10 +98,10 @@ export default function CustomMap() {
         duration: 200,
         useNativeDriver: false,
       }),
-    ]).start(() => {
+    ]).start(()=>{
       setIsExpanded(false);
       setSelectedPin(null);
-    });
+    })
   };
 
   const expandFull = () =>{
@@ -130,21 +121,12 @@ export default function CustomMap() {
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 0 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10)) {
-        translateY.setValue(containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
-        mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
-      } else if(!isExpanded && gestureState.dy > 0 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10)){
-        translateY.setValue(containerHeight);
-        mapHeight.setValue(containerHeight);
-      }
-    },
     onPanResponderRelease: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 100) {
+      if (!isExpanded && gestureState.dy > 50) {
         closeModal();
       } else if (!isExpanded && gestureState.dy < -50) {
         expandFull()
-      }else{
+      }else if (!isExpanded){
         openModal()
       }
     },
@@ -187,14 +169,12 @@ export default function CustomMap() {
         <MapView
           style={styles.map}
           region={region}
+          ref={mapRef}
           showsUserLocation
           scrollEnabled={!isExpanded}
           zoomEnabled={!isExpanded}
           rotateEnabled={!isExpanded}
-          showsMyLocationButton
-          onStartShouldSetResponder={() => false}
           >
-            {/* PinPoints hardcoded for designing/testing */}
           {radiusShops?.map((shop) => {
             return (
               <PinPoint
@@ -217,7 +197,7 @@ export default function CustomMap() {
         <TouchableOpacity 
           style={styles.crossHairButton}
           onPress={() => {
-            locateMe()
+            locateMe();
           }}>
             <FontAwesome6 name={'location-crosshairs'} size={30} color={'black'} />
         </TouchableOpacity>

@@ -13,7 +13,7 @@ import {
 } from 'react';
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
-import { Plan, Profile, regionProp, shop, shops } from './data-types';
+import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (user_id:string, radius:number) => void; 
@@ -23,8 +23,8 @@ const DataContext = createContext<{
     locateMe: () => void; 
     setRegion:(location:regionProp) => void;
     region:regionProp;
-    radiusShops?: shops[] | null;
-    discoverShops?: shops[] | null;
+    radiusShops?: shopPreview[] | null;
+    discoverShops?: shopPreview[] | null;
     shop?: shop | null;
     profile?: Profile|null;
     plans?:Plan[]|null;
@@ -42,8 +42,8 @@ const DataContext = createContext<{
       {
         latitude: 28.5384,
         longitude: -81.3789,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitudeDelta: 0.008,
+        longitudeDelta: 0.008,
       },
     shop: null,
     profile:null,
@@ -64,8 +64,8 @@ const DataContext = createContext<{
   export function AppData({ children }: PropsWithChildren) {
     const { alert } = useProps();
 
-    const [radiusShops, setRadiusShops] = useState<shops[]|null>();
-    const [discoverShops, setDiscoverShops] = useState<shops[]|null>();
+    const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();
+    const [discoverShops, setDiscoverShops] = useState<shopPreview[]|null>();
     const [shop, setShop] = useState<shop|null>();
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
@@ -77,6 +77,8 @@ const DataContext = createContext<{
       });
 
     const [fetching, setFetching] = useState(false);
+
+    useEffect(()=>{getCurrentLocation()},[])
 
     async function getCurrentLocation() {
       try{
@@ -97,57 +99,53 @@ const DataContext = createContext<{
     }
 
     useEffect(() => {
-      getCurrentLocation();
-    }, []);
-
-
-      useEffect(() => {
-        if(!profile){
-          setFetching(true)
-          // Replace mock API with API here
-          mockProfile().then((profile)=>{
-            setProfile(profile)
-           })
-          .catch((error) => {
+      if(!profile){
+        setFetching(true)
+        // Replace mock API with API here
+        mockProfile().then((profile)=>{
+          setProfile(profile)
+         })
+        .catch((error) => {
+          console.error('Error fetching shops:', error);
+        });
+        setFetching(false)
+      }
+      if(!discoverShops){
+        setFetching(true)
+        // Replace mock API with API here
+        mockDiscoverProfile().then((shops)=>{
+          setDiscoverShops(shops)
+        })
+        .catch((error) => {
+          console.error('Error fetching shops:', error);
+        });
+        setFetching(false)
+      }
+      if (!radiusShops) {
+        setFetching(true)
+        getCurrentLocation();
+        // Replace mock API with API here
+        mockShopRadius()
+        .then((shops) => {
+          setRadiusShops(shops);
+        })
+        .catch((error) => {
+          console.error('Error fetching shops:', error);
+        });
+        setFetching(false)
+      }
+      if(!plans){
+        setFetching(true)
+        // Replace mock API with API here
+        mockPlans().then((plansData)=>{
+          setPlans(plansData)
+        })
+        .catch((error) => {
             console.error('Error fetching shops:', error);
-          });
-          setFetching(false)
-        }
-        if(!discoverShops){
-          setFetching(true)
-          // Replace mock API with API here
-          mockDiscoverProfile().then((shops)=>{
-            setDiscoverShops(shops)
-          })
-          .catch((error) => {
-            console.error('Error fetching shops:', error);
-          });
-          setFetching(false)
-        }
-        if (!radiusShops) {
-          setFetching(true)
-          // Replace mock API with API here
-          mockShopRadius()
-          .then((shops) => {
-            setRadiusShops(shops);
-          })
-          .catch((error) => {
-            console.error('Error fetching shops:', error);
-          });
-          setFetching(false)
-        }
-        if(!plans){
-          setFetching(true)
-          // Replace mock API with API here
-          mockPlans().then((plansData)=>{
-            setPlans(plansData)
-          })
-          .catch((error) => {
-              console.error('Error fetching shops:', error);
-          }); 
-          setFetching(false)
-        }
-      }, [radiusShops, discoverShops, profile, plans]);
+        }); 
+        setFetching(false)
+      }
+    }, [radiusShops, discoverShops, profile, plans]);
   
     return (
       <DataContext.Provider

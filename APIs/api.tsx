@@ -1,4 +1,4 @@
-import { Plan, Profile, shop, shops } from "@/app-data/data-types";
+import { Plan, Profile, shop, shopPreview } from "@/app-data/data-types";
 
 // These functions are intended to mock the API outputs with a mock Delay for frontend 
 // Development while the real APIs are being created
@@ -34,10 +34,10 @@ export const mockShop = (): Promise<shop> => {
     });
   };
 
-export const mockShopRadius = (): Promise<shops[]> => {
+export const mockShopRadius = (): Promise<shopPreview[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const sampleShops: shops[] = [
+        const sampleShops: shopPreview[] = [
           {
             latitude: 37.7749,
             longitude: -122.4194,
@@ -88,10 +88,10 @@ export const mockShopRadius = (): Promise<shops[]> => {
     });
   };
 
-  export const mockDiscoverProfile = (): Promise<shops[]> => {
+  export const mockDiscoverProfile = (): Promise<shopPreview[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const sampleShops: shops[] = [
+        const sampleShops: shopPreview[] = [
           {
             latitude: 37.7749,
             longitude: -122.4194,

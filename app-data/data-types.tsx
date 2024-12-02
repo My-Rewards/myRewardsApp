@@ -13,7 +13,7 @@ export interface ShopHour {
     close: string | null;
   }
   
-  export interface shops {
+  export interface shopPreview {
     id: string; 
     organization_id: string; 
     location_id: string;
