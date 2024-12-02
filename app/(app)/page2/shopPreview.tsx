@@ -1,9 +1,10 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { color_pallete } from '@/constants/Colors';
-import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import { PinPointProps } from '../page2';
 import { useEffect, useState } from 'react';
 import { shopPreview } from '@/app-data/data-types';
+import { transform } from '@babel/core';
 
 type ExpandedShopProps = {
     selectedPin: shopPreview;
@@ -34,9 +35,10 @@ export const ExpandedShop = ({ selectedPin, closeModal, isExpanded }: ExpandedSh
         }
     },[isExpanded])
 
+    // this will serve as the template
     if(isExpanded){
         return (
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, {borderTopRightRadius:10, borderTopLeftRadius:10}]}>
               <Text style={styles.modalTitle}>{selectedPin.name}</Text>
               <Text>${selectedPin.name} Ecpanded View</Text>
               <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
@@ -46,7 +48,7 @@ export const ExpandedShop = ({ selectedPin, closeModal, isExpanded }: ExpandedSh
         );
     }else{
         return (
-            <View style={styles.modalContent}>
+            <View style={[styles.modalContent, {margin:14, borderRadius:10}]}>
               <View style={styles.pullTab}/>
               <Text style={styles.modalTitle}>{selectedPin.name}</Text>
               <Text>${selectedPin.name}</Text>
@@ -87,6 +89,8 @@ const styles = StyleSheet.create({
       marginTop: -5,
     },
     modalContent: {
+      backgroundColor:'white',
+      flex:1,
       paddingHorizontal: 20,
       paddingBottom:20,
       paddingTop:10

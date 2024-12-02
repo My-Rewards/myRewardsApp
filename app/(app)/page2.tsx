@@ -10,7 +10,7 @@ import { localData } from '@/app-data/appData';
 import { shopPreview } from '@/app-data/data-types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const { height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export type PinPointProps = shopPreview & {
   onPress: () => void;
@@ -21,16 +21,10 @@ export default function CustomMap() {
   const { radiusShops, isLoading, region, setRegion, locateMe } = localData();
   const [containerHeight, setContainerHeight] = useState(1);
 
-  if(containerHeight === 0){
-    return(
-      <View style={{flex:1, width:'100%', height:'100%', backgroundColor:'white'}}/>
-    )
-  }
-
-  const MODAL_COLLAPSED_HEIGHT = containerHeight * 0.31;
-  const MODAL_EXPANDED_HEIGHT = containerHeight * 0.8;
-  const MAP_COLLAPSED_HEIGHT = containerHeight * 0.7;
-  const MAP_EXPANDED_HEIGHT = containerHeight * 0.21;
+  // const MODAL_COLLAPSED_HEIGHT = containerHeight * 0.31;
+  const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
+  const MODAL_EXPANDED_HEIGHT = containerHeight * 0.82;
+  const MAP_EXPANDED_HEIGHT = containerHeight * 0.19;
 
 
   const [selectedPin, setSelectedPin] = useState<shopPreview | null>(null);
@@ -43,10 +37,10 @@ export default function CustomMap() {
   useEffect(()=>{
     if(isExpanded && selectedPin && mapRef.current){
       mapRef.current.animateToRegion({
-        latitude: selectedPin.latitude,
+        latitude: selectedPin.latitude-0.00001,
         longitude: selectedPin.longitude,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
       }, 500);
     }
   },[isExpanded])
@@ -66,13 +60,7 @@ export default function CustomMap() {
         toValue: containerHeight - MODAL_COLLAPSED_HEIGHT,
         duration: 200,
         useNativeDriver: true,
-      }),
-      Animated.timing(mapHeight, {
-        toValue: MAP_COLLAPSED_HEIGHT,
-        delay:40,
-        duration: 200,
-        useNativeDriver: false,
-      }),
+      })
     ]).start();
   };
 
@@ -114,19 +102,21 @@ export default function CustomMap() {
     onPanResponderMove: (_, gestureState) => {
       if (!isExpanded && gestureState.dy > 0 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10)) {
         translateY.setValue(containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
-        mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
       } else if(!isExpanded && gestureState.dy > 0 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10)){
         translateY.setValue(containerHeight);
-        mapHeight.setValue(containerHeight);
       }
     },
     onPanResponderRelease: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 100) {
+      const isPress = Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
+      if (isPress) {
+        console.log('expand')
+        expandFull();
+      } else if (!isExpanded && gestureState.dy > 100) {
         closeModal();
       } else if (!isExpanded && gestureState.dy < -50) {
-        expandFull()
-      }else if (!isExpanded){
-        openModal()
+        expandFull();
+      } else if (!isExpanded) {
+        openModal();
       }
     },
   });
@@ -187,12 +177,12 @@ export default function CustomMap() {
                 organization_id={shop.id} 
                 location_id={shop.location_id} 
                 geohash={shop.geohash} 
-                onPress={() => openModal(shop)}
+                onPress={() => {openModal(shop)}}
               />
             );
           })}
         </MapView>
-        {!isExpanded &&  
+        {!isExpanded && !selectedPin &&  
         <TouchableOpacity 
           style={styles.crossHairButton}
           onPress={() => {
@@ -204,13 +194,16 @@ export default function CustomMap() {
       </Animated.View>
       {selectedPin && (
         <Animated.View
-          style={[styles.bottomModal, { transform: [{ translateY }], height:isExpanded?MODAL_EXPANDED_HEIGHT:MODAL_COLLAPSED_HEIGHT}]}
+          style={[styles.bottomModal, 
+            { transform: [{ translateY }], 
+            height:isExpanded?MODAL_EXPANDED_HEIGHT: MODAL_COLLAPSED_HEIGHT, width:isExpanded?width:width-20}]}
           {...panResponder.panHandlers}
         >
-          <ExpandedShop 
-           selectedPin={selectedPin}
-           isExpanded={isExpanded}
-           closeModal={closeModal}/>
+            <ExpandedShop 
+            selectedPin={selectedPin}
+            isExpanded={isExpanded}
+            closeModal={closeModal}
+          />
         </Animated.View>
       )}
     </View>
@@ -262,7 +255,6 @@ const styles = StyleSheet.create({
   bottomModal: {
     position: 'absolute',
     width: '100%',
-    backgroundColor: 'white',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     shadowColor: '#000',
