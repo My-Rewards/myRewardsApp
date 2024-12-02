@@ -80,6 +80,7 @@ export default function CustomMap() {
       }),
       Animated.timing(mapHeight, {
         toValue: MAP_COLLAPSED_HEIGHT,
+        delay:40,
         duration: 200,
         useNativeDriver: false,
       }),
