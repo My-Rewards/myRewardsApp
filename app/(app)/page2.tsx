@@ -27,9 +27,9 @@ export default function CustomMap() {
     )
   }
 
-  const MODAL_COLLAPSED_HEIGHT = containerHeight * 0.35;
+  const MODAL_COLLAPSED_HEIGHT = containerHeight * 0.31;
   const MODAL_EXPANDED_HEIGHT = containerHeight * 0.8;
-  const MAP_COLLAPSED_HEIGHT = containerHeight * 0.66;
+  const MAP_COLLAPSED_HEIGHT = containerHeight * 0.7;
   const MAP_EXPANDED_HEIGHT = containerHeight * 0.21;
 
 
@@ -47,20 +47,9 @@ export default function CustomMap() {
         longitude: selectedPin.longitude,
         latitudeDelta: 0.006,
         longitudeDelta: 0.006,
-      }, 500); // Animation duration in ms
+      }, 500);
     }
   },[isExpanded])
-
-  useEffect(()=>{
-    if(mapRef.current){
-      mapRef.current.animateToRegion({
-        latitude: region.latitude,
-        longitude: region.longitude,
-        latitudeDelta: region.latitudeDelta,
-        longitudeDelta: region.longitudeDelta,
-      }, 100);
-    }
-  },[region])
 
   useEffect(()=>{
     translateY.setValue(containerHeight);
@@ -122,8 +111,17 @@ export default function CustomMap() {
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gestureState) => {
+      if (!isExpanded && gestureState.dy > 0 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10)) {
+        translateY.setValue(containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
+        mapHeight.setValue(MAP_COLLAPSED_HEIGHT + gestureState.dy);
+      } else if(!isExpanded && gestureState.dy > 0 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10)){
+        translateY.setValue(containerHeight);
+        mapHeight.setValue(containerHeight);
+      }
+    },
     onPanResponderRelease: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 50) {
+      if (!isExpanded && gestureState.dy > 100) {
         closeModal();
       } else if (!isExpanded && gestureState.dy < -50) {
         expandFull()
@@ -198,9 +196,9 @@ export default function CustomMap() {
         <TouchableOpacity 
           style={styles.crossHairButton}
           onPress={() => {
-            locateMe();
+            locateMe(mapRef);
           }}>
-            <FontAwesome6 name={'location-crosshairs'} size={30} color={'black'} />
+            <FontAwesome6 name={'location-crosshairs'} size={40} color={color_pallete[2]} />
         </TouchableOpacity>
         }
       </Animated.View>

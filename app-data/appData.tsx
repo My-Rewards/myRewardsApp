@@ -14,13 +14,14 @@ import {
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
 import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
+import MapView from 'react-native-maps';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (user_id:string, radius:number) => void; 
     fetchDiscoverShops: (user_id:string, filterOption:number) => void;
     fetchPlans: (filterOption:number)=>void;
     fetchProfile: (user_id:string) => void; 
-    locateMe: () => void; 
+    locateMe: (map:React.RefObject<MapView>) => void; 
     setRegion:(location:regionProp) => void;
     region:regionProp;
     radiusShops?: shopPreview[] | null;
@@ -69,6 +70,7 @@ const DataContext = createContext<{
     const [shop, setShop] = useState<shop|null>();
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
+    const [userLocation, setUserLocation] = useState<regionProp|null>();
     const [region, setRegion] = useState({
         latitude: 28.5384,
         longitude: -81.3789,
@@ -78,23 +80,51 @@ const DataContext = createContext<{
 
     const [fetching, setFetching] = useState(false);
 
-    useEffect(()=>{getCurrentLocation()},[])
-
     async function getCurrentLocation() {
-      try{
-        let location = await Location.getCurrentPositionAsync({});
+      setFetching(true);
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          const permission = await Location.requestForegroundPermissionsAsync();
+          if (permission.status !== 'granted') {
+            alert('', 'Enable Access to your Location in Settings', 'error');
+            return;
+          }
+        }
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        });
         setRegion({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.05,
-          longitudeDelta: 0.05,      
-        })
-      }catch{
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          alert('', 'Enable Access to your Location in Settings', 'error');
-          return;
-        }
+          longitudeDelta: 0.05,
+        });
+      } catch (error) {
+        console.error('Error fetching location:', error);
+      } finally {
+        setFetching(false);
+      }
+    }    
+
+    async function rebaseUserLocation(map:React.RefObject<MapView>){
+      if(userLocation){
+        setRegion(userLocation)
+      }else{
+        getCurrentLocation()
+      }
+      
+      if(userLocation && map.current){
+        map.current.animateToRegion({
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: userLocation.latitudeDelta,
+          longitudeDelta: userLocation.longitudeDelta,
+        }, 200);
       }
     }
 
@@ -227,7 +257,7 @@ const DataContext = createContext<{
               
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
-            locateMe: async ()=>{getCurrentLocation()},
+            locateMe: async (map:React.RefObject<MapView>)=>{rebaseUserLocation(map)},
             radiusShops,
             discoverShops,
             shop,
