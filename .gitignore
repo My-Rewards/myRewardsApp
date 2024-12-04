@@ -6,4 +6,7 @@ node_modules/
 
 .expo/
 
+/ios
+/android
+
 # @end expo-cli

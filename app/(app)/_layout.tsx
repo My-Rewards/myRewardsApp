@@ -93,7 +93,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="page2"
+        name="mapPage"
         options={{
           title: 'Map',
           tabBarIcon: ({ focused }) => (
@@ -119,7 +119,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="page3"
+        name="scanPage"
         options={{
           title: undefined,
           headerShown:false,
@@ -143,7 +143,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="page4"
+        name="plansPage"
         options={{
           title: 'Rewards',
           tabBarIcon: ({ focused }) => (
@@ -183,7 +183,7 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
-        name="page5"
+        name="profilePage"
         options={{
           title: 'Profile',
           tabBarIcon: ({ focused }) => (
@@ -200,6 +200,21 @@ export default function AppLayout() {
               Profile
             </Text>
           ),
+          header: () => (
+            <View style={[styles.header, {paddingBottom:5}]}>
+              <SafeAreaView />
+              <Text style={styles.headerText}>Profile</Text>
+            </View>
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="shopPage"
+        options={{
+          title: 'Profile',
+          tabBarStyle: { display: 'none' },
+          tabBarButton: () => null,
+          tabBarShowLabel:false,
           header: () => (
             <View style={[styles.header, {paddingBottom:5}]}>
               <SafeAreaView />

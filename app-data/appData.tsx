@@ -74,8 +74,8 @@ const DataContext = createContext<{
     const [region, setRegion] = useState({
         latitude: 28.5384,
         longitude: -81.3789,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
       });
 
     const [fetching, setFetching] = useState(false);
