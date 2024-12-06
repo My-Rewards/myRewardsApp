@@ -92,6 +92,7 @@ const DataContext = createContext<{
           }
         }
         const location = await Location.getCurrentPositionAsync({});
+
         setUserLocation({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -124,11 +125,15 @@ const DataContext = createContext<{
           longitude: userLocation.longitude,
           latitudeDelta: userLocation.latitudeDelta,
           longitudeDelta: userLocation.longitudeDelta,
-        }, 200);
+        }, 0);
       }
     }
 
     useEffect(() => {
+      if(!userLocation){
+        getCurrentLocation();
+      }
+      
       if(!profile){
         setFetching(true)
         // Replace mock API with API here
@@ -153,7 +158,6 @@ const DataContext = createContext<{
       }
       if (!radiusShops) {
         setFetching(true)
-        getCurrentLocation();
         // Replace mock API with API here
         mockShopRadius()
         .then((shops) => {
@@ -175,7 +179,7 @@ const DataContext = createContext<{
         }); 
         setFetching(false)
       }
-    }, [radiusShops, discoverShops, profile, plans]);
+    }, []);
   
     return (
       <DataContext.Provider

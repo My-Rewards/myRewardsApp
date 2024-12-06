@@ -26,8 +26,8 @@ export const mockShop = (): Promise<shop> => {
           ],
           description: "A cozy coffee shop offering the best artisan coffee and pastries.",
           title: "Cozy Coffee Corner",
-          logo: "https://picsum.photos/300/200",
-          banner: "https://picsum.photos/300/200",
+          logo: "https://picsum.photos/200/200",
+          banner: "https://picsum.photos/400/200",
         };
         resolve(sampleShop);
       }, 2000);

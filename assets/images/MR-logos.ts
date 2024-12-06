@@ -1,4 +1,4 @@
-export const whiteHandStar = `
+export const handStar = `
 <?xml version="1.0" encoding="UTF-8"?>
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 631.09 615.31">
   <g>

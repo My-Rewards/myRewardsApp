@@ -1,16 +1,15 @@
 import { color_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity, Modal, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { ExpandedShop } from '../../components/shopPreview';
+import { ExpandedShop, ShopPreview } from '../../components/shopPreview';
 import { useProps } from '../LoadingProp/propsProvider';
 import {SvgXml} from 'react-native-svg';
-import { whiteHandStar } from '@/assets/images/MR-logos';
+import { handStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
 import { shopPreview } from '@/app-data/data-types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
-const { width } = Dimensions.get('window');
 
 export type PinPointProps = shopPreview & {
   onPress: () => void;
@@ -21,11 +20,7 @@ export default function mapPage() {
   const { radiusShops, isLoading, region, setRegion, locateMe } = localData();
   const [containerHeight, setContainerHeight] = useState(1);
 
-  // probably gonna change MODAL_COLLAPSED_HEIGHT to fized height
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-  const MODAL_EXPANDED_HEIGHT = containerHeight * 0.82;
-  const MAP_EXPANDED_HEIGHT = containerHeight * 0.19;
-
 
   const [selectedPin, setSelectedPin] = useState<shopPreview | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
@@ -33,17 +28,6 @@ export default function mapPage() {
   const [isExpanded, setIsExpanded] = useState(false); 
 
   const mapRef = useRef<MapView>(null);
-
-  useEffect(()=>{
-    if(isExpanded && selectedPin && mapRef.current){
-      mapRef.current.animateToRegion({
-        latitude: selectedPin.latitude-0.00001,
-        longitude: selectedPin.longitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
-      }, 500);
-    }
-  },[isExpanded])
 
   useEffect(()=>{
     translateY.setValue(containerHeight);
@@ -82,21 +66,6 @@ export default function mapPage() {
     })
   };
 
-  const expandFull = () =>{
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: containerHeight - MODAL_EXPANDED_HEIGHT,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(mapHeight, {
-        toValue: MAP_EXPANDED_HEIGHT,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start(() => setIsExpanded(true));
-  }
-
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (_, gestureState) => {
@@ -109,12 +78,9 @@ export default function mapPage() {
     onPanResponderRelease: (_, gestureState) => {
       const isPress = Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
       if (isPress) {
-        console.log('expand')
-        expandFull();
+        setIsExpanded(true)
       } else if (!isExpanded && gestureState.dy > 100) {
         closeModal();
-      } else if (!isExpanded && gestureState.dy < -50) {
-        expandFull();
       } else if (!isExpanded) {
         openModal();
       }
@@ -130,8 +96,8 @@ export default function mapPage() {
       <View style={styles.marker}>
         <View style={selectedPin?.id == info.id ? styles.circleSelected : styles.circle}>
           <SvgXml
-            color='white'
-            xml={whiteHandStar}
+            color={selectedPin?.id == info.id ?color_pallete[1]:'white'}
+            xml={handStar}
             width="62%"
             height="62%"
           />
@@ -194,18 +160,25 @@ export default function mapPage() {
         }
       </Animated.View>
       {selectedPin && (
-        <Animated.View
-          style={[styles.bottomModal, 
-            { transform: [{ translateY }], 
-            height:isExpanded?MODAL_EXPANDED_HEIGHT: MODAL_COLLAPSED_HEIGHT}]}
-          {...panResponder.panHandlers}
-        >
-            <ExpandedShop 
+        <>
+          <Animated.View
+            style={[styles.bottomModal, 
+              { transform: [{ translateY }], 
+              height:MODAL_COLLAPSED_HEIGHT}]}
+            {...panResponder.panHandlers}
+          >
+              <ShopPreview 
+              selectedPin={selectedPin}
+              isExpanded={isExpanded}
+            />
+          </Animated.View>
+          
+          {isExpanded && <ExpandedShop 
             selectedPin={selectedPin}
             isExpanded={isExpanded}
-            closeModal={closeModal}
-          />
-        </Animated.View>
+            setExpansion={setIsExpanded}
+          />}
+        </>
       )}
     </View>
   );
@@ -225,12 +198,13 @@ const styles = StyleSheet.create({
   circleSelected: {
     width: 40,
     height: 40,
-    backgroundColor: color_pallete[1],
+    backgroundColor: 'white',
     borderRadius: 20,
     borderWidth:2,
-    borderColor: color_pallete[2],
+    borderColor: color_pallete[1],
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex:11
   },
   circle: {
     width: 40,
@@ -252,17 +226,17 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderTopColor: color_pallete[1],
     marginTop: -5,
+    zIndex:10
   },
   bottomModal: {
     position: 'absolute',
     width: '100%',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+    backgroundColor:'transparent'
   },
   crossHairButton:{
     position:'absolute',
