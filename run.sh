@@ -35,7 +35,7 @@ echo "You selected profile: $selected_profile"
 
 # Try to fetch parameters without logging in
 echo "Fetching AWS Parameters using profile: $selected_profile..."
-PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile" 2>/dev/null)
+PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/customerUserPoolId" "/myRewardsApp/beta/customerWebClientId" "/myRewardsApp/beta/customerCognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile" 2>/dev/null)
 
 if [[ $? -ne 0 ]]; then
     echo "AWS SSO session expired or invalid. Logging in with profile: $selected_profile..."

@@ -1,15 +1,16 @@
 import { color_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity, Modal, Text } from 'react-native';
+import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity, Modal, Text, FlatList } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { ExpandedShop, ShopPreview } from '../../components/shopPreview';
 import { useProps } from '../LoadingProp/propsProvider';
 import {SvgXml} from 'react-native-svg';
 import { handStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
-import { shopPreview } from '@/app-data/data-types';
+import { ShopHour, shopPreview } from '@/app-data/data-types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
+const { width } = Dimensions.get('window');
 
 export type PinPointProps = shopPreview & {
   onPress: () => void;
@@ -26,17 +27,22 @@ export default function mapPage() {
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const mapHeight = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
+  const [isFlatListScrolling, setIsFlatListScrolling] = useState(true);
 
   const mapRef = useRef<MapView>(null);
+  const flatListRef = useRef<FlatList>(null);
+  const currentScrollX = useRef(0);
 
   useEffect(()=>{
     translateY.setValue(containerHeight);
     mapHeight.setValue(containerHeight);
   },[containerHeight])
 
-  const openModal = (selectedPin?:shopPreview) => {
-    if(selectedPin){
+  const openModal = (selectedPin?:shopPreview, pos?:number) => {
+    if(selectedPin && pos!== undefined){
       setSelectedPin(selectedPin);
+      flatListRef.current?.scrollToIndex({index:pos, animated:false})
+      currentScrollX.current = pos * width; 
     }
 
     Animated.parallel([
@@ -68,12 +74,20 @@ export default function mapPage() {
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: (_, gestureState) => {
+      return !isFlatListScrolling && Math.abs(gestureState.dy) > Math.abs(gestureState.dx);
+    },
     onPanResponderMove: (_, gestureState) => {
-      if (!isExpanded && gestureState.dy > 0 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10)) {
+      if (!isExpanded && gestureState.dy > 20 && gestureState.dy<(MODAL_COLLAPSED_HEIGHT-10) && Math.abs(gestureState.dx) < 20 ) {
         translateY.setValue(containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy);
-      } else if(!isExpanded && gestureState.dy > 0 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10)){
+      } else if(!isExpanded && gestureState.dy > 20 && gestureState.dy>=(MODAL_COLLAPSED_HEIGHT-10) && Math.abs(gestureState.dx) < 20){
         translateY.setValue(containerHeight);
       }
+      if(!isExpanded && Math.abs(gestureState.dx) > Math.abs(gestureState.dy)){
+        const offsetX = currentScrollX.current - gestureState.dx;
+        flatListRef.current?.scrollToOffset({ offset: offsetX, animated: false });
+      }
+
     },
     onPanResponderRelease: (_, gestureState) => {
       const isPress = Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
@@ -83,6 +97,80 @@ export default function mapPage() {
         closeModal();
       } else if (!isExpanded) {
         openModal();
+      }
+
+      if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && radiusShops) {
+        let move = 0;
+
+        if(gestureState.dx > 0){
+          move = Math.round((gestureState.dx + (width/4))/ width);
+        }else{
+          move = Math.round((gestureState.dx - (width/4))/ width);
+        }
+
+        let currPos = currentScrollX.current/width;
+        let newPos = currentScrollX.current/width;
+
+        if(move > 0 && currPos>0){
+          newPos = currPos - 1;
+        }
+
+        else if(move < 0 && currPos<radiusShops.length-1){
+          newPos = currPos + 1;
+        }
+    
+        flatListRef.current?.scrollToIndex({index:newPos, animated:true})
+        mapRef.current?.animateToRegion({
+          latitude: radiusShops[newPos].latitude,
+          longitude: radiusShops[newPos].longitude,
+          latitudeDelta: region.latitudeDelta,
+          longitudeDelta: region.longitudeDelta,
+        }, 300);
+    
+        currentScrollX.current = newPos * width; 
+        setSelectedPin(radiusShops[newPos]);   
+      }
+    },
+    onPanResponderTerminate: (_, gestureState) => {
+      const isPress = Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
+      if (isPress) {
+        setIsExpanded(true)
+      } else if (!isExpanded && gestureState.dy > 100) {
+        closeModal();
+      } else if (!isExpanded) {
+        openModal();
+      }
+
+      if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy) && radiusShops) {
+        let move = 0;
+
+        if(gestureState.dx > 0){
+          move = Math.round((gestureState.dx + (width/4))/ width);
+        }else{
+          move = Math.round((gestureState.dx - (width/4))/ width);
+        }
+
+        let currPos = currentScrollX.current/width;
+        let newPos = currentScrollX.current/width;
+
+        if(move > 0 && currPos>0){
+          newPos = currPos - 1;
+        }
+
+        else if(move < 0 && currPos<radiusShops.length-1){
+          newPos = currPos + 1;
+        }
+    
+        flatListRef.current?.scrollToIndex({index:newPos, animated:true})
+        mapRef.current?.animateToRegion({
+          latitude: radiusShops[newPos].latitude,
+          longitude: radiusShops[newPos].longitude,
+          latitudeDelta: region.latitudeDelta,
+          longitudeDelta: region.longitudeDelta,
+        }, 300);
+    
+        currentScrollX.current = newPos * width; 
+        setSelectedPin(radiusShops[newPos]);   
       }
     },
   });
@@ -126,28 +214,27 @@ export default function mapPage() {
           region={region}
           ref={mapRef}
           showsUserLocation
+          pitchEnabled={false}
           scrollEnabled={!isExpanded}
           zoomEnabled={!isExpanded}
           rotateEnabled={!isExpanded}
           onMapReady={()=>{ locateMe(mapRef)}}
           >
-          {radiusShops?.map((shop) => {
-            return (
-              <PinPoint
-                key={shop.id}
-                latitude={shop.latitude}
-                longitude={shop.longitude}
-                logo={shop.logo}
-                id={shop.id}
-                name={shop.name}
-                description={shop.description}
-                organization_id={shop.id} 
-                location_id={shop.location_id} 
-                geohash={shop.geohash} 
-                onPress={() => {openModal(shop)}}
-              />
-            );
-          })}
+          {radiusShops?.map((shop, index) => (
+            <PinPoint
+              key={shop.id}
+              latitude={shop.latitude}
+              longitude={shop.longitude}
+              logo={shop.logo}
+              id={shop.id}
+              name={shop.name}
+              description={shop.description}
+              organization_id={shop.id} 
+              location_id={shop.location_id} 
+              geohash={shop.geohash} 
+              onPress={() => {openModal(shop, index)}}
+            />
+          ))}
         </MapView>
         {!isExpanded && !selectedPin &&  
         <TouchableOpacity 
@@ -159,27 +246,38 @@ export default function mapPage() {
         </TouchableOpacity>
         }
       </Animated.View>
-      {selectedPin && (
-        <>
-          <Animated.View
-            style={[styles.bottomModal, 
-              { transform: [{ translateY }], 
-              height:MODAL_COLLAPSED_HEIGHT}]}
-            {...panResponder.panHandlers}
-          >
-              <ShopPreview 
-              selectedPin={selectedPin}
-              isExpanded={isExpanded}
-            />
-          </Animated.View>
-          
-          {isExpanded && <ExpandedShop 
+      <Animated.View
+        style={[styles.bottomModal, 
+          { transform: [{ translateY }], 
+          height:MODAL_COLLAPSED_HEIGHT}]}
+        {...panResponder.panHandlers}
+        >                
+          <FlatList
+            ref={flatListRef}
+            data={radiusShops}
+            horizontal
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <ShopPreview
+                key={item.id}
+                selectedPin={item}      
+                />
+            )}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={width}
+            snapToAlignment="center"
+            decelerationRate="fast"
+            onScrollBeginDrag={() => setIsFlatListScrolling(true)}
+            onScrollEndDrag={() => setIsFlatListScrolling(false)}
+            onMomentumScrollEnd={() => setIsFlatListScrolling(false)}
+          />
+        </Animated.View>      
+        {isExpanded &&  selectedPin &&
+          <ExpandedShop 
             selectedPin={selectedPin}
             isExpanded={isExpanded}
             setExpansion={setIsExpanded}
-          />}
-        </>
-      )}
+        />}
     </View>
   );
 }

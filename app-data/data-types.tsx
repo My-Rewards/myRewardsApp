@@ -34,9 +34,14 @@ export interface ShopHour {
     longitude: number;
     shop_hours: ShopHour[];
     description: string; 
+    location:{
+      city:string,
+      state:string
+    }
     title: string; 
     logo: string; 
     banner: string;
+    liked:boolean
   }
 
   export interface Profile {
