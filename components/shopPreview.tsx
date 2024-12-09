@@ -1,14 +1,13 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { color_pallete } from '@/constants/Colors';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Modal, Dimensions, Image, ScrollView, ActivityIndicator, PanResponder} from 'react-native';
-import { PinPointProps } from '../app/(app)/mapPage';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Plan, shop, ShopHour, shopPreview } from '@/app-data/data-types';
-import { transform } from '@babel/core';
 import { mockPlan, mockShop } from '@/APIs/api';
 import ParallaxScrollView from './ParallaxScrollView';
 import { localData } from '@/app-data/appData';
-import { isLoading } from 'expo-font';
+import {modalStyle, styles} from './mapPreviewStyle'
+import { color_pallete } from '@/constants/Colors';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
@@ -86,12 +85,31 @@ const calculateDistance = (lat: number, lon: number): string => {
 }
 
 export const ShopPreview = ({selectedPin}: ShopPreviewProps) => {
+  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
 
   return (
     <View style={{height:'100%', width:width-30, alignSelf:'center', marginHorizontal:10}}>
       <View style={[styles.modalContent,]}>
-        <Text style={styles.header}>{selectedPin.name}</Text>
-        <Text>${selectedPin.name}</Text>
+        <View style={[styles.titleContainer, {marginBottom:5}]}>
+          <View style={styles.logo2}>
+            <Image style={{flex:1}} source={{uri: selectedPin.logo}}/>
+          </View>
+          <Text style={styles.text1}>{selectedPin.name}</Text>
+        </View>
+        <View style={styles.subHeader2}>
+          <Text style={[styles.modalTitle1]}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+          <View style={styles.subHeader1}>
+            <View>
+              <Text style={[styles.subText]}>{distance} miles away</Text>
+            </View>
+            <View>
+              <Text style={styles.subText}>{getShopStatus(selectedPin.shop_hours)}</Text>
+            </View>
+          </View>
+          <View style={styles.descContainer}>
+            <Text style={styles.text2}>{selectedPin.description}</Text>
+          </View>
+        </View>
       </View>
     </View>
 );
@@ -102,6 +120,7 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [liked, setLiked] = useState<boolean>(false)
 
   const [loading, setLoading] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
@@ -111,16 +130,19 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
   const currentScreen = useRef(0);
 
   const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
-
+  const { width: screenWidth } = Dimensions.get('window');
+  
   useEffect(() => {
     const fetchShopDetails = async () => {
       if (isExpanded && profile) {
         setLoading(true);
         try {
-          const shopData = await mockShop(selectedPin.id);
+          const shopData = await mockShop(selectedPin.id, profile.id);
           setShopDetails(shopData);
-          const planData = await mockPlan(profile?.id, shopData.id)
+          setLiked(shopData.liked)
+          const planData = await mockPlan(profile.id, shopData.id)
           setPlan(planData)
+
         } catch (error) {
           console.error('Error fetching shop details:', error);
         } finally {
@@ -206,8 +228,33 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     },
   });
 
+  function getNextRewardVisits(data:Plan) {
+    const { reward_plan, visits } = data;
+  
+    if (!reward_plan || !reward_plan.road_map) {
+      throw new Error("Invalid reward plan structure");
+    }
+  
+    const milestones = Object.keys(reward_plan.road_map)
+      .map(Number)
+      .sort((a, b) => a - b);
+      for (const milestone of milestones) {
+      if (visits < milestone) {
+        return milestone - visits;
+      }
+    }
+      return null;
+  }
+  
+
   const planSection = () =>{
     if(plan && shopDetails && !loading){
+      const milestones = Object.entries(plan.reward_plan.road_map);
+      const totalMilestones = milestones.length;
+      const lineWidth = ((screenWidth - milestones.length * 30) / (milestones.length - 1))*0.8;
+
+      const numOfVisits = getNextRewardVisits(plan);
+
       return(
         <View>
           <Animated.View
@@ -217,11 +264,31 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
           ]}
           {...panResponder.panHandlers}
         >    
-            <View style={{width}}>
-              <Text>{plan.id}</Text>
+            <View style={{width, flexDirection:'column'}}>
+              <View style={{alignItems:'center', margin:20}}>
+                <Text style={modalStyle.visitsText}>{numOfVisits} {numOfVisits === 1?'Visit':'Visits'} until your next reward!</Text>
+              </View>
+              <View style={modalStyle.roadmapContainer}>
+                <View style={modalStyle.roadmap}>
+                  {milestones.map(([milestone], index) => (
+                    <View key={milestone} style={modalStyle.stepContainer}>
+                      {plan.visits.toString()>milestone ? (
+                      <View style={[modalStyle.circle, {backgroundColor:color_pallete[2]}]}>
+                        <Ionicons name='checkmark' color={'white'}/>
+                      </View>
+                      ):(
+                      <View style={[modalStyle.circle]}>
+                        <Text style={modalStyle.circleText}>{milestone}</Text>
+                      </View>
+                      )}
+                      {index < milestones.length - 1 && <View style={[modalStyle.line, { width: lineWidth }]} />}
+                    </View>
+                  ))}
+                </View>
+              </View>
             </View>
             <View style={{width}}>
-              <Text>{plan.reward_plan.exp_rewards.expenditure}</Text>
+              <Text></Text>
             </View>
           </Animated.View>
         </View>
@@ -234,7 +301,6 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
       )
     }
   }
-
 
   return (
     <View style={[modalStyle.modalContainer]}>
@@ -270,17 +336,17 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                     <Text style={modalStyle.modalTitle}>{selectedPin.name}</Text>
                   </View>
                   <View>
-                    <Text style={modalStyle.modalTitle1}>{shopDetails.location.city}, {shopDetails.location.state}</Text>
+                    <Text style={modalStyle.modalTitle1}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
                     <View style={modalStyle.subHeader}>
                       <View>
                         <Text style={[modalStyle.subText]}>{distance} miles away</Text>
                       </View>
                       <View>
-                        <Text style={modalStyle.subText}>{getShopStatus(shopDetails.shop_hours)}</Text>
+                        <Text style={modalStyle.subText}>{getShopStatus(selectedPin.shop_hours)}</Text>
                       </View>
                     </View>
                     <View style={modalStyle.descContainer}>
-                      <Text style={modalStyle.text1}>{shopDetails.description}</Text>
+                      <Text style={modalStyle.text1}>{selectedPin.description}</Text>
                     </View>
                   </View>
                   <View style={modalStyle.toggleSection}>
@@ -293,7 +359,20 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                       </TouchableOpacity>
                   </View>
                 </View>
-                { planSection() }
+                <View>
+                  <View style={styles.subHeader}>
+                    <View style={styles.titleContainer}>
+                      <View style={styles.logo}>
+                        <Image style={{flex:1}} source={{uri: selectedPin.logo}}/>
+                      </View>
+                      <Text style={styles.text1}>{selectedPin.name}</Text>
+                    </View>
+                    <TouchableOpacity onPress={()=>{setLiked(!liked)}}>
+                      <TabBarIcon color={color_pallete[2]} name={liked?'heart':'heart-outline'} />
+                    </TouchableOpacity>
+                  </View>
+                  { planSection() }
+                </View>
               </View>
             </ParallaxScrollView>
           )}
@@ -303,171 +382,3 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     </View>
   );
 };
-
-
-const styles = StyleSheet.create({
-    mapContainer: {
-      width: '100%',
-    },
-    map: {
-      width: '100%',
-      height: '100%',
-    },
-    marker: {
-      alignItems: 'center',
-    },
-    circle: {
-      width: 40,
-      height: 40,
-      backgroundColor: color_pallete[1],
-      borderRadius: 20,
-      borderColor: '#fff',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    pin: {
-      width: 0,
-      height: 0,
-      borderLeftWidth: 10,
-      borderRightWidth: 10,
-      borderTopWidth: 15,
-      borderLeftColor: 'transparent',
-      borderRightColor: 'transparent',
-      borderTopColor: color_pallete[1],
-      marginTop: -5,
-    },
-    modalContent: {
-      backgroundColor:'white',
-      flex:1,
-      paddingHorizontal: 20,
-      margin:10,
-      borderRadius:10,
-      paddingTop:10,
-      width:width-20,
-      alignSelf:'center'
-    },
-    closeButton: {
-      position: 'absolute',
-      right: 10,
-      top: 10,
-      backgroundColor: 'rgba(0,0,0,0.2)',
-      borderRadius: 25,
-      padding: 5,
-      zIndex:100
-    },
-    header:{
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 10,
-    }
-});
-  
-const modalStyle = StyleSheet.create({
-  modalContainer:{ 
-    position: 'absolute', 
-    width: '100%', 
-    height: '100%'
-  },
-  container:{
-    backgroundColor:'white', 
-    flex:0.8,
-    borderTopRightRadius:15,
-    borderTopLeftRadius:15,
-    overflow:'hidden',
-  },
-  loadingContainer:{
-    display:'flex',
-    flex:1,
-  },
-  container2: {
-    flex: 1,
-    justifyContent: 'center',
-    position:'relative',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    zIndex:99
-  },
-  imageContainer: {
-    justifyContent: 'flex-start',
-    width: '100%',
-    backgroundColor: '#f0f0f0',
-  },
-  image: {
-    width: '100%',
-    height: undefined,
-    aspectRatio: 2,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color:'white',
-    textAlign:'center',
-    fontFamily:'Avenir Next'
-  },
-  modalTitle1:{
-    alignSelf:'center',
-    fontFamily:'Avenir Next',
-    fontWeight:'700',
-    fontSize:16,
-    color:'white',
-    opacity:0.8
-  },
-  titleContainer:{
-    borderRadius:10,
-    borderWidth:2,
-    borderColor:'white',
-    display:'flex',
-    alignSelf: 'center',
-    marginVertical: 10,
-    marginHorizontal:10,
-    paddingVertical:5, 
-    paddingHorizontal:10,
-    minWidth:'60%'
-  },
-  subHeader:{
-    display:'flex',
-    flexDirection:'row',
-    justifyContent:'center',
-    gap:10,
-    marginTop:5,
-    marginBottom:20
-  },
-  subText:{
-    fontFamily:'Avenir Next',
-    color:'white',
-    fontWeight:'500',
-    fontSize:12,
-    opacity:0.8
-  },
-  descContainer:{
-    alignSelf:'center', 
-    marginBottom:30
-  },
-  text1:{
-    fontFamily:'Avenir Next',
-    color:'white',
-    fontWeight:'500',
-    fontSize:13,
-    opacity:1
-  },
-  toggleSection:{
-    display:'flex',
-    flexDirection:'row',
-    justifyContent:'space-around',
-    paddingBottom:5,
-    marginBottom:3
-  },
-  toggleText:{
-    fontSize:14,
-    color:'white',
-    fontFamily:'Avenir Next',
-    fontWeight:'500'
-  },
-  wrapper: {
-    flexDirection: 'row',
-    width: width * 2,
-    backgroundColor:'transparent',
-    flex:1,
-    height:500
-  },
-});

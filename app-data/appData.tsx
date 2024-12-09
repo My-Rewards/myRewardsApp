@@ -126,57 +126,72 @@ const DataContext = createContext<{
     }
 
     useEffect(() => {
-      if(!userLocation){
-        getCurrentLocation();
-      }
-      
-      if(!profile){
-        setFetching(true)
-        // Replace mock API with API here
-        mockProfile().then((profile)=>{
-          setProfile(profile)
-         })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if(!discoverShops){
-        setFetching(true)
-        // Replace mock API with API here
-        mockDiscoverShops().then((shops)=>{
-          setDiscoverShops(shops)
-        })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if (!radiusShops) {
-        setFetching(true)
-        // Replace mock API with API here
-        mockShopRadius()
-        .then((shops) => {
-          setRadiusShops(shops);
-        })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if(!plans && profile){
-        setFetching(true)
-        // Replace mock API with API here
-        mockPlans(profile.id).then((plansData)=>{
-          setPlans(plansData)
-        })
-        .catch((error) => {
-            console.error('Error fetching shops:', error);
-        }); 
-        setFetching(false)
-      }
+      const fetchData = async () => {
+        try {
+          if (!userLocation) {
+            await getCurrentLocation();
+          }
+          let fetchedProfile;
+    
+          if (!profile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              fetchedProfile = await mockProfile();
+              setProfile(fetchedProfile);
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!discoverShops && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const shops = await mockDiscoverShops(fetchedProfile.id);
+              setDiscoverShops(shops);
+            } catch (error) {
+              console.error('Error fetching discover shops:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!radiusShops && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const shops = await mockShopRadius(fetchedProfile.id);
+              setRadiusShops(shops);
+            } catch (error) {
+              console.error('Error fetching radius shops:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!plans && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const plansData = await mockPlans(fetchedProfile.id);
+              setPlans(plansData);
+            } catch (error) {
+              console.error('Error fetching plans:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+        } catch (error) {
+          console.error('Error in fetchData sequence:', error);
+        }
+      };
+    
+      fetchData(); // Call the async function
     }, []);
-  
+    
     return (
       <DataContext.Provider
         value={{
@@ -190,7 +205,7 @@ const DataContext = createContext<{
                     let shops;
                     switch (filterOption) {
                       case 0:
-                        mockDiscoverShops().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {
@@ -198,7 +213,7 @@ const DataContext = createContext<{
                         }); // Replace with nearby API call
                         break;
                       case 1:
-                        mockDiscoverShops().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {
@@ -206,7 +221,7 @@ const DataContext = createContext<{
                         }); // Replace with popular API call
                         break;
                       case 2:
-                        mockDiscoverShops().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {

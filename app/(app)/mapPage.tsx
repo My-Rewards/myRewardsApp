@@ -32,6 +32,7 @@ export default function mapPage() {
   const mapRef = useRef<MapView>(null);
   const flatListRef = useRef<FlatList>(null);
   const currentScrollX = useRef(0);
+  const memoizedPins = React.useMemo(() => radiusShops, [radiusShops]);
 
   useEffect(()=>{
     translateY.setValue(containerHeight);
@@ -175,26 +176,26 @@ export default function mapPage() {
     },
   });
 
-  const PinPoint: React.FC<PinPointProps> = (info) => {
+  const PinPoint: React.FC<PinPointProps> = React.memo((info) => {
     const latitude = info.latitude;
     const longitude = info.longitude;
-
-    return(
+  
+    return (
       <Marker coordinate={{ latitude, longitude }} onPress={info.onPress}>
-      <View style={styles.marker}>
-        <View style={selectedPin?.id == info.id ? styles.circleSelected : styles.circle}>
-          <SvgXml
-            color={selectedPin?.id == info.id ?color_pallete[1]:'white'}
-            xml={handStar}
-            width="62%"
-            height="62%"
-          />
+        <View style={styles.marker}>
+          <View style={info.id === selectedPin?.id ? styles.circleSelected : styles.circle}>
+            <SvgXml
+              color={info.id === selectedPin?.id ? color_pallete[1] : 'white'}
+              xml={handStar}
+              width="62%"
+              height="62%"
+            />
+          </View>
+          <View style={styles.pin} />
         </View>
-        <View style={styles.pin} />
-      </View>
-    </Marker>
-    )
-  };
+      </Marker>
+    );
+  });
 
   return (
     <View 
@@ -220,7 +221,7 @@ export default function mapPage() {
           rotateEnabled={!isExpanded}
           onMapReady={()=>{ locateMe(mapRef)}}
           >
-          {radiusShops?.map((shop, index) => (
+          {memoizedPins?.map((shop, index) => (
             <PinPoint
               key={shop.id}
               latitude={shop.latitude}
@@ -232,7 +233,10 @@ export default function mapPage() {
               organization_id={shop.id} 
               location_id={shop.location_id} 
               geohash={shop.geohash} 
+              location={shop.location}
+              shop_hours={shop.shop_hours}
               onPress={() => {openModal(shop, index)}}
+              liked={shop.liked}
             />
           ))}
         </MapView>
@@ -256,6 +260,7 @@ export default function mapPage() {
             ref={flatListRef}
             data={radiusShops}
             horizontal
+            style={{shadowOpacity:0, backgroundColor:'transparent'}}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <ShopPreview
@@ -329,12 +334,8 @@ const styles = StyleSheet.create({
   bottomModal: {
     position: 'absolute',
     width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
     elevation: 5,
-    backgroundColor:'transparent'
+    backgroundColor:'transparent',
   },
   crossHairButton:{
     position:'absolute',
