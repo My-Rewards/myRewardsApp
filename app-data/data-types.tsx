@@ -23,6 +23,12 @@ export interface ShopHour {
     geohash: string;
     latitude: number;
     longitude: number;
+    liked:boolean;
+    location:{
+      city:string,
+      state:string
+    }
+    shop_hours: ShopHour[];
   }
 
   export interface shop {
@@ -30,13 +36,8 @@ export interface ShopHour {
     organization_id: string; 
     location_id: string;
     geohash: string;
-    latitude: number;
-    longitude: number;
-    shop_hours: ShopHour[];
-    description: string; 
-    title: string; 
-    logo: string; 
     banner: string;
+    liked:boolean
   }
 
   export interface Profile {

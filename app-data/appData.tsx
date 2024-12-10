@@ -1,5 +1,5 @@
 import { 
-  mockDiscoverProfile, 
+  mockDiscoverShops, 
   mockPlans, 
   mockProfile, 
   mockShopRadius 
@@ -30,6 +30,7 @@ const DataContext = createContext<{
     profile?: Profile|null;
     plans?:Plan[]|null;
     isLoading: boolean;
+    userLocation:regionProp|null
     }>({
     fetchShopsByRadius: async () => null,
     fetchDiscoverShops: async () => null,
@@ -50,6 +51,7 @@ const DataContext = createContext<{
     profile:null,
     plans:null,
     isLoading: false,
+    userLocation:null
   });
 
   export function localData() {
@@ -70,7 +72,7 @@ const DataContext = createContext<{
     const [shop, setShop] = useState<shop|null>();
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
-    const [userLocation, setUserLocation] = useState<regionProp|null>();
+    const [userLocation, setUserLocation] = useState<regionProp|null>(null);
     const [region, setRegion] = useState({
         latitude: 28.5384,
         longitude: -81.3789,
@@ -83,14 +85,6 @@ const DataContext = createContext<{
     async function getCurrentLocation() {
       setFetching(true);
       try {
-        const { status } = await Location.getForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          const permission = await Location.requestForegroundPermissionsAsync();
-          if (permission.status !== 'granted') {
-            alert('', 'Enable Access to your Location in Settings', 'error');
-            return;
-          }
-        }
         const location = await Location.getCurrentPositionAsync({});
 
         setUserLocation({
@@ -106,19 +100,21 @@ const DataContext = createContext<{
           longitudeDelta: 0.05,
         });
       } catch (error) {
-        console.error('Error fetching location:', error);
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          const permission = await Location.requestForegroundPermissionsAsync();
+          if (permission.status !== 'granted') {
+            alert('', 'Enable Access to your Location in Settings', 'error');
+            return;
+          }
+        }
       } finally {
         setFetching(false);
       }
     }    
 
     async function rebaseUserLocation(map:React.RefObject<MapView>){
-      if(userLocation){
-        setRegion(userLocation)
-      }else{
-        getCurrentLocation()
-      }
-      
+      getCurrentLocation()
       if(userLocation && map.current){
         map.current.animateToRegion({
           latitude: userLocation.latitude,
@@ -130,57 +126,72 @@ const DataContext = createContext<{
     }
 
     useEffect(() => {
-      if(!userLocation){
-        getCurrentLocation();
-      }
-      
-      if(!profile){
-        setFetching(true)
-        // Replace mock API with API here
-        mockProfile().then((profile)=>{
-          setProfile(profile)
-         })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if(!discoverShops){
-        setFetching(true)
-        // Replace mock API with API here
-        mockDiscoverProfile().then((shops)=>{
-          setDiscoverShops(shops)
-        })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if (!radiusShops) {
-        setFetching(true)
-        // Replace mock API with API here
-        mockShopRadius()
-        .then((shops) => {
-          setRadiusShops(shops);
-        })
-        .catch((error) => {
-          console.error('Error fetching shops:', error);
-        });
-        setFetching(false)
-      }
-      if(!plans){
-        setFetching(true)
-        // Replace mock API with API here
-        mockPlans().then((plansData)=>{
-          setPlans(plansData)
-        })
-        .catch((error) => {
-            console.error('Error fetching shops:', error);
-        }); 
-        setFetching(false)
-      }
+      const fetchData = async () => {
+        try {
+          if (!userLocation) {
+            await getCurrentLocation();
+          }
+          let fetchedProfile;
+    
+          if (!profile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              fetchedProfile = await mockProfile();
+              setProfile(fetchedProfile);
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!discoverShops && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const shops = await mockDiscoverShops(fetchedProfile.id);
+              setDiscoverShops(shops);
+            } catch (error) {
+              console.error('Error fetching discover shops:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!radiusShops && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const shops = await mockShopRadius(fetchedProfile.id);
+              setRadiusShops(shops);
+            } catch (error) {
+              console.error('Error fetching radius shops:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+    
+          if (!plans && fetchedProfile) {
+            setFetching(true);
+            try {
+              // Replace mock API with actual API
+              const plansData = await mockPlans(fetchedProfile.id);
+              setPlans(plansData);
+            } catch (error) {
+              console.error('Error fetching plans:', error);
+            } finally {
+              setFetching(false);
+            }
+          }
+        } catch (error) {
+          console.error('Error in fetchData sequence:', error);
+        }
+      };
+    
+      fetchData(); // Call the async function
     }, []);
-  
+    
     return (
       <DataContext.Provider
         value={{
@@ -194,7 +205,7 @@ const DataContext = createContext<{
                     let shops;
                     switch (filterOption) {
                       case 0:
-                        mockDiscoverProfile().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {
@@ -202,7 +213,7 @@ const DataContext = createContext<{
                         }); // Replace with nearby API call
                         break;
                       case 1:
-                        mockDiscoverProfile().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {
@@ -210,7 +221,7 @@ const DataContext = createContext<{
                         }); // Replace with popular API call
                         break;
                       case 2:
-                        mockDiscoverProfile().then((shops)=>{
+                        mockDiscoverShops(user_id).then((shops)=>{
                           setDiscoverShops(shops)
                        })
                       .catch((error) => {
@@ -228,9 +239,11 @@ const DataContext = createContext<{
             fetchPlans: async (filterOption:number) => {
               try{
                 setFetching(true)
+                if(!profile) return;
+                
                 switch (filterOption) {
                   case 0:
-                    mockPlans().then((plansData)=>{
+                    mockPlans(profile.id).then((plansData)=>{
                       setPlans(plansData)
                       setFetching(false)
                    })
@@ -239,7 +252,7 @@ const DataContext = createContext<{
                     }); // Replace with nearby API call
                     break;
                   case 1:
-                    mockPlans().then((plansData)=>{
+                    mockPlans(profile.id).then((plansData)=>{
                       setPlans([])
                       setFetching(false)
                     })
@@ -268,6 +281,7 @@ const DataContext = createContext<{
             plans,
             region,
             profile,
+            userLocation,
             isLoading: fetching
         }}>
         {children}

@@ -5,36 +5,42 @@ import { Plan, Profile, shop, shopPreview } from "@/app-data/data-types";
 
 // When APIS are ready create them here then replace the mock with the real APIs
 
-export const mockShop = (): Promise<shop> => {
+export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const sampleShop: shop = {
-          id: "shop123",
-          organization_id: "org456",
-          location_id: "loc789",
-          geohash: "dr5regw3n",
-          latitude: 40.7128,
-          longitude: -74.006,
-          shop_hours: [
-            { day: "Monday", open: "08:00", close: "20:00" },
-            { day: "Tuesday", open: "08:00", close: "20:00" },
-            { day: "Wednesday", open: "08:00", close: "20:00" },
-            { day: "Thursday", open: "08:00", close: "20:00" },
-            { day: "Friday", open: "08:00", close: "22:00" },
-            { day: "Saturday", open: "09:00", close: "22:00" },
-            { day: "Sunday", open: "10:00", close: "18:00" },
-          ],
-          description: "A cozy coffee shop offering the best artisan coffee and pastries.",
-          title: "Cozy Coffee Corner",
-          logo: "https://picsum.photos/200/200",
-          banner: "https://picsum.photos/400/200",
-        };
-        resolve(sampleShop);
-      }, 2000);
+        if(shop_id === '24hHsk345m'){
+          resolve({
+            id: "24hHsk345m",
+            organization_id: "org456",
+            location_id: "loc789",
+            geohash: "dr5regw3n",
+            banner: "https://picsum.photos/400/200",
+            liked:true,
+          });
+        }else if (shop_id === '24hHsk346m'){
+          resolve({
+            id: "24hHsk346m",
+            organization_id: "org456",
+            location_id: "loc789",
+            geohash: "dr5regw3n",
+            banner: "https://picsum.photos/400/200",
+            liked:false,
+          });
+        }else{
+          resolve({
+            id: "ien5J2k2",
+            organization_id: "org456",
+            location_id: "loc789",
+            geohash: "dr5regw3n",
+            banner: "https://picsum.photos/400/200",
+            liked:false,
+          });
+        }
+      }, 1000);
     });
   };
 
-export const mockShopRadius = (): Promise<shopPreview[]> => {
+export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const sampleShops: shopPreview[] = [
@@ -47,7 +53,21 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             location_id: "loc789",
             id: '24hHsk345m',
             name: 'Brolic Brunches',
-            description: 'Yummy food everyday'
+            description: 'Yummy food everyday',
+            liked:true,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7819,
@@ -59,6 +79,20 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: '24hHsk346m',
             name: 'Alpha Artichokes',
             description: 'Delicious food every day',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7919,
@@ -70,6 +104,20 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: 'wjn4Sj320B',
             name: 'Beta Breaky',
             description: 'Crispy Food for the Hungry',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7809,
@@ -81,14 +129,28 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: 'ien5J2k2',
             name: 'Los Tacos',
             description: 'Hand made authentic tacos',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           }
         ];
         resolve(sampleShops);
-      }, 2000);
+      }, 1000);
     });
   };
 
-  export const mockDiscoverProfile = (): Promise<shopPreview[]> => {
+  export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const sampleShops: shopPreview[] = [
@@ -101,7 +163,21 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             location_id: "loc789",
             id: '24hHsk345m',
             name: 'Brolic Brunches',
-            description: 'Yummy food everyday'
+            description: 'Yummy food everyday',
+            liked:true,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7819,
@@ -113,6 +189,20 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: '24hHsk346m',
             name: 'Alpha Artichokes',
             description: 'Delicious food every day',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7919,
@@ -124,6 +214,20 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: 'wjn4Sj320B',
             name: 'Beta Breaky',
             description: 'Crispy Food for the Hungry',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           },
           {
             latitude: 37.7809,
@@ -135,13 +239,26 @@ export const mockShopRadius = (): Promise<shopPreview[]> => {
             id: 'ien5J2k2',
             name: 'Los Tacos',
             description: 'Hand made authentic tacos',
+            liked:false,
+            location:{
+              city:'Los Angelas',
+              state:'California'
+            },
+            shop_hours: [
+              { day: "Monday", open: "08:00", close: "20:00" },
+              { day: "Tuesday", open: "08:00", close: "20:00" },
+              { day: "Wednesday", open: "08:00", close: "20:00" },
+              { day: "Thursday", open: "08:00", close: "20:00" },
+              { day: "Friday", open: "08:00", close: "22:00" },
+              { day: "Saturday", open: "09:00", close: "22:00" },
+              { day: "Sunday", open: "00:00", close: "00:00" },
+            ],
           }
         ];
         resolve(sampleShops);
-      }, 2000);
+      }, 1000);
     });
   };
-  
   
 export const mockProfile = (): Promise<Profile> => {
     return new Promise((resolve) => {
@@ -159,66 +276,105 @@ export const mockProfile = (): Promise<Profile> => {
             date_registered: "2024-01-01",
           };
           resolve(sampleProfile);
-        }, 2000);
+        }, 1000);
       });
   }
 
-  export const mockPlans = (): Promise<Plan[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-          const samplePlan: Plan[] = [{
-            reward_plan: {
-                road_map: {
-                  "3": [
-                    { type: "cost", value: 5 },
-                    { type: "percentage", value: 10 }
-                  ],
-                  "6": [
-                    { type: "cost", value: 10 },
-                    { type: "percentage", value: 20 }
-                  ]
-                },
-                exp_rewards: {
-                  expenditure: "150",
-                  rewardsOptions: [
-                    { type: "cost", value: 20 },
-                    { type: "percentage", value: 50 }
-                  ]
-                }
+export const mockPlans = (user_id:string): Promise<Plan[]> => {
+  return new Promise((resolve) => {
+      setTimeout(() => {
+        const samplePlans: Plan[] = [{
+          reward_plan: {
+              road_map: {
+                3: [
+                  { type: "cost", value: 5 },
+                  { type: "percentage", value: 10 }
+                ],
+                6: [
+                  { type: "cost", value: 10 },
+                  { type: "percentage", value: 20 }
+                ]
               },
-              visits: 5,
-              spent: 120,
-              organization_id: "org12345",
-              name:'Los Tacos',
-              id:'341Dig'
-          }, 
-          {
-            reward_plan: {
-                road_map: {
-                  "4": [
-                    { type: "cost", value: 6 },
-                    { type: "percentage", value: 12 }
-                  ],
-                  "6": [
-                    { type: "cost", value: 12 },
-                    { type: "percentage", value: 22 }
-                  ]
-                },
-                exp_rewards: {
-                  expenditure: "100",
-                  rewardsOptions: [
-                    { type: "cost", value: 25 },
-                    { type: "percentage", value: 45 }
-                  ]
-                }
+              exp_rewards: {
+                expenditure: "150",
+                rewardsOptions: [
+                  { type: "cost", value: 20 },
+                  { type: "percentage", value: 50 }
+                ]
+              }
+            },
+            visits: 5,
+            spent: 120,
+            organization_id: "org12345",
+            name:'Los Tacos',
+            id:'341Dig'
+        }, 
+        {
+          reward_plan: {
+              road_map: {
+                "4": [
+                  { type: "cost", value: 6 },
+                  { type: "percentage", value: 12 }
+                ],
+                "6": [
+                  { type: "cost", value: 12 },
+                  { type: "percentage", value: 22 }
+                ]
               },
-              visits: 5,
-              spent: 0,
-              organization_id: "org334",
-              name:'Beta Breaky',
-              id:'34nDi3'
-          }];
-          resolve(samplePlan);
-        }, 2000);
-      });
-  }
+              exp_rewards: {
+                expenditure: "100",
+                rewardsOptions: [
+                  { type: "cost", value: 25 },
+                  { type: "percentage", value: 45 }
+                ]
+              }
+            },
+            visits: 5,
+            spent: 0,
+            organization_id: "org334",
+            name:'Beta Breaky',
+            id:'34nDi3'
+        }];
+        resolve(samplePlans);
+      }, 1000);
+    });
+}
+
+export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const samplePlan: Plan = 
+      {
+        reward_plan: {
+            road_map: {
+              3: [
+                { type: "cost", value: 5 },
+                { type: "percentage", value: 10 }
+              ],
+              6: [
+                { type: "cost", value: 10 },
+                { type: "percentage", value: 20 }
+              ],
+              9: [
+                { type: "cost", value: 15 },
+                { type: "percentage", value: 25 }
+              ]
+            },
+            exp_rewards: {
+              expenditure: "150",
+              rewardsOptions: [
+                { type: "cost", value: 20 },
+                { type: "percentage", value: 50 }
+              ]
+            }
+          },
+          visits: 5,
+          spent: 120,
+          organization_id: "org12345",
+          name:'Los Tacos',
+          id:'341Dig'
+      };
+      resolve(samplePlan);
+    }, 1000);
+  });
+}

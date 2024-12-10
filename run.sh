@@ -35,7 +35,7 @@ echo "You selected profile: $selected_profile"
 
 # Try to fetch parameters without logging in
 echo "Fetching AWS Parameters using profile: $selected_profile..."
-PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile" 2>/dev/null)
+PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/customerUserPoolId" "/myRewardsApp/beta/customerWebClientId" "/myRewardsApp/beta/customerCognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile" 2>/dev/null)
 
 if [[ $? -ne 0 ]]; then
     echo "AWS SSO session expired or invalid. Logging in with profile: $selected_profile..."
@@ -47,7 +47,7 @@ if [[ $? -ne 0 ]]; then
 
     # Retry fetching parameters after login
     echo "Retrying fetch of AWS Parameters..."
-    PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile")
+    PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/customerUserPoolId" "/myRewardsApp/beta/customerWebClientId" "/myRewardsApp/beta/customerCognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1 --profile "$selected_profile")
 
     if [[ $? -ne 0 ]]; then
         echo "Error: Failed to fetch AWS parameters after logging in. Please check your profile, permissions, or network connectivity."
@@ -56,9 +56,9 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Extract the values using jq
-USER_POOL_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/userPoolId").Value')
-WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/webClientId").Value')
-COGNITO_DOMAIN=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/cognitoDomain").Value')
+USER_POOL_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/customerUserPoolId").Value')
+WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/customerWebClientId").Value')
+COGNITO_DOMAIN=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/customerCognitoDomain").Value')
 IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/identityPoolId").Value')
 
 # Write to .env file
@@ -85,7 +85,7 @@ fi
 # Run the appropriate platform build
 if [[ "$platform" == "ios" ]]; then
     echo "Running iOS build..."
-    npx expo run:ios -device
+    npx expo run:ios --device
 elif [[ "$platform" == "android" ]]; then
     echo "Running Android build..."
     npx expo run:android
