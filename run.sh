@@ -85,7 +85,7 @@ fi
 # Run the appropriate platform build
 if [[ "$platform" == "ios" ]]; then
     echo "Running iOS build..."
-    npx expo run:ios -device
+    npx expo run:ios --device
 elif [[ "$platform" == "android" ]]; then
     echo "Running Android build..."
     npx expo run:android

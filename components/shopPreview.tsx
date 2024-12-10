@@ -7,7 +7,7 @@ import ParallaxScrollView from './ParallaxScrollView';
 import { localData } from '@/app-data/appData';
 import {modalStyle, styles} from './mapPreviewStyle'
 import { color_pallete } from '@/constants/Colors';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {roadMap} from '@/components/planTemplate' 
 
 const { width } = Dimensions.get('window');
 
@@ -228,33 +228,8 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     },
   });
 
-  function getNextRewardVisits(data:Plan) {
-    const { reward_plan, visits } = data;
-  
-    if (!reward_plan || !reward_plan.road_map) {
-      throw new Error("Invalid reward plan structure");
-    }
-  
-    const milestones = Object.keys(reward_plan.road_map)
-      .map(Number)
-      .sort((a, b) => a - b);
-      for (const milestone of milestones) {
-      if (visits < milestone) {
-        return milestone - visits;
-      }
-    }
-      return null;
-  }
-  
-
   const planSection = () =>{
     if(plan && shopDetails && !loading){
-      const milestones = Object.entries(plan.reward_plan.road_map);
-      const totalMilestones = milestones.length;
-      const lineWidth = ((screenWidth - milestones.length * 30) / (milestones.length - 1))*0.8;
-
-      const numOfVisits = getNextRewardVisits(plan);
-
       return(
         <View>
           <Animated.View
@@ -265,30 +240,9 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
           {...panResponder.panHandlers}
         >    
             <View style={{width, flexDirection:'column'}}>
-              <View style={{alignItems:'center', margin:20}}>
-                <Text style={modalStyle.visitsText}>{numOfVisits} {numOfVisits === 1?'Visit':'Visits'} until your next reward!</Text>
-              </View>
-              <View style={modalStyle.roadmapContainer}>
-                <View style={modalStyle.roadmap}>
-                  {milestones.map(([milestone], index) => (
-                    <View key={milestone} style={modalStyle.stepContainer}>
-                      {plan.visits.toString()>milestone ? (
-                      <View style={[modalStyle.circle, {backgroundColor:color_pallete[2]}]}>
-                        <Ionicons name='checkmark' color={'white'}/>
-                      </View>
-                      ):(
-                      <View style={[modalStyle.circle]}>
-                        <Text style={modalStyle.circleText}>{milestone}</Text>
-                      </View>
-                      )}
-                      {index < milestones.length - 1 && <View style={[modalStyle.line, { width: lineWidth }]} />}
-                    </View>
-                  ))}
-                </View>
-              </View>
+              {roadMap(plan)}
             </View>
             <View style={{width}}>
-              <Text></Text>
             </View>
           </Animated.View>
         </View>
