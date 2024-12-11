@@ -54,8 +54,10 @@ export interface ShopHour {
   }
   
   export type Reward = {
-    type: 'cost'|'percentage'; 
-    value: number; 
+    type: 'cost'|'percentage'|'item'; 
+    value?: number; 
+    item?: string;
+    rule?: string|number;
   };
 
   export interface RewardSystem {

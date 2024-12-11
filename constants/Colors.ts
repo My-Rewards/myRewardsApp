@@ -13,6 +13,9 @@ export const color_pallete = [
   'rgba(249, 139, 78, 1)',
   'rgba(249, 139, 78, 0.5)', 
   'rgba(64, 124, 156, 1)',
+  'rgba(188, 221, 226, 1)',
+  'rgba(188, 221, 226, 0.5)'
+
 ]
 
 export const Colors = {
