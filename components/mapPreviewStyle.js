@@ -223,13 +223,12 @@ export const modalStyle = StyleSheet.create({
     width: width * 2,
     backgroundColor:'transparent',
     flex:1,
-    height:400
   },
   roadmap: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width:'80%'
+    width:'80%',
   },
   roadmapContainer:{
     width:'100%',
@@ -265,3 +264,46 @@ export const modalStyle = StyleSheet.create({
     fontSize:16
   }
 });
+
+export const dropDown = StyleSheet.create({
+    container:{
+        backgroundColor:'transparent',
+        borderColor:color_pallete[5],
+        borderWidth:2,
+        borderRadius:10,
+        width:'80%',
+        overflow:'hidden'
+    },
+    tearText1:{
+
+    },
+    seperaterLine:{
+        height:2,
+        backgroundColor:color_pallete[5],
+        width:'100%'
+    },
+    tierTitleContainer:{
+        display:'flex',
+        flexDirection:'row',
+        justifyContent:'space-between',
+        padding:15,
+        width:'100%'
+    },
+    tierContainer:{
+        display:'flex',
+        flexDirection:'column',
+    },
+    subText1:{
+      fontFamily:'Avenir Next',
+      fontWeight:'600'
+    },
+    rewardContainer:{
+      paddingVertical:15,
+      paddingHorizontal:10
+    },
+    rewardText:{
+      fontFamily:'Avenir Next',
+      fontWeight:'500',
+      color:color_pallete[5]
+    }
+})

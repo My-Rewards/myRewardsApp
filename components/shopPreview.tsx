@@ -1,5 +1,5 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Modal, Dimensions, Image, ScrollView, ActivityIndicator, PanResponder} from 'react-native';
+import { View, Text, TouchableOpacity, Animated, Modal, Dimensions, Image, ActivityIndicator, PanResponder} from 'react-native';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Plan, shop, ShopHour, shopPreview } from '@/app-data/data-types';
 import { mockPlan, mockShop } from '@/APIs/api';
@@ -7,7 +7,7 @@ import ParallaxScrollView from './ParallaxScrollView';
 import { localData } from '@/app-data/appData';
 import {modalStyle, styles} from './mapPreviewStyle'
 import { color_pallete } from '@/constants/Colors';
-import {roadMap} from '@/components/planTemplate' 
+import {ExpendatureMap, RoadMap} from '@/components/planTemplate' 
 
 const { width } = Dimensions.get('window');
 
@@ -130,7 +130,6 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
   const currentScreen = useRef(0);
 
   const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
-  const { width: screenWidth } = Dimensions.get('window');
   
   useEffect(() => {
     const fetchShopDetails = async () => {
@@ -229,7 +228,7 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
   });
 
   const planSection = () =>{
-    if(plan && shopDetails && !loading){
+    if(plan){
       return(
         <View>
           <Animated.View
@@ -240,9 +239,10 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
           {...panResponder.panHandlers}
         >    
             <View style={{width, flexDirection:'column'}}>
-              {roadMap(plan)}
+              <RoadMap plan={plan}/>
             </View>
             <View style={{width}}>
+              <ExpendatureMap plan={plan}/>
             </View>
           </Animated.View>
         </View>

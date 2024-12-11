@@ -287,19 +287,22 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
           reward_plan: {
               road_map: {
                 3: [
-                  { type: "cost", value: 5 },
-                  { type: "percentage", value: 10 }
+                  { type: "cost", value: 5, rule:'menu Item' },
+                  { type: "percentage", value: 10, rule:'menu Item' },
+                  { type: "item", item: 'beverage', rule:15},
                 ],
                 6: [
-                  { type: "cost", value: 10 },
-                  { type: "percentage", value: 20 }
+                  { type: "cost", value: 15, rule:'menu Item' },
+                  { type: "percentage", value: 25, rule:'menu Item' },
+                  { type: "item", item: 'entree', rule:15},
                 ]
               },
               exp_rewards: {
                 expenditure: "150",
                 rewardsOptions: [
-                  { type: "cost", value: 20 },
-                  { type: "percentage", value: 50 }
+                  { type: "cost", value: 15, rule:'menu Item' },
+                  { type: "percentage", value: 25, rule:'menu Item' },
+                  { type: "item", item: 'entree', rule:15},
                 ]
               }
             },
@@ -313,19 +316,22 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
           reward_plan: {
               road_map: {
                 "4": [
-                  { type: "cost", value: 6 },
-                  { type: "percentage", value: 12 }
+                  { type: "cost", value: 5, rule:'menu Item' },
+                  { type: "percentage", value: 10, rule:10 },
+                  { type: "item", item: 'beverage', rule:'meal'}
                 ],
                 "6": [
-                  { type: "cost", value: 12 },
-                  { type: "percentage", value: 22 }
+                  { type: "cost", value: 15, rule:'menu Item' },
+                  { type: "percentage", value: 25, rule:'menu Item' },
+                  { type: "item", item: 'entree', rule:15},
                 ]
               },
               exp_rewards: {
                 expenditure: "100",
                 rewardsOptions: [
-                  { type: "cost", value: 25 },
-                  { type: "percentage", value: 45 }
+                  { type: "cost", value: 10, rule:'menu Item' },
+                  { type: "percentage", value: 20, rule:'menu Item'},
+                  { type: "item", item: 'appetizer', rule:'meal'},
                 ]
               }
             },
@@ -348,23 +354,27 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         reward_plan: {
             road_map: {
               3: [
-                { type: "cost", value: 5 },
-                { type: "percentage", value: 10 }
+                { type: "cost", value: 5, rule:'menu Item' },
+                { type: "percentage", value: 10, rule:10 },
+                { type: "item", item: 'beverage', rule:'meal'}
               ],
               6: [
-                { type: "cost", value: 10 },
-                { type: "percentage", value: 20 }
+                { type: "cost", value: 10, rule:'menu Item' },
+                { type: "percentage", value: 20, rule:'entree'},
+                { type: "item", item: 'appetizer', rule:'meal'},
               ],
               9: [
-                { type: "cost", value: 15 },
-                { type: "percentage", value: 25 }
+                { type: "cost", value: 15, rule:'menu Item' },
+                { type: "percentage", value: 25, rule:'menu Item' },
+                { type: "item", item: 'entree', rule:0},
               ]
             },
             exp_rewards: {
               expenditure: "150",
               rewardsOptions: [
-                { type: "cost", value: 20 },
-                { type: "percentage", value: 50 }
+                { type: "cost", value: 20, rule:'menu Item' },
+                { type: "percentage", value: 50, rule:'menu Item' },
+                { type: "item", item: 'entree', rule:0},
               ]
             }
           },
