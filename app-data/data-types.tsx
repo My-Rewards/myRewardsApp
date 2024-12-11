@@ -65,7 +65,7 @@ export interface ShopHour {
       [milestone: string]: Reward[];
     };
     exp_rewards: {
-      expenditure: string;
+      expenditure: number;
       rewardsOptions: Reward[];
     };
   }
@@ -73,8 +73,9 @@ export interface ShopHour {
   export interface Plan{
     reward_plan:RewardSystem,
     visits:number,
-    spent:number,
+    points:number,
     organization_id:string
     name:string,
+    firstPlan:boolean,
     id:string
   }

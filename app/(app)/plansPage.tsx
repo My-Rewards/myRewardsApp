@@ -82,7 +82,7 @@ const PlansPreview = React.memo(({ plansData, isLoading }: { plansData: Plan[]|n
               plansData.map((plan:Plan) => (
                 <View key={plan.id}>
                   <Text>{plan.name}</Text>
-                  <Text>{plan.spent}</Text>
+                  <Text>{plan.points}</Text>
                 </View>
               ))
             }

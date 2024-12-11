@@ -36,7 +36,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             liked:false,
           });
         }
-      }, 1000);
+      }, 500);
     });
   };
 
@@ -256,7 +256,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
           }
         ];
         resolve(sampleShops);
-      }, 1000);
+      }, 500);
     });
   };
   
@@ -276,7 +276,7 @@ export const mockProfile = (): Promise<Profile> => {
             date_registered: "2024-01-01",
           };
           resolve(sampleProfile);
-        }, 1000);
+        }, 500);
       });
   }
 
@@ -298,7 +298,7 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
                 ]
               },
               exp_rewards: {
-                expenditure: "150",
+                expenditure: 150,
                 rewardsOptions: [
                   { type: "cost", value: 15, rule:'menu Item' },
                   { type: "percentage", value: 25, rule:'menu Item' },
@@ -307,10 +307,11 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
               }
             },
             visits: 5,
-            spent: 120,
+            points: 120,
             organization_id: "org12345",
             name:'Los Tacos',
-            id:'341Dig'
+            id:'341Dig',
+            firstPlan:true,
         }, 
         {
           reward_plan: {
@@ -327,7 +328,7 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
                 ]
               },
               exp_rewards: {
-                expenditure: "100",
+                expenditure: 100,
                 rewardsOptions: [
                   { type: "cost", value: 10, rule:'menu Item' },
                   { type: "percentage", value: 20, rule:'menu Item'},
@@ -336,13 +337,14 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
               }
             },
             visits: 5,
-            spent: 0,
+            points: 0,
             organization_id: "org334",
             name:'Beta Breaky',
-            id:'34nDi3'
+            id:'34nDi3',
+            firstPlan:true,
         }];
         resolve(samplePlans);
-      }, 1000);
+      }, 500);
     });
 }
 
@@ -370,7 +372,7 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
               ]
             },
             exp_rewards: {
-              expenditure: "150",
+              expenditure: 150,
               rewardsOptions: [
                 { type: "cost", value: 20, rule:'menu Item' },
                 { type: "percentage", value: 50, rule:'menu Item' },
@@ -379,12 +381,13 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
             }
           },
           visits: 5,
-          spent: 120,
+          points: 0,
+          firstPlan:true,
           organization_id: "org12345",
           name:'Los Tacos',
           id:'341Dig'
       };
       resolve(samplePlan);
-    }, 1000);
+    }, 500);
   });
 }

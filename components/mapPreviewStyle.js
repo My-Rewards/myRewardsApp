@@ -307,3 +307,37 @@ export const dropDown = StyleSheet.create({
       color:color_pallete[5]
     }
 })
+
+export const milestoneStyle = StyleSheet.create({
+  bar:{
+    flex:1,
+    backgroundColor:color_pallete[6],
+    borderRadius:3,
+    overflow:'hidden'
+  },
+  barConatiner:{
+    flexDirection:'row',
+    justifyContent:'center',
+    gap:10,
+    marginHorizontal:'6%',
+    marginBottom:40,
+  },
+  darker:{
+    backgroundColor:color_pallete[5],
+    height:'100%',
+    position:'absolute',
+    left:0
+  },
+  text:{
+    fontFamily:'Avenir Next',
+    fontWeight:'500',
+    color:color_pallete[5]
+  },
+  visitsText2:{
+    color:color_pallete[3],
+    fontFamily:'Avenir Next',
+    fontWeight:'600',
+    fontSize:14,
+    opacity:0.8
+  }
+})
