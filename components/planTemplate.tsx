@@ -1,7 +1,7 @@
 import { Plan, Reward } from "@/app-data/data-types";
 import { View, Text, Dimensions, TouchableOpacity, Animated, SafeAreaView } from "react-native"
 import Collapsible from 'react-native-collapsible';
-import {dropDown, milestoneStyle, modalStyle, styles} from './mapPreviewStyle'
+import {dropDown, milestoneStyle, modalStyle} from '@/components/mapPreviewStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { color_pallete } from "@/constants/Colors";
 import { useState } from "react";
