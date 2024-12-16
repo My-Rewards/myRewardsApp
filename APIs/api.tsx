@@ -15,6 +15,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             location_id: "loc789",
             geohash: "dr5regw3n",
             banner: "https://picsum.photos/400/200",
+            logo: 'https://picsum.photos/200',
             liked:true,
           });
         }else if (shop_id === '24hHsk346m'){
@@ -24,6 +25,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             location_id: "loc789",
             geohash: "dr5regw3n",
             banner: "https://picsum.photos/400/200",
+            logo: 'https://picsum.photos/200',
             liked:false,
           });
         }else{
@@ -33,6 +35,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             location_id: "loc789",
             geohash: "dr5regw3n",
             banner: "https://picsum.photos/400/200",
+            logo: 'https://picsum.photos/200',
             liked:false,
           });
         }
@@ -47,7 +50,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
           {
             latitude: 37.7749,
             longitude: -122.4194,
-            logo: 'https://picsum.photos/200',
+            preview: 'https://picsum.photos/200',
             organization_id: "org456",
             geohash:'34jn3',
             location_id: "loc789",
@@ -72,7 +75,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
           {
             latitude: 37.7819,
             longitude: -122.4114,
-            logo: 'https://picsum.photos/200',
+            preview: 'https://picsum.photos/200',
             organization_id: "org446",
             geohash:'34jn3',
             location_id: "loc341",
@@ -100,7 +103,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
             organization_id: "org596",
             location_id: "loc115",
             geohash:'34jn3',
-            logo: 'https://picsum.photos/200',
+            preview: 'https://picsum.photos/200',
             id: 'wjn4Sj320B',
             name: 'Beta Breaky',
             description: 'Crispy Food for the Hungry',
@@ -122,7 +125,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
           {
             latitude: 37.7809,
             longitude: -122.3994,
-            logo: 'https://picsum.photos/200',
+            preview: 'https://picsum.photos/200',
             organization_id: "org123",
             geohash:'34jn3',
             location_id: "loc129",
@@ -150,115 +153,115 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
     });
   };
 
-  export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const sampleShops: shopPreview[] = [
-          {
-            latitude: 37.7749,
-            longitude: -122.4194,
-            logo: 'https://picsum.photos/200',
-            organization_id: "org456",
-            geohash:'34jn3',
-            location_id: "loc789",
-            id: '24hHsk345m',
-            name: 'Brolic Brunches',
-            description: 'Yummy food everyday',
-            liked:true,
-            location:{
-              city:'Los Angelas',
-              state:'California'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const sampleShops: shopPreview[] = [
+        {
+          latitude: 37.7749,
+          longitude: -122.4194,
+          preview: 'https://picsum.photos/200',
+          organization_id: "org456",
+          geohash:'34jn3',
+          location_id: "loc789",
+          id: '24hHsk345m',
+          name: 'Brolic Brunches',
+          description: 'Yummy food everyday',
+          liked:true,
+          location:{
+            city:'Los Angelas',
+            state:'California'
           },
-          {
-            latitude: 37.7819,
-            longitude: -122.4114,
-            logo: 'https://picsum.photos/200',
-            organization_id: "org446",
-            geohash:'34jn3',
-            location_id: "loc341",
-            id: '24hHsk346m',
-            name: 'Alpha Artichokes',
-            description: 'Delicious food every day',
-            liked:false,
-            location:{
-              city:'Los Angelas',
-              state:'California'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: "00:00", close: "00:00" },
+          ],
+        },
+        {
+          latitude: 37.7819,
+          longitude: -122.4114,
+          preview: 'https://picsum.photos/200',
+          organization_id: "org446",
+          geohash:'34jn3',
+          location_id: "loc341",
+          id: '24hHsk346m',
+          name: 'Alpha Artichokes',
+          description: 'Delicious food every day',
+          liked:false,
+          location:{
+            city:'Los Angelas',
+            state:'California'
           },
-          {
-            latitude: 37.7919,
-            longitude: -122.4144,
-            organization_id: "org596",
-            location_id: "loc115",
-            geohash:'34jn3',
-            logo: 'https://picsum.photos/200',
-            id: 'wjn4Sj320B',
-            name: 'Beta Breaky',
-            description: 'Crispy Food for the Hungry',
-            liked:false,
-            location:{
-              city:'Los Angelas',
-              state:'California'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: "00:00", close: "00:00" },
+          ],
+        },
+        {
+          latitude: 37.7919,
+          longitude: -122.4144,
+          organization_id: "org596",
+          location_id: "loc115",
+          geohash:'34jn3',
+          preview: 'https://picsum.photos/200',
+          id: 'wjn4Sj320B',
+          name: 'Beta Breaky',
+          description: 'Crispy Food for the Hungry',
+          liked:false,
+          location:{
+            city:'Los Angelas',
+            state:'California'
           },
-          {
-            latitude: 37.7809,
-            longitude: -122.3994,
-            logo: 'https://picsum.photos/200',
-            organization_id: "org123",
-            geohash:'34jn3',
-            location_id: "loc129",
-            id: 'ien5J2k2',
-            name: 'Los Tacos',
-            description: 'Hand made authentic tacos',
-            liked:false,
-            location:{
-              city:'Los Angelas',
-              state:'California'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
-          }
-        ];
-        resolve(sampleShops);
-      }, 500);
-    });
-  };
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: "00:00", close: "00:00" },
+          ],
+        },
+        {
+          latitude: 37.7809,
+          longitude: -122.3994,
+          preview: 'https://picsum.photos/200',
+          organization_id: "org123",
+          geohash:'34jn3',
+          location_id: "loc129",
+          id: 'ien5J2k2',
+          name: 'Los Tacos',
+          description: 'Hand made authentic tacos',
+          liked:false,
+          location:{
+            city:'Los Angelas',
+            state:'California'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: "00:00", close: "00:00" },
+          ],
+        }
+      ];
+      resolve(sampleShops);
+    }, 500);
+  });
+};
   
 export const mockProfile = (): Promise<Profile> => {
     return new Promise((resolve) => {
@@ -308,6 +311,7 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             },
             visits: 5,
             points: 120,
+            redeemable:false,
             organization_id: "org12345",
             name:'Los Tacos',
             id:'341Dig',
@@ -338,6 +342,7 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             },
             visits: 5,
             points: 0,
+            redeemable:false,
             organization_id: "org334",
             name:'Beta Breaky',
             id:'34nDi3',
@@ -351,7 +356,7 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
 export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
   return new Promise((resolve) => {
     setTimeout(() => {
-      const samplePlan: Plan = 
+      const samplePlan1: Plan = 
       {
         reward_plan: {
             road_map: {
@@ -379,15 +384,57 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
                 { type: "item", item: 'entree', rule:0},
               ]
             }
-          },
-          visits: 5,
-          points: 0,
-          firstPlan:true,
-          organization_id: "org12345",
-          name:'Los Tacos',
-          id:'341Dig'
+        },
+        visits: 6,
+        points: 0,
+        redeemable:false,
+        firstPlan:true,
+        organization_id: "org12345",
+        name:'Los Tacos',
+        id:'341Dig'
       };
-      resolve(samplePlan);
+      const samplePlan2: Plan = 
+      {
+        reward_plan: {
+            road_map: {
+              3: [
+                { type: "cost", value: 5, rule:'menu Item' },
+                { type: "percentage", value: 10, rule:0 },
+                { type: "percentage", value: 20, rule:'meal'}
+              ],
+              6: [
+                { type: "cost", value: 5, rule:0 },
+                { type: "percentage", value: 20, rule:'entree'},
+                { type: "item", item: 'appetizer', rule:'meal'},
+              ],
+              9: [
+                { type: "cost", value: 15, rule:'menu Item' },
+                { type: "percentage", value: 25, rule:'menu Item' },
+                { type: "item", item: 'entree', rule:0},
+              ]
+            },
+            exp_rewards: {
+              expenditure: 150,
+              rewardsOptions: [
+                { type: "cost", value: 20, rule:'menu Item' },
+                { type: "percentage", value: 50, rule:'menu Item' },
+                { type: "item", item: 'entree', rule:0},
+              ]
+            }
+        },
+        visits: 6,
+        points: 0,
+        redeemable:true,
+        firstPlan:true,
+        organization_id: "org12345",
+        name:'Los Tacos',
+        id:'341Dig'
+      };
+      if(shop_id === '24hHsk345m'){
+        resolve(samplePlan1)
+      }else{
+        resolve(samplePlan2)
+      }
     }, 500);
   });
 }

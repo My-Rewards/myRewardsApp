@@ -151,6 +151,7 @@ export const modalStyle = StyleSheet.create({
     width: '100%',
     height: undefined,
     aspectRatio: 2,
+    backgroundColor:'gray'
   },
   modalTitle: {
     fontSize: 20,
@@ -299,12 +300,26 @@ export const dropDown = StyleSheet.create({
     },
     rewardContainer:{
       paddingVertical:15,
-      paddingHorizontal:10
+      paddingHorizontal:10,
+      justifyContent:'space-between',
+      flexDirection:'row',
+      alignItems:"center"
     },
     rewardText:{
       fontFamily:'Avenir Next',
       fontWeight:'500',
-      color:color_pallete[5]
+      color:color_pallete[5],
+    },
+    redeemBtn:{
+      backgroundColor:color_pallete[5],
+      borderRadius:5,
+      padding:5
+    },
+    redeemText:{
+      color:'white',
+      fontSize:12,
+      fontWeight:'500',
+      fontFamily:'Avenir Next',
     }
 })
 

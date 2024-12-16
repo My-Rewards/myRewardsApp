@@ -12,7 +12,7 @@ import React, { useRef } from 'react';
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
 import { Plan } from '@/app-data/data-types';
-import Svg, { SvgXml } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 import { mediumLogo } from '@/assets/images/MR-logos';
 
 const { width } = Dimensions.get('window');
