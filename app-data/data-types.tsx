@@ -17,7 +17,7 @@ export interface ShopHour {
     id: string; 
     organization_id: string; 
     location_id: string;
-    logo:string;
+    preview:string;
     name:string;
     description:string;
     geohash: string;
@@ -37,7 +37,8 @@ export interface ShopHour {
     location_id: string;
     geohash: string;
     banner: string;
-    liked:boolean
+    logo:string;
+    liked:boolean;
   }
 
   export interface Profile {
@@ -65,7 +66,7 @@ export interface ShopHour {
       [milestone: string]: Reward[];
     };
     exp_rewards: {
-      expenditure: string;
+      expenditure: number;
       rewardsOptions: Reward[];
     };
   }
@@ -73,8 +74,10 @@ export interface ShopHour {
   export interface Plan{
     reward_plan:RewardSystem,
     visits:number,
-    spent:number,
+    points:number,
+    redeemable:boolean,
     organization_id:string
     name:string,
+    firstPlan:boolean,
     id:string
   }

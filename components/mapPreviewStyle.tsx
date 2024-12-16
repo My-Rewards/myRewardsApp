@@ -151,6 +151,7 @@ export const modalStyle = StyleSheet.create({
     width: '100%',
     height: undefined,
     aspectRatio: 2,
+    backgroundColor:'gray'
   },
   modalTitle: {
     fontSize: 20,
@@ -299,11 +300,59 @@ export const dropDown = StyleSheet.create({
     },
     rewardContainer:{
       paddingVertical:15,
-      paddingHorizontal:10
+      paddingHorizontal:10,
+      justifyContent:'space-between',
+      flexDirection:'row',
+      alignItems:"center"
     },
     rewardText:{
       fontFamily:'Avenir Next',
       fontWeight:'500',
-      color:color_pallete[5]
+      color:color_pallete[5],
+    },
+    redeemBtn:{
+      backgroundColor:color_pallete[5],
+      borderRadius:5,
+      padding:5
+    },
+    redeemText:{
+      color:'white',
+      fontSize:12,
+      fontWeight:'500',
+      fontFamily:'Avenir Next',
     }
+})
+
+export const milestoneStyle = StyleSheet.create({
+  bar:{
+    flex:1,
+    backgroundColor:color_pallete[6],
+    borderRadius:3,
+    overflow:'hidden'
+  },
+  barConatiner:{
+    flexDirection:'row',
+    justifyContent:'center',
+    gap:10,
+    marginHorizontal:'6%',
+    marginBottom:40,
+  },
+  darker:{
+    backgroundColor:color_pallete[5],
+    height:'100%',
+    position:'absolute',
+    left:0
+  },
+  text:{
+    fontFamily:'Avenir Next',
+    fontWeight:'500',
+    color:color_pallete[5]
+  },
+  visitsText2:{
+    color:color_pallete[3],
+    fontFamily:'Avenir Next',
+    fontWeight:'600',
+    fontSize:14,
+    opacity:0.8
+  }
 })

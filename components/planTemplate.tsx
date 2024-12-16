@@ -1,7 +1,7 @@
 import { Plan, Reward } from "@/app-data/data-types";
 import { View, Text, Dimensions, TouchableOpacity, Animated, SafeAreaView } from "react-native"
 import Collapsible from 'react-native-collapsible';
-import {dropDown, modalStyle, styles} from './mapPreviewStyle'
+import {dropDown, milestoneStyle, modalStyle} from '@/components/mapPreviewStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { color_pallete } from "@/constants/Colors";
 import { useState } from "react";
@@ -13,8 +13,8 @@ type RoadMapProps = {
     plan: Plan;
   };
 
-function getNextRewardVisits(data:Plan) {
-    const { reward_plan, visits } = data;
+function getNextRewardVisits(plan:Plan) {
+    const { reward_plan, visits, redeemable } = plan;
   
     if (!reward_plan || !reward_plan.road_map) {
       throw new Error("Invalid reward plan structure");
@@ -24,12 +24,14 @@ function getNextRewardVisits(data:Plan) {
       .map(Number)
       .sort((a, b) => a - b);
       for (const milestone of milestones) {
-      if (visits < milestone) {
+      if(redeemable && milestone === visits){
+        return milestone - visits;
+      }else if (!redeemable && visits < milestone) {
         return milestone - visits;
       }
     }
     
-    return null;
+    return 0;
 }
 
 function anlyzeInput(reward:Reward){
@@ -76,9 +78,11 @@ const categorizeRewards = (plan: Plan) => {
     const milestones = Object.keys(road_map).map(Number).sort((a, b) => a - b);
   
     return milestones.map((milestone) => {
-      if (milestone <= visits) {
+      if (milestone <= visits && !plan.redeemable || milestone < visits && plan.redeemable) {
         return { milestone, status: "passed", rewards: road_map[milestone] };
-      } else if (milestone === Math.min(...milestones.filter((m) => m > visits))) {
+      } else if (
+        milestone === Math.min(...milestones.filter((m) => m > visits)) && !plan.redeemable || 
+        milestone === Math.min(...milestones.filter((m) => m == visits)) && plan.redeemable ) {
         return { milestone, status: "current", rewards: road_map[milestone] };
       } else {
         return { milestone, status: "upcoming", rewards: road_map[milestone] };
@@ -86,7 +90,7 @@ const categorizeRewards = (plan: Plan) => {
     });
 };
 
-const ListRewards: React.FC<{rewards:Reward[], option:number}> = ({rewards, option}) =>{
+const ListRewards: React.FC<{rewards:Reward[], option:number, redeemable:boolean}> = ({rewards, option, redeemable}) =>{
     return(
         <View>
             {rewards.map((reward, index) => {
@@ -99,6 +103,11 @@ const ListRewards: React.FC<{rewards:Reward[], option:number}> = ({rewards, opti
                         <View key={index} 
                         style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[7]}]:[dropDown.rewardContainer]}>
                             <Text style={dropDown.rewardText}> {rewardOption}</Text>
+                            {redeemable &&
+                                <TouchableOpacity style={dropDown.redeemBtn}>
+                                    <Text style={dropDown.redeemText}>Redeem</Text>
+                                </TouchableOpacity>
+                            }
                         </View>
                         {index < rewards.length - 1 && (
                             <View style={dropDown.seperaterLine} />
@@ -112,7 +121,6 @@ const ListRewards: React.FC<{rewards:Reward[], option:number}> = ({rewards, opti
 
 export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-    const [focal, setFocal] = useState<boolean>(false);
 
     const milestones = Object.entries(plan.reward_plan.road_map);
     const lineWidth = ((width - milestones.length * 30) / (milestones.length - 1)) * 0.8;
@@ -127,23 +135,30 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                     {tillNextRew && tillNextRew>0 ?
                     `${tillNextRew} ${tillNextRew === 1 ? 'Visit' : 'Visits'} until your next reward!`
                     :
-                    `Redeem a reward on your next visit`
+                    `Redeem a reward on your next visit!`
                     }
                 </Text>
             </View>
+            {/* Completion Bar */}
             <View style={modalStyle.roadmapContainer}>
                 <View style={modalStyle.roadmap}>
                     {milestones.map(([milestone], index) => (
                         <View key={milestone} style={modalStyle.stepContainer}>
-                        {plan.visits >= parseInt(milestone,10) ? (
+
+                    {plan.visits > parseInt(milestone,10) || (plan.visits == parseInt(milestone,10) && !plan.redeemable)? (
                             <View style={[modalStyle.circle, { backgroundColor: color_pallete[2] }]}>
                                 <Ionicons name="checkmark" color="white" />
                             </View>
-                        ) : (
+                        ) : plan.redeemable && parseInt(milestone,10) === plan.visits ?(                            
+                            <View style={[modalStyle.circle, {backgroundColor:color_pallete[3]}]}>
+                                <Ionicons name="star" color={'white'} />
+                            </View>
+                        ):(
                             <View style={[modalStyle.circle]}>
                                 <Text style={modalStyle.circleText}>{milestone}</Text>
                             </View>
                         )}
+
                         {index < milestones.length - 1 && (
                             <View style={[modalStyle.line, { width: lineWidth }]} />
                         )}
@@ -151,57 +166,62 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                     ))}
                 </View>
             </View>
+            {/* Drop Down */}
             <View style={[modalStyle.roadmapContainer, {marginTop:10}]}>
                 <Animated.View style={dropDown.container}>
-                        {taggedRewards.map(({ status, rewards }, index) => (
-                            <React.Fragment key={index}>
-                            {status === 'passed' && (
-                                <TouchableOpacity activeOpacity={1} style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[6]}]}>
+                    {taggedRewards.map(({ status, rewards }, index) => (
+                        <React.Fragment key={index}>
+                        {status === 'passed' && (
+                            <TouchableOpacity activeOpacity={1} style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[6]}]}>
+                                <View>
+                                    <Text style={[dropDown.subText1, {color:color_pallete[5]}]}>{`Tier ${index + 1} Rewards`}</Text>
+                                </View>
+                                <Ionicons name={'checkmark'} size={width/20} color={color_pallete[5]}/>
+                            </TouchableOpacity>
+                        )}
+                        {status === 'current' && (
+                            <View style={dropDown.tierContainer}>
+                                <TouchableOpacity 
+                                    activeOpacity={1}
+                                    style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[5]}]} 
+                                    onPress={()=>{selectedIndex==index ? setSelectedIndex(-1):setSelectedIndex(index)}}
+                                >
+                                    <View>
+                                        <Text style={[dropDown.subText1, {color:'white'}]}>{`Tier ${index + 1} Rewards`}</Text>
+                                    </View>
+                                    <Ionicons name={selectedIndex == index?'chevron-up':'chevron-down'} size={width/20} color={'white'}/>
+                                </TouchableOpacity>
+                                <Collapsible collapsed={selectedIndex !== index}>
+                                    <ListRewards 
+                                        rewards={rewards} 
+                                        option={0} 
+                                        redeemable={plan.redeemable && tillNextRew === 0}
+                                    />
+                                </Collapsible>
+                            </View>
+                        )}
+                        {status === 'upcoming' && (
+                            <View style={dropDown.tierContainer}>
+                                <TouchableOpacity 
+                                    activeOpacity={1}
+                                    style={[dropDown.tierTitleContainer]} 
+                                    onPress={()=>{selectedIndex==index ? setSelectedIndex(-1):setSelectedIndex(index)}}
+                                >
                                     <View>
                                         <Text style={[dropDown.subText1, {color:color_pallete[5]}]}>{`Tier ${index + 1} Rewards`}</Text>
                                     </View>
-                                    <Ionicons name={'checkmark'} size={width/20} color={color_pallete[5]}/>
+                                    <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
                                 </TouchableOpacity>
-                            )}
-                            {status === 'current' && (
-                                <View style={dropDown.tierContainer}>
-                                    <TouchableOpacity 
-                                        activeOpacity={1}
-                                        style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[5]}]} 
-                                        onPress={()=>{selectedIndex==index ? setSelectedIndex(-1):setSelectedIndex(index)}}
-                                    >
-                                        <View>
-                                            <Text style={[dropDown.subText1, {color:'white'}]}>{`Tier ${index + 1} Rewards`}</Text>
-                                        </View>
-                                        <Ionicons name={selectedIndex == index?'chevron-up':'chevron-down'} size={width/20} color={'white'}/>
-                                    </TouchableOpacity>
-                                    <Collapsible collapsed={selectedIndex !== index}>
-                                        <ListRewards rewards={rewards} option={0} />
-                                    </Collapsible>
-                                </View>
-                            )}
-                            {status === 'upcoming' && (
-                                <View style={dropDown.tierContainer}>
-                                    <TouchableOpacity 
-                                        activeOpacity={1}
-                                        style={[dropDown.tierTitleContainer]} 
-                                        onPress={()=>{selectedIndex==index ? setSelectedIndex(-1):setSelectedIndex(index)}}
-                                    >
-                                        <View>
-                                            <Text style={[dropDown.subText1, {color:color_pallete[5]}]}>{`Tier ${index + 1} Rewards`}</Text>
-                                        </View>
-                                        <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
-                                    </TouchableOpacity>
-                                    <Collapsible collapsed={selectedIndex !== index}>
-                                        <ListRewards rewards={rewards} option={1}/>
-                                    </Collapsible>
-                                </View>
-                            )}
-                            {index < taggedRewards.length - 1 && (
-                                <View style={dropDown.seperaterLine} />
-                            )}
-                            </React.Fragment>
-                        ))}
+                                <Collapsible collapsed={selectedIndex !== index}>
+                                    <ListRewards rewards={rewards} option={1} redeemable={false}/>
+                                </Collapsible>
+                            </View>
+                        )}
+                        {index < taggedRewards.length - 1 && (
+                            <View style={dropDown.seperaterLine} />
+                        )}
+                        </React.Fragment>
+                    ))}
                 </Animated.View>
             </View>
         </View>
@@ -209,10 +229,60 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 };
 
 export const ExpendatureMap:React.FC<RoadMapProps> = ({plan}) => {
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    let dark_ratio =  Math.round((plan.points/plan.reward_plan.exp_rewards.expenditure) * 100);
+    let pointsTill = plan.reward_plan.exp_rewards.expenditure-plan.points;
+    let points = plan.points;
+
+    if(dark_ratio === 0 && plan.firstPlan){
+        pointsTill = plan.reward_plan.exp_rewards.expenditure-50;
+        dark_ratio = Math.round((50/plan.reward_plan.exp_rewards.expenditure) * 100);
+        points = 50
+    }
 
     return(
         <View>
-
+            <View style={{ alignItems: 'center', marginVertical:10, marginBottom:20}}>
+                {plan.firstPlan && 
+                    <Text style={modalStyle.visitsText}>
+                        Get 50 points on us with your first plan!
+                    </Text>
+                }
+                <Text style={plan.firstPlan ? milestoneStyle.visitsText2 : modalStyle.visitsText}>
+                    {pointsTill} points until you unlock Rewards!
+                </Text>
+            </View>
+            {/* Completion Bar */}
+            <View style={milestoneStyle.barConatiner}>
+                <Text style={milestoneStyle.text}>{points}</Text>
+                <View style={milestoneStyle.bar}>
+                    <View style={[milestoneStyle.darker, {width:`${dark_ratio}%`}]}/>
+                </View>
+                <Text style={milestoneStyle.text}>{plan.reward_plan.exp_rewards.expenditure}</Text>
+            </View>
+            {/* Drop Down */}
+            <View style={[modalStyle.roadmapContainer, {marginTop:10}]}>
+                <Animated.View style={dropDown.container}>
+                    <View style={dropDown.tierContainer}>
+                        <TouchableOpacity 
+                            activeOpacity={1}
+                            style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[5]}]} 
+                            onPress={()=>{selectedIndex==1 ? setSelectedIndex(0):setSelectedIndex(1)}}
+                        >
+                            <View>
+                                <Text style={[dropDown.subText1, {color:'white'}]}>{`View Milestone Reward options`}</Text>
+                            </View>
+                            <Ionicons name={selectedIndex == 1?'chevron-up':'chevron-down'} size={width/20} color={'white'}/>
+                        </TouchableOpacity>
+                        <Collapsible collapsed={selectedIndex !== 1}>
+                            <ListRewards 
+                            rewards={plan.reward_plan.exp_rewards.rewardsOptions} 
+                            option={0} 
+                            redeemable={plan.redeemable && plan.points>=plan.reward_plan.exp_rewards.expenditure}/>
+                        </Collapsible>
+                    </View>
+                </Animated.View>
+            </View>
         </View>
     )
 }

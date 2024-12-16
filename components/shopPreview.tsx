@@ -92,7 +92,7 @@ export const ShopPreview = ({selectedPin}: ShopPreviewProps) => {
       <View style={[styles.modalContent,]}>
         <View style={[styles.titleContainer, {marginBottom:5}]}>
           <View style={styles.logo2}>
-            <Image style={{flex:1}} source={{uri: selectedPin.logo}}/>
+            <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: selectedPin.preview}}/>
           </View>
           <Text style={styles.text1}>{selectedPin.name}</Text>
         </View>
@@ -317,7 +317,7 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                   <View style={styles.subHeader}>
                     <View style={styles.titleContainer}>
                       <View style={styles.logo}>
-                        <Image style={{flex:1}} source={{uri: selectedPin.logo}}/>
+                        <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: selectedPin.preview}}/>
                       </View>
                       <Text style={styles.text1}>{selectedPin.name}</Text>
                     </View>
