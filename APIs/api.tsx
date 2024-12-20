@@ -50,7 +50,7 @@ export const mockShopRadius = (user_id:string): Promise<shopPreview[]> => {
           {
             latitude: 37.7749,
             longitude: -122.4194,
-            preview: 'https://picsum.photos/200',
+            preview: 'https://picsum.photos/300',
             organization_id: "org456",
             geohash:'34jn3',
             location_id: "loc789",
@@ -288,18 +288,32 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
       setTimeout(() => {
         const samplePlans: Plan[] = [{
           reward_plan: {
-              road_map: {
-                3: [
-                  { type: "cost", value: 5, rule:'menu Item' },
-                  { type: "percentage", value: 10, rule:'menu Item' },
-                  { type: "item", item: 'beverage', rule:15},
+            road_map: {
+              3: {
+                id: "tier-3",
+                rewards: [
+                  { type: "cost", value: 5, rule: "menu Item" },
+                  { type: "percentage", value: 10, rule: 0 },
+                  { type: "percentage", value: 20, rule: "meal" },
                 ],
-                6: [
-                  { type: "cost", value: 15, rule:'menu Item' },
-                  { type: "percentage", value: 25, rule:'menu Item' },
-                  { type: "item", item: 'entree', rule:15},
-                ]
               },
+              6: {
+                id: "tier-6",
+                rewards: [
+                  { type: "cost", value: 5, rule: 0 },
+                  { type: "percentage", value: 20, rule: "entree" },
+                  { type: "item", item: "appetizer", rule: "meal" },
+                ],
+              },
+              9: {
+                id: "tier-9",
+                rewards: [
+                  { type: "cost", value: 15, rule: "menu Item" },
+                  { type: "percentage", value: 25, rule: "menu Item" },
+                  { type: "item", item: "entree", rule: 0 },
+                ],
+              },
+            },
               exp_rewards: {
                 expenditure: 150,
                 rewardsOptions: [
@@ -309,28 +323,44 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
                 ]
               }
             },
-            visits: 5,
-            points: 120,
+            visits: 0,
+            points: 0,
             redeemable:false,
+            redeemableRewards:[],
             organization_id: "org12345",
             name:'Los Tacos',
             id:'341Dig',
             firstPlan:true,
+            activePlan:false
         }, 
         {
           reward_plan: {
-              road_map: {
-                "4": [
-                  { type: "cost", value: 5, rule:'menu Item' },
-                  { type: "percentage", value: 10, rule:10 },
-                  { type: "item", item: 'beverage', rule:'meal'}
-                ],
-                "6": [
-                  { type: "cost", value: 15, rule:'menu Item' },
-                  { type: "percentage", value: 25, rule:'menu Item' },
-                  { type: "item", item: 'entree', rule:15},
-                ]
-              },
+          road_map: {
+            3: {
+              id: "tier-3",
+              rewards: [
+                { type: "cost", value: 5, rule: "menu Item" },
+                { type: "percentage", value: 10, rule: 0 },
+                { type: "percentage", value: 20, rule: "meal" },
+              ],
+            },
+            6: {
+              id: "tier-6",
+              rewards: [
+                { type: "cost", value: 5, rule: 0 },
+                { type: "percentage", value: 20, rule: "entree" },
+                { type: "item", item: "appetizer", rule: "meal" },
+              ],
+            },
+            9: {
+              id: "tier-9",
+              rewards: [
+                { type: "cost", value: 15, rule: "menu Item" },
+                { type: "percentage", value: 25, rule: "menu Item" },
+                { type: "item", item: "entree", rule: 0 },
+              ],
+            },
+          },
               exp_rewards: {
                 expenditure: 100,
                 rewardsOptions: [
@@ -343,10 +373,12 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             visits: 5,
             points: 0,
             redeemable:false,
+            redeemableRewards:[],
             organization_id: "org334",
             name:'Beta Breaky',
             id:'34nDi3',
-            firstPlan:true,
+            firstPlan:false,
+            activePlan:true
         }];
         resolve(samplePlans);
       }, 500);
@@ -359,23 +391,32 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
       const samplePlan1: Plan = 
       {
         reward_plan: {
-            road_map: {
-              3: [
-                { type: "cost", value: 5, rule:'menu Item' },
-                { type: "percentage", value: 10, rule:10 },
-                { type: "item", item: 'beverage', rule:'meal'}
+          road_map: {
+            3: {
+              id: "tier-3",
+              rewards: [
+                { type: "cost", value: 5, rule: "menu Item" },
+                { type: "percentage", value: 10, rule: 0 },
+                { type: "percentage", value: 20, rule: "meal" },
               ],
-              6: [
-                { type: "cost", value: 10, rule:'menu Item' },
-                { type: "percentage", value: 20, rule:'entree'},
-                { type: "item", item: 'appetizer', rule:'meal'},
-              ],
-              9: [
-                { type: "cost", value: 15, rule:'menu Item' },
-                { type: "percentage", value: 25, rule:'menu Item' },
-                { type: "item", item: 'entree', rule:0},
-              ]
             },
+            6: {
+              id: "tier-6",
+              rewards: [
+                { type: "cost", value: 5, rule: 0 },
+                { type: "percentage", value: 20, rule: "entree" },
+                { type: "item", item: "appetizer", rule: "meal" },
+              ],
+            },
+            9: {
+              id: "tier-9",
+              rewards: [
+                { type: "cost", value: 15, rule: "menu Item" },
+                { type: "percentage", value: 25, rule: "menu Item" },
+                { type: "item", item: "entree", rule: 0 },
+              ],
+            },
+          },
             exp_rewards: {
               expenditure: 150,
               rewardsOptions: [
@@ -385,10 +426,12 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
               ]
             }
         },
-        visits: 6,
+        visits: 5,
         points: 0,
         redeemable:false,
-        firstPlan:true,
+        redeemableRewards:['tier-3'],
+        firstPlan:false,
+        activePlan:false,
         organization_id: "org12345",
         name:'Los Tacos',
         id:'341Dig'
@@ -396,23 +439,32 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
       const samplePlan2: Plan = 
       {
         reward_plan: {
-            road_map: {
-              3: [
-                { type: "cost", value: 5, rule:'menu Item' },
-                { type: "percentage", value: 10, rule:0 },
-                { type: "percentage", value: 20, rule:'meal'}
+          road_map: {
+            3: {
+              id: "tier-3",
+              rewards: [
+                { type: "cost", value: 5, rule: "menu Item" },
+                { type: "percentage", value: 10, rule: 0 },
+                { type: "percentage", value: 20, rule: "meal" },
               ],
-              6: [
-                { type: "cost", value: 5, rule:0 },
-                { type: "percentage", value: 20, rule:'entree'},
-                { type: "item", item: 'appetizer', rule:'meal'},
-              ],
-              9: [
-                { type: "cost", value: 15, rule:'menu Item' },
-                { type: "percentage", value: 25, rule:'menu Item' },
-                { type: "item", item: 'entree', rule:0},
-              ]
             },
+            6: {
+              id: "tier-6",
+              rewards: [
+                { type: "cost", value: 5, rule: 0 },
+                { type: "percentage", value: 20, rule: "entree" },
+                { type: "item", item: "appetizer", rule: "meal" },
+              ],
+            },
+            9: {
+              id: "tier-9",
+              rewards: [
+                { type: "cost", value: 15, rule: "menu Item" },
+                { type: "percentage", value: 25, rule: "menu Item" },
+                { type: "item", item: "entree", rule: 0 },
+              ],
+            },
+          },
             exp_rewards: {
               expenditure: 150,
               rewardsOptions: [
@@ -423,16 +475,70 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
             }
         },
         visits: 6,
-        points: 0,
+        points: 50,
         redeemable:true,
-        firstPlan:true,
+        firstPlan:false,
+        redeemableRewards:['tier-6'],
+        activePlan:false,
+        organization_id: "org12345",
+        name:'Los Tacos',
+        id:'341Dig'
+      };
+      const samplePlan3: Plan = 
+      {
+        reward_plan: {
+          road_map: {
+            3: {
+              id: "tier-3",
+              rewards: [
+                { type: "cost", value: 5, rule: "menu Item" },
+                { type: "percentage", value: 10, rule: 0 },
+                { type: "percentage", value: 20, rule: "meal" },
+              ],
+            },
+            6: {
+              id: "tier-6",
+              rewards: [
+                { type: "cost", value: 5, rule: 0 },
+                { type: "percentage", value: 20, rule: "entree" },
+                { type: "item", item: "appetizer", rule: "meal" },
+              ],
+            },
+            9: {
+              id: "tier-9",
+              rewards: [
+                { type: "cost", value: 15, rule: "menu Item" },
+                { type: "percentage", value: 25, rule: "menu Item" },
+                { type: "item", item: "entree", rule: 0 },
+              ],
+            },
+          },
+          exp_rewards: {
+            expenditure: 150,
+            rewardsOptions: [
+              { type: "cost", value: 20, rule:'menu Item' },
+              { type: "percentage", value: 50, rule:'menu Item' },
+              { type: "item", item: 'entree', rule:0},
+            ]
+          }
+        },
+        visits: 2,
+        points: 80,
+        redeemable:true,
+        firstPlan:false,
+        activePlan:false,
+        redeemableRewards:[],
         organization_id: "org12345",
         name:'Los Tacos',
         id:'341Dig'
       };
       if(shop_id === '24hHsk345m'){
         resolve(samplePlan1)
-      }else{
+      }
+      else if (shop_id === '123456'){
+        resolve(samplePlan3)
+      }
+      else{
         resolve(samplePlan2)
       }
     }, 500);

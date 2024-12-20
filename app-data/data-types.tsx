@@ -61,9 +61,14 @@ export interface ShopHour {
     rule?: string|number;
   };
 
-  export interface RewardSystem {
+  interface Tier {
+    id: string;
+    rewards: Reward[];
+  }
+  
+  interface RewardSystem {
     road_map: {
-      [milestone: string]: Reward[];
+      [tier: number]: Tier;
     };
     exp_rewards: {
       expenditure: number;
@@ -79,5 +84,7 @@ export interface ShopHour {
     organization_id:string
     name:string,
     firstPlan:boolean,
-    id:string
+    activePlan:boolean,
+    redeemableRewards:string[],
+    id?:string
   }

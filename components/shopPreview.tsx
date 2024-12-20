@@ -125,7 +125,7 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
   const [loading, setLoading] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
   const [selectedIndex, setSelectedIndex] = useState(0); 
-  const underlinePosition = useRef(new Animated.Value(10)).current;
+  const highlightPosition = useRef(new Animated.Value(-15)).current;
   const translateX = useRef(new Animated.Value(0)).current;
   const currentScreen = useRef(0);
 
@@ -184,8 +184,8 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     setSelectedIndex(index);
     currentScreen.current = -index;
 
-    Animated.timing(underlinePosition, {
-      toValue: (index * (width/2)) + 20,
+    Animated.timing(highlightPosition, {
+      toValue: (index * (width/2)-15),
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -208,13 +208,13 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     },
     onPanResponderMove: (_, gestureState) => {
       const nextTranslateX = width * currentScreen.current + gestureState.dx;
-      const underlineTranslation = -(width/2 * currentScreen.current)+20 - gestureState.dx/2;
+      const underlineTranslation = -(width/2 * currentScreen.current)-15 - gestureState.dx/2;
 
       if ((currentScreen.current === 0 && gestureState.dx > 0) || (currentScreen.current === -1 && gestureState.dx < 0)) {
         return;
       }
       translateX.setValue(nextTranslateX);
-      underlinePosition.setValue(underlineTranslation)
+      highlightPosition.setValue(underlineTranslation)
     },
     onPanResponderRelease: (_, gestureState) => {
       if (gestureState.dx < -width / 4 && currentScreen.current === 0) {
@@ -303,14 +303,16 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                       <Text style={modalStyle.text1}>{selectedPin.description}</Text>
                     </View>
                   </View>
-                  <View style={modalStyle.toggleSection}>
-                    <Animated.View style={[{height:2, width:(width/2 - 40), backgroundColor:'white', position:'absolute', bottom:0, left:underlinePosition}]}/>
-                    <TouchableOpacity onPress={()=>handleToggle(0)}>
+                  <View style={{width:'100%',backgroundColor:'white'}}>
+                  <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
+                    <View style={modalStyle.toggleSection}>
+                     <TouchableOpacity onPress={()=>handleToggle(0)}>
                         <Text style={[modalStyle.toggleText, selectedIndex===0?{'opacity':1}:{'opacity':0.6}]}>Loyalty Rewards</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={()=>handleToggle(1)}>
                         <Text style={[modalStyle.toggleText, selectedIndex===1?{'opacity':1}:{'opacity':0.6}]}>Milestone Rewards</Text>
                       </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
                 <View>
