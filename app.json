@@ -22,7 +22,7 @@
           "fetch",
           "remote-notification"
         ],
-        "NSLocationWhenInUseUsageDescription": "This app requires access to your location when open.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to location while open to show you relevant nearby content.",
         "deploymentTarget": "14"
       }
     },
@@ -43,7 +43,7 @@
       "expo-localization",
       "expo-location",
       {
-        "locationAlwaysAndWhenInUsePermission": "Allow MyRewards to use your location."
+        "locationWhenInUsePermission": "Allow MyRewards to use your location."
       }
     ],
     "experiments": {

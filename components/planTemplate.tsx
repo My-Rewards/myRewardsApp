@@ -90,11 +90,11 @@ const categorizeRewards = (plan: Plan) => {
     });
 };
 
-const ListRewards: React.FC<{rewards:Reward[], option:number, redeemable:boolean}> = ({rewards, option, redeemable}) =>{
+const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:boolean}> = ({rewardList, option, redeemable}) =>{
     return(
         <View>
-            {rewards.map((reward, index) => {
-                const rewardOption = anlyzeInput(reward);
+            {rewardList.map((rewards, index) => {
+                const rewardOption = anlyzeInput(rewards);
                 return(
                     <View key={index}>
                         {index == 0 && (
@@ -109,7 +109,7 @@ const ListRewards: React.FC<{rewards:Reward[], option:number, redeemable:boolean
                                 </TouchableOpacity>
                             }
                         </View>
-                        {index < rewards.length - 1 && (
+                        {index < rewardList.length - 1 && (
                             <View style={dropDown.seperaterLine} />
                         )}                 
                     </View>
@@ -193,7 +193,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                 </TouchableOpacity>
                                 <Collapsible collapsed={selectedIndex !== index}>
                                     <ListRewards 
-                                        rewards={rewards} 
+                                        rewardList={rewards.rewards} 
                                         option={0} 
                                         redeemable={plan.redeemable && tillNextRew === 0}
                                     />
@@ -213,7 +213,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
                                 </TouchableOpacity>
                                 <Collapsible collapsed={selectedIndex !== index}>
-                                    <ListRewards rewards={rewards} option={1} redeemable={false}/>
+                                    <ListRewards rewardList={rewards.rewards} option={1} redeemable={false}/>
                                 </Collapsible>
                             </View>
                         )}
@@ -276,7 +276,7 @@ export const ExpendatureMap:React.FC<RoadMapProps> = ({plan}) => {
                         </TouchableOpacity>
                         <Collapsible collapsed={selectedIndex !== 1}>
                             <ListRewards 
-                            rewards={plan.reward_plan.exp_rewards.rewardsOptions} 
+                            rewardList={plan.reward_plan.exp_rewards.rewardsOptions} 
                             option={0} 
                             redeemable={plan.redeemable && plan.points>=plan.reward_plan.exp_rewards.expenditure}/>
                         </Collapsible>

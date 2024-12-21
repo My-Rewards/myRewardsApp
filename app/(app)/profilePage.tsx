@@ -25,7 +25,7 @@ export default function profilePage() {
         </Text>
         <Text>{profile.first_name}</Text>
         <Text>{profile.last_name}</Text>
-        <Text>{profile.dob}</Text>
+        <Text>{profile.dob.toUTCString()}</Text>
         <Text>{profile.username}</Text>
         <Text>{profile.first_name}</Text>
       </View>

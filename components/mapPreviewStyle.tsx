@@ -210,12 +210,23 @@ export const modalStyle = StyleSheet.create({
     display:'flex',
     flexDirection:'row',
     justifyContent:'space-around',
-    paddingBottom:5,
-    marginBottom:3
+    paddingVertical:6,
+    borderTopColor:color_pallete[6],
+    borderTopWidth:2,
+    borderBottomColor:color_pallete[6],
+    borderBottomWidth:2
+  },
+  toggleHighlight:{
+    backgroundColor:color_pallete[6], 
+    position:'absolute', 
+    bottom:0,
+    height:'100%', 
+    width:(width/2)+30,
+    borderRadius:20,
   },
   toggleText:{
     fontSize:14,
-    color:'white',
+    color:color_pallete[5],
     fontFamily:'Avenir Next',
     fontWeight:'500'
   },

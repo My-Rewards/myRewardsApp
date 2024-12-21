@@ -1,5 +1,3 @@
-import { Timestamp } from "react-native-reanimated/lib/typescript/reanimated2/commonTypes";
-
 export interface regionProp {    
         latitude: number,
         longitude: number,
@@ -47,7 +45,7 @@ export interface ShopHour {
     role: "customer" | "admin" | "owner";
     first_name: string;
     last_name: string;
-    dob: Timestamp;
+    dob: Date;
     preferences: {
       theme: "dark" | "light";
     };
@@ -61,9 +59,14 @@ export interface ShopHour {
     rule?: string|number;
   };
 
-  export interface RewardSystem {
+  interface Tier {
+    id: string;
+    rewards: Reward[];
+  }
+  
+  interface RewardSystem {
     road_map: {
-      [milestone: string]: Reward[];
+      [tier: number]: Tier;
     };
     exp_rewards: {
       expenditure: number;
@@ -77,7 +80,10 @@ export interface ShopHour {
     points:number,
     redeemable:boolean,
     organization_id:string
+    menu:string|undefined;
     name:string,
     firstPlan:boolean,
-    id:string
+    activePlan:boolean,
+    redeemableRewards:string[],
+    id?:string
   }

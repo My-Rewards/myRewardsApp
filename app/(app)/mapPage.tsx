@@ -226,7 +226,7 @@ export default function mapPage() {
               key={shop.id}
               latitude={shop.latitude}
               longitude={shop.longitude}
-              logo={shop.logo}
+              preview={shop.preview}
               id={shop.id}
               name={shop.name}
               description={shop.description}
