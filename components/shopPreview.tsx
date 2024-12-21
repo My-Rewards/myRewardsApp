@@ -286,24 +286,20 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
             >
               <View>
                 <View style={{backgroundColor:'rgba(64, 124, 156, 1)'}}>
-                  <View style={modalStyle.titleContainer}>
-                    <Text style={modalStyle.modalTitle}>{selectedPin.name}</Text>
+                  <View>
+
                   </View>
                   <View>
-                    <Text style={modalStyle.modalTitle1}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
-                    <View style={modalStyle.subHeader}>
-                      <View>
-                        <Text style={[modalStyle.subText]}>{distance} miles away</Text>
-                      </View>
-                      <View>
-                        <Text style={modalStyle.subText}>{getShopStatus(selectedPin.shop_hours)}</Text>
-                      </View>
-                    </View>
-                    <View style={modalStyle.descContainer}>
-                      <Text style={modalStyle.text1}>{selectedPin.description}</Text>
-                    </View>
+                    
                   </View>
-                  <View style={{width:'100%',backgroundColor:'white'}}>
+                  <View>
+                    
+                  </View>
+                  <View>
+                    
+                  </View>
+                </View>
+                <View style={{width:'100%',backgroundColor:'white'}}>
                   <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
                     <View style={modalStyle.toggleSection}>
                      <TouchableOpacity onPress={()=>handleToggle(0)}>
@@ -314,7 +310,6 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                       </TouchableOpacity>
                     </View>
                   </View>
-                </View>
                 <View>
                   <View style={styles.subHeader}>
                     <View style={styles.titleContainer}>

@@ -5,7 +5,8 @@ import {
   TextInput, 
   SafeAreaView, 
   TouchableWithoutFeedback, 
-  Keyboard 
+  Keyboard, 
+  TouchableOpacity
 } from 'react-native';
 import { Redirect, Tabs } from 'expo-router';
 import { useSession } from '../../auth/ctx';
@@ -17,13 +18,8 @@ import {SvgXml} from 'react-native-svg';
 import React from 'react';
 import { whtieStar } from '@/assets/images/MR-logos';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-/* 
-  App itself (redirect back to landingScreen from here if needed)
-
-  Tips:
-  - Default screen needs to be named index (index.tsx)
-*/
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function AppLayout() {
   const { session, isLoading } = useSession();
@@ -97,7 +93,9 @@ export default function AppLayout() {
         options={{
           title: 'Map',
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon name={'map'} color={focused?'white':color_pallete[1]} />
+            <View style={{backgroundColor:focused?'white':color_pallete[1], flex:1, borderRadius:50, aspectRatio: 1, alignItems:'center', justifyContent:'center'}}>
+              <FontAwesome name={'location-arrow'} color={color_pallete[0]} />
+            </View>
           ),
           tabBarLabel: ({ focused, color }) => (
             <Text
@@ -123,22 +121,25 @@ export default function AppLayout() {
         options={{
           title: undefined,
           headerShown:false,
-          tabBarItemStyle:{backgroundColor:'white', borderRadius:10},
-          tabBarLabel: ({ focused, color }) => (
-            <Text
-              style={{
-                fontWeight: 'normal',
-                fontSize:12,
-                color:color_pallete[1],
-                fontFamily:'Avenir Next'
-              }}>
-              Scan
-            </Text>
-          ),
-          tabBarIcon: ({ focused }) => (
-            <View>
-              <TabBarIcon name={'barcode-outline'} size={40} color={color_pallete[1]}/>
-            </View>
+          tabBarLabel: () => null,
+          tabBarButton: (props) => (
+            <TouchableOpacity
+            onPress={props.onPress} 
+            activeOpacity={1}
+            style={styles.scanButton}
+          >
+            <SvgXml
+              xml={whtieStar}
+              width="100%"
+              height="100%" 
+              color={color_pallete[1]} 
+            />
+            <Ionicons name={'chevron-back'} color={color_pallete[1]} style={{position:'absolute', top:0, left:0, transform: [{ rotate: '45deg' }]}}/>
+            <Ionicons name={'chevron-back'} color={color_pallete[1]} style={{position:'absolute', top:0, right:0, transform: [{ rotate: '135deg' }]}}/>
+            <Ionicons name={'chevron-back'} color={color_pallete[1]} style={{position:'absolute', bottom:0, left:0, transform: [{ rotate: '-45deg' }]}}/>
+            <Ionicons name={'chevron-back'} color={color_pallete[1]} style={{position:'absolute', bottom:0, right:0, transform: [{ rotate: '-135deg' }]}}/>
+
+          </TouchableOpacity>
           ),
         }}
       />
@@ -147,15 +148,11 @@ export default function AppLayout() {
         options={{
           title: 'Rewards',
           tabBarIcon: ({ focused }) => (
-            <SvgXml
-              xml={whtieStar}
-              height="100%"
-              width="100%"
-              color={focused?'white':color_pallete[1]}
-            />
+            <View style={{flex:1, aspectRatio:1, alignItems:'center', justifyContent:'center'}}>
+              <Ionicons name={'book'} color={focused?'white':color_pallete[1]} size={25}/>
+            </View>
           ),
-          
-          tabBarLabel: ({ focused, color }) => (
+          tabBarLabel: ({ focused }) => (
             <Text
               style={{
                 fontWeight: 'normal',
@@ -189,7 +186,7 @@ export default function AppLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon name={'person'} color={focused?'white':color_pallete[1]} />
           ),
-          tabBarLabel: ({ focused, color }) => (
+          tabBarLabel: ({ focused }) => (
             <Text
               style={{
                 fontWeight: 'normal',
@@ -211,14 +208,11 @@ export default function AppLayout() {
       <Tabs.Screen
         name="shopPage"
         options={{
-          title: 'Profile',
-          tabBarStyle: { display: 'none' },
-          tabBarButton: () => null,
-          tabBarShowLabel:false,
+          href:null,
           header: () => (
             <View style={[styles.header, {paddingBottom:5}]}>
               <SafeAreaView />
-              <Text style={styles.headerText}>Profile</Text>
+              <Text style={styles.headerText}>Shop</Text>
             </View>
           )
         }}
@@ -300,9 +294,22 @@ const styles = StyleSheet.create({
     backgroundColor: color_pallete[0],
     paddingTop:5,
     paddingBottom:10,
-    height:77, //88 because 85 + 3 (border)
+    height:77,
     borderTopColor:color_pallete[1],
     borderTopWidth:2,
     zIndex:99,
+  },
+  scanButton:{
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    aspectRatio:1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor:'white',
+    alignSelf:'center',
+    padding:4,
+    paddingHorizontal:10,
+    borderRadius:6
   }
 })

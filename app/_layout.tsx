@@ -5,10 +5,6 @@ import {Amplify} from 'aws-amplify';
 import {amplifyConfiguration} from './amplify-config'
 import { PropsProvider } from './LoadingProp/propsProvider';
 
-/* 
-  Main App screen components landing screen & app itself
-*/
-
 console.warn = () => {};
 Amplify.configure(amplifyConfiguration);
 
