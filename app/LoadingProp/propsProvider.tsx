@@ -41,3 +41,5 @@ export const PropsProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useProps = () => useContext(PropsContext);
+
+export default PropsProvider;

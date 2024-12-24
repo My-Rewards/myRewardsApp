@@ -1,7 +1,7 @@
-import { Plan, Reward } from "@/app-data/data-types";
+import { Plan, Reward, Tier } from "@/app-data/data-types";
 import { View, Text, Dimensions, TouchableOpacity, Animated, SafeAreaView } from "react-native"
 import Collapsible from 'react-native-collapsible';
-import {dropDown, milestoneStyle, modalStyle} from '@/components/mapPreviewStyle';
+import {dropDown, milestoneStyle, modalStyle} from '@/components/styling/mapPreviewStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { color_pallete } from "@/constants/Colors";
 import { useState } from "react";
@@ -14,7 +14,7 @@ type RoadMapProps = {
   };
 
 function getNextRewardVisits(plan:Plan) {
-    const { reward_plan, visits, redeemable } = plan;
+    const { reward_plan, visits } = plan;
   
     if (!reward_plan || !reward_plan.road_map) {
       throw new Error("Invalid reward plan structure");
@@ -24,9 +24,9 @@ function getNextRewardVisits(plan:Plan) {
       .map(Number)
       .sort((a, b) => a - b);
       for (const milestone of milestones) {
-      if(redeemable && milestone === visits){
+      if( milestone === visits){
         return milestone - visits;
-      }else if (!redeemable && visits < milestone) {
+      }else if (visits < milestone) {
         return milestone - visits;
       }
     }
@@ -75,19 +75,21 @@ const categorizeRewards = (plan: Plan) => {
     const { road_map } = plan.reward_plan;
     const visits = plan.visits;
   
-    const milestones = Object.keys(road_map).map(Number).sort((a, b) => a - b);
-  
+    const milestones = Object.keys(road_map)
+    .map(key => Number(key))
+    .filter(milestone => !isNaN(milestone));
+
     return milestones.map((milestone) => {
-      if (milestone <= visits && !plan.redeemable || milestone < visits && plan.redeemable) {
-        return { milestone, status: "passed", rewards: road_map[milestone] };
-      } else if (
-        milestone === Math.min(...milestones.filter((m) => m > visits)) && !plan.redeemable || 
-        milestone === Math.min(...milestones.filter((m) => m == visits)) && plan.redeemable ) {
-        return { milestone, status: "current", rewards: road_map[milestone] };
-      } else {
-        return { milestone, status: "upcoming", rewards: road_map[milestone] };
-      }
-    });
+        const tier_id = road_map[milestone].id
+      
+        if (milestone <= visits && !plan.redeemableRewards.includes(tier_id)) {
+          return { milestone, status: "passed", rewards: road_map[milestone] };
+        } else if (plan.redeemableRewards.includes(tier_id) || milestone <= visits ) {
+          return { milestone, status: "current", rewards: road_map[milestone] };
+        } else {
+          return { milestone, status: "upcoming", rewards: road_map[milestone] };
+        }
+      });
 };
 
 const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:boolean}> = ({rewardList, option, redeemable}) =>{
@@ -128,6 +130,32 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 
     const taggedRewards = categorizeRewards(plan);
 
+    const PointStatus: React.FC<{milestone:[string, Tier], index:number}> = ({ milestone, index }) => {   
+        const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
+        const checkpoint = parseInt(milestone[0],10);
+
+        return(
+            <View key={index} style={modalStyle.stepContainer}>
+                {plan.visits >= checkpoint && !rewardRedeemable ? (
+                <View style={[modalStyle.circle, { backgroundColor: color_pallete[2] }]}>
+                    <Ionicons name="checkmark" color="white" />
+                </View>
+                ) : rewardRedeemable ?(                            
+                <View style={[modalStyle.circle, {backgroundColor:color_pallete[3]}]}>
+                    <Ionicons name="star" color={'white'} />
+                </View>
+                ):(
+                <View style={[modalStyle.circle]}>
+                    <Text style={modalStyle.circleText}>{checkpoint}</Text>
+                </View>
+                )}
+                {index < milestones.length - 1 && (
+                    <View style={[modalStyle.line, { width: lineWidth }]} />
+                )}
+            </View>
+        )
+    }
+
     return (
         <View style={{gap:30, marginBottom:height/10}}>
             <View style={{ alignItems: 'center', marginTop:10}}>
@@ -142,28 +170,9 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
             {/* Completion Bar */}
             <View style={modalStyle.roadmapContainer}>
                 <View style={modalStyle.roadmap}>
-                    {milestones.map(([milestone], index) => (
-                        <View key={milestone} style={modalStyle.stepContainer}>
-
-                    {plan.visits > parseInt(milestone,10) || (plan.visits == parseInt(milestone,10) && !plan.redeemable)? (
-                            <View style={[modalStyle.circle, { backgroundColor: color_pallete[2] }]}>
-                                <Ionicons name="checkmark" color="white" />
-                            </View>
-                        ) : plan.redeemable && parseInt(milestone,10) === plan.visits ?(                            
-                            <View style={[modalStyle.circle, {backgroundColor:color_pallete[3]}]}>
-                                <Ionicons name="star" color={'white'} />
-                            </View>
-                        ):(
-                            <View style={[modalStyle.circle]}>
-                                <Text style={modalStyle.circleText}>{milestone}</Text>
-                            </View>
-                        )}
-
-                        {index < milestones.length - 1 && (
-                            <View style={[modalStyle.line, { width: lineWidth }]} />
-                        )}
-                        </View>
-                    ))}
+                    {milestones.map((milestone, index) => 
+                    <PointStatus milestone={milestone} index={index}/>
+                    )}
                 </View>
             </View>
             {/* Drop Down */}
@@ -195,7 +204,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <ListRewards 
                                         rewardList={rewards.rewards} 
                                         option={0} 
-                                        redeemable={plan.redeemable && tillNextRew === 0}
+                                        redeemable={tillNextRew === 0}
                                     />
                                 </Collapsible>
                             </View>
@@ -278,7 +287,7 @@ export const ExpendatureMap:React.FC<RoadMapProps> = ({plan}) => {
                             <ListRewards 
                             rewardList={plan.reward_plan.exp_rewards.rewardsOptions} 
                             option={0} 
-                            redeemable={plan.redeemable && plan.points>=plan.reward_plan.exp_rewards.expenditure}/>
+                            redeemable={plan.points>=plan.reward_plan.exp_rewards.expenditure}/>
                         </Collapsible>
                     </View>
                 </Animated.View>

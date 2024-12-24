@@ -1,113 +1,73 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { View, Text, TouchableOpacity, Animated, Modal, Dimensions, Image, ActivityIndicator, PanResponder} from 'react-native';
+import { View, Text, TouchableOpacity, Animated, Modal, Dimensions, Image, ActivityIndicator, PanResponder, Platform} from 'react-native';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { Plan, shop, ShopHour, shopPreview } from '@/app-data/data-types';
 import { mockPlan, mockShop } from '@/APIs/api';
-import ParallaxScrollView from './ParallaxScrollView';
+import ShopScrollView from './ShopScrollView';
 import { localData } from '@/app-data/appData';
-import {modalStyle, styles} from './mapPreviewStyle'
+import {modalStyle, styles} from './styling/mapPreviewStyle'
 import { color_pallete } from '@/constants/Colors';
 import {ExpendatureMap, RoadMap} from '@/components/planTemplate' 
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Collapsible from 'react-native-collapsible';
+import AntDesign from '@expo/vector-icons/AntDesign'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import * as Linking from "expo-linking";
+import * as Haptics from 'expo-haptics';
+import { calculateDistance, convertTo12HourFormat, getShopStatus } from '@/constants/functions';
+import { useProps } from '@/app/LoadingProp/propsProvider';
 
 const { width } = Dimensions.get('window');
 
+type ShopPreviewProps = {
+  selectedPin: shopPreview;
+};
+
 type PrewviewShopProps = {
-    selectedPin: shopPreview;
-    isExpanded:boolean;
-    setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
-  };
-  
-  type ShopPreviewProps = {
-    selectedPin: shopPreview;
-  };
-const getShopStatus = (shop_hours:ShopHour[]) => {
-  const daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
-  const now = new Date();
-  const currentDay = daysOfWeek[now.getDay()];
-  const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
-
-  const todayHours = shop_hours.find((day) => day.day === currentDay);
-
-  if (!todayHours || todayHours.open === null || todayHours.close === null) {
-    return "closed today";
-  }
-  else if (currentTime < todayHours.open) {
-    return `opens at ${convertTo12HourFormat(todayHours.open)}`;
-  }
-  else if (currentTime >= todayHours.close) {
-    return "closed today";
-  }
-  else return `open until ${convertTo12HourFormat(todayHours.close)}`;
+  selectedPin: shopPreview;
+  isExpanded:boolean;
+  setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
+  type:number
 };
 
-const convertTo12HourFormat = (time:string) => {
-  if (!time) return "";
-  const [hours, minutes] = time.split(":").map(Number);
-  const period = hours >= 12 ? "PM" : "AM";
-  const adjustedHours = hours % 12 || 12;
-  return `${adjustedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
+type OpenMapArgs = {
+  lat: string | number;
+  lng: string | number;
+  label: string;
 };
-
-const calculateDistance = (lat: number, lon: number): string => {
-  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
-  const { userLocation } = localData();
-
-  if (!userLocation) return '';
-
-  const R = 6371;
-  const dLat = toRadians(userLocation.latitude - lat);
-  const dLon = toRadians(userLocation.longitude - lon);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat)) *
-      Math.cos(toRadians(userLocation.latitude)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  const distanceInKm = R * c;
-  const distanceInMiles = distanceInKm * 0.621371;
-  return(`${Math.round(distanceInMiles * 10) / 10}`);
-}
 
 export const ShopPreview = ({selectedPin}: ShopPreviewProps) => {
   const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
+  const shopStatus = getShopStatus(selectedPin.shop_hours);
 
   return (
-    <View style={{height:'100%', width:width-30, alignSelf:'center', marginHorizontal:10}}>
-      <View style={[styles.modalContent,]}>
-        <View style={[styles.titleContainer, {marginBottom:5}]}>
-          <View style={styles.logo2}>
-            <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: selectedPin.preview}}/>
-          </View>
-          <Text style={styles.text1}>{selectedPin.name}</Text>
-        </View>
-        <View style={styles.subHeader2}>
-          <Text style={[styles.modalTitle1]}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
-          <View style={styles.subHeader1}>
-            <View>
-              <Text style={[styles.subText]}>{distance} miles away</Text>
+    <View style={{height:'100%', width:width-30, alignSelf:'center', marginHorizontal:10, backgroundColor:'transparent'}}>
+      <View style={[styles.modalContent]}>
+        <View style={styles.miniContainer}>
+          <Image style={{objectFit:'contain', height:'100%', aspectRatio:1}} source={{uri: selectedPin.preview}}/>
+          <View style={{flex:1, flexDirection:'column'}}>
+            <View style={styles.miniHeader}>
+              <Text style={styles.headerText}>{selectedPin.name}</Text>
+                {
+                selectedPin.liked &&
+                  <View style={styles.heartButton}> 
+                    <Ionicons name='heart' size={16} color={'white'}/>
+                  </View>
+                }
             </View>
-            <View>
-              <Text style={styles.subText}>{getShopStatus(selectedPin.shop_hours)}</Text>
+            <View style={{padding:10, flex:1, flexDirection:'column', gap:10}}>
+              <View>
+                <Text style={styles.minitext}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+                <Text style={styles.miniSubText}>{distance} miles away</Text>
+              </View>
+              <View>
+                <Text style={styles.minitext2}>{shopStatus.status}</Text>
+                { shopStatus.hours && shopStatus.hours.open && shopStatus.hours.close ?
+                  <Text style={styles.miniSubText}>{convertTo12HourFormat(shopStatus.hours?.open)} - {convertTo12HourFormat(shopStatus.hours?.close)}</Text>:
+                  null
+                }
+              </View>
             </View>
-          </View>
-          <View style={styles.descContainer}>
-            <Text style={styles.text2}>{selectedPin.description}</Text>
           </View>
         </View>
       </View>
@@ -115,12 +75,15 @@ export const ShopPreview = ({selectedPin}: ShopPreviewProps) => {
 );
 }
 
-export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: PrewviewShopProps) => {
+export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded, type }: PrewviewShopProps) => {
   const { profile } = localData();
+
+  const {alert} = useProps()
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [liked, setLiked] = useState<boolean>(false)
+  const [expandHours, setExpandHours] = useState<boolean>(false)
 
   const [loading, setLoading] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
@@ -130,6 +93,7 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
   const currentScreen = useRef(0);
 
   const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
+  const shopStatus = getShopStatus(selectedPin.shop_hours);
   
   useEffect(() => {
     const fetchShopDetails = async () => {
@@ -256,6 +220,42 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
     }
   }
 
+  const redirectWeb = async (url:string|undefined) => {
+    if(url){
+      try {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+        } else {
+          console.log(`Can't handle URL: ${url}`);
+        }
+      } catch (error) {
+        console.error('Something went wrong', error);
+      }
+    }
+  };
+
+  const openMap = ({lat, lng, label}: OpenMapArgs) => {
+    const scheme = Platform.select({
+      ios: `maps://?q=${label}&ll=${lat},${lng}`,
+      android: `geo:${lat},${lng}?q=${lat},${lng}(${label})`,
+    });
+  
+    if (scheme) {
+      Linking.openURL(scheme).catch(err =>
+        console.error('Error opening map: ', err),
+      );
+    }
+  };
+
+  const handleLike = () =>{
+    if(!liked){
+      alert('Shop added to Favoriites', '', 'success')
+    }
+    setLiked(!liked)
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  }
+
   return (
     <View style={[modalStyle.modalContainer]}>
       <Modal
@@ -266,39 +266,103 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
       >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
         <View style={modalStyle.container}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() =>  setExpansion && setExpansion(false)}
-          >
-            <TabBarIcon name={'close'} color={'rgba(255,255,255,0.7)'} />
-          </TouchableOpacity>
           {loading || !shopDetails ? (
             <View style={modalStyle.loadingContainer}>
-              <Animated.View style={[{height:200, width:'100%'},{backgroundColor: animatedBackgroundColor }]} />
+              <Animated.View style={[{height:250, width:'100%'},{backgroundColor: animatedBackgroundColor }]} />
               <View style={{alignContent:'center', justifyContent:'center', flex:1}}>
                 <ActivityIndicator />
               </View>
             </View>
           ) : (
-            <ParallaxScrollView
+            <ShopScrollView
             headerBackgroundColor={{ light: 'rgba(64, 124, 156, 1)', dark: 'rgba(64, 124, 156, 1)' }}
             headerImage={<Image source={{ uri: shopDetails.banner }} style={modalStyle.image} resizeMode="contain"/>}
+            type={type}
+            name={selectedPin.name}
+            description={selectedPin.description}
+            setExpansion={setExpansion}
             >
               <View>
-                <View style={{backgroundColor:'rgba(64, 124, 156, 1)'}}>
+                <View style={{backgroundColor:color_pallete[5], paddingVertical:10}}>
                   <View>
-
+                    <View style={modalStyle.infoRow}>
+                      <Ionicons name={'location-outline'} color={'white'} size={25}/>
+                      <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{openMap({lat:selectedPin.latitude, lng:selectedPin.longitude, label:'Open maps'})}}>
+                        <View style={{flex:1}}>
+                          <Text style={modalStyle.underline_infoText}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+                          <Text style={modalStyle.sub_infoText}>{distance} miles away</Text>
+                        </View>
+                        <Ionicons name='arrow-forward' style={{transform:[{rotate:'-45deg'}], marginRight:10}} color={'white'} size={25} />
+                        <View  style={modalStyle.underline}/>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View>
-                    
+                    <View style={modalStyle.infoRow}>
+                      <View style={{position:'relative', height:'100%', width:25}}>
+                        <AntDesign name={'clockcircleo'} color={'white'} size={25} style={{position:'absolute', alignSelf:'center', top:15,}}/>
+                      </View>
+                      <View style={{flexDirection:'column', flex:1}}>
+                        <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{setExpandHours(!expandHours)}}>
+                          <Text style={shopStatus.status == 'Open'? modalStyle.openText: modalStyle.closedText}>{shopStatus.status}</Text>
+                          <Ionicons name='chevron-up' size={25} color={'white'}  style={{transform:[{rotate:!expandHours?'90deg':'180deg'}], marginRight:10}}/>
+                        </TouchableOpacity>
+                        <View>
+                          <Collapsible collapsed={!expandHours}>
+                            <View style={{marginBottom:10, gap:2}}>
+                              {selectedPin.shop_hours.map((shopDay, index)=>{
+                                if(shopDay.open && shopDay.close){
+                                  return(
+                                    <View style={modalStyle.hoursContainer} key={index}>
+                                      <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
+                                      <View>
+                                        <Text style={modalStyle.infoText1}>{convertTo12HourFormat(shopDay.open)} - {convertTo12HourFormat(shopDay.close)}</Text>
+                                      </View>
+                                    </View>
+                                  )
+                                }else{
+                                  return(
+                                    <View style={modalStyle.hoursContainer} key={index}>
+                                      <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
+                                      <Text style={modalStyle.infoText1}>Closed</Text>
+                                    </View>
+                                  )
+                                }
+                              })}
+                            </View>
+                          </Collapsible>
+                        </View>
+                      <View  style={modalStyle.underline}/>
+                      </View>
+                    </View>
                   </View>
-                  <View>
-                    
-                  </View>
-                  <View>
-                    
-                  </View>
+                  {shopDetails.menu && 
+                    <View>
+                      <View style={modalStyle.infoRow}>
+                        <MaterialIcons name={'restaurant'} color={'white'} size={25}/>
+                        <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>redirectWeb(shopDetails.menu)}>
+                          <View style={{flex:1}}>
+                            <Text style={modalStyle.underline_infoText}>Menu</Text>
+                          </View>
+                          <Ionicons name='arrow-forward' style={{transform:[{rotate:'-45deg'}], marginRight:10}} color={'white'} size={25} />
+                          <View  style={modalStyle.underline}/>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  }
+                    <View>
+                    <View style={modalStyle.infoRow}>
+                        <AntDesign name={'phone'} style={{transform: [{ scaleX: -1 }]}} color={'white'} size={25}/>
+                        <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>redirectWeb(`tel:${shopDetails.phoneNumber}`)}>
+                          <View style={{flex:1}}>
+                            <Text style={modalStyle.underline_infoText}>{shopDetails.phoneNumber}</Text>
+                          </View>
+                          <Ionicons name='arrow-forward' style={{transform:[{rotate:'-45deg'}], marginRight:10}} color={'white'} size={25} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                 </View>
+
                 <View style={{width:'100%',backgroundColor:'white'}}>
                   <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
                     <View style={modalStyle.toggleSection}>
@@ -309,7 +373,8 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                         <Text style={[modalStyle.toggleText, selectedIndex===1?{'opacity':1}:{'opacity':0.6}]}>Milestone Rewards</Text>
                       </TouchableOpacity>
                     </View>
-                  </View>
+                </View>
+
                 <View>
                   <View style={styles.subHeader}>
                     <View style={styles.titleContainer}>
@@ -318,14 +383,14 @@ export const ExpandedShop = ({ selectedPin, setExpansion, isExpanded }: Prewview
                       </View>
                       <Text style={styles.text1}>{selectedPin.name}</Text>
                     </View>
-                    <TouchableOpacity onPress={()=>{setLiked(!liked)}}>
+                    <TouchableOpacity onPress={handleLike}>
                       <TabBarIcon color={color_pallete[2]} name={liked?'heart':'heart-outline'} />
                     </TouchableOpacity>
                   </View>
-                  { planSection() }
+                  {planSection()}
                 </View>
               </View>
-            </ParallaxScrollView>
+            </ShopScrollView>
           )}
         </View>
       </View>

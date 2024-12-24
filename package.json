@@ -56,7 +56,9 @@
     "react-native-svg": "15.8.0",
     "react-native-swipe-gestures": "^1.0.5",
     "react-native-web": "~0.19.10",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "expo-linear-gradient": "~14.0.1",
+    "expo-haptics": "~14.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

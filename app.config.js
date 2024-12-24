@@ -8,6 +8,15 @@ export default () => {
       bundleIdentifier: isProd ? 'com.my.app' : 'com.anonymous.myRewards',
       icon: './assets/images/MyRewardsLogo1.png',
       runtimeVersion: "1.0.0",
+      infoPlist: {
+        UIBackgroundModes: [
+          "location",
+          "fetch",
+          "remote-notification"
+        ],
+        "NSLocationWhenInUseUsageDescription": "MyRewards needs access to you location when using the app.",
+        "LSApplicationQueriesSchemes": ["tel"]
+      },
     },
     extra: {
       eas: {

@@ -303,13 +303,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    aspectRatio:1,
+    aspectRatio:5/4,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor:'white',
     alignSelf:'center',
-    padding:4,
+    padding:8,
     paddingHorizontal:10,
-    borderRadius:6
+    borderRadius:6,
   }
 })

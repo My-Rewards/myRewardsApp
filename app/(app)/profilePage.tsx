@@ -7,7 +7,6 @@ export default function profilePage() {
   const { profile } = localData();
 
   if(!profile){
-    // loading profile silouette
     return(
       <View>
 

@@ -37,6 +37,8 @@ export interface ShopHour {
     banner: string;
     logo:string;
     liked:boolean;
+    menu:string|undefined;
+    phoneNumber:string;
   }
 
   export interface Profile {
@@ -59,7 +61,7 @@ export interface ShopHour {
     rule?: string|number;
   };
 
-  interface Tier {
+  export interface Tier {
     id: string;
     rewards: Reward[];
   }
@@ -78,9 +80,7 @@ export interface ShopHour {
     reward_plan:RewardSystem,
     visits:number,
     points:number,
-    redeemable:boolean,
     organization_id:string
-    menu:string|undefined;
     name:string,
     firstPlan:boolean,
     activePlan:boolean,

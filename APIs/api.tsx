@@ -14,7 +14,9 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             organization_id: "org456",
             location_id: "loc789",
             geohash: "dr5regw3n",
-            banner: "https://picsum.photos/400/200",
+            banner: "https://picsum.photos/300/200",
+            menu:undefined,
+            phoneNumber:'5614455304',
             logo: 'https://picsum.photos/200',
             liked:true,
           });
@@ -24,7 +26,9 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             organization_id: "org456",
             location_id: "loc789",
             geohash: "dr5regw3n",
-            banner: "https://picsum.photos/400/200",
+            menu:'https://www.mock-menu-link.com',
+            phoneNumber:'5614936645',
+            banner: "https://picsum.photos/300/200",
             logo: 'https://picsum.photos/200',
             liked:false,
           });
@@ -34,7 +38,9 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             organization_id: "org456",
             location_id: "loc789",
             geohash: "dr5regw3n",
-            banner: "https://picsum.photos/400/200",
+            menu:'https://www.mock-menu-link.com',
+            phoneNumber:'5612331223',
+            banner: "https://picsum.photos/300/200",
             logo: 'https://picsum.photos/200',
             liked:false,
           });
@@ -43,116 +49,115 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
     });
   };
 
-  export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const sampleShops: shopPreview[] = [
-          {
-            latitude: 29.6542,
-            longitude: -82.3351,
-            preview: 'https://picsum.photos/300',
-            organization_id: "org456",
-            geohash: '34jn3',
-            location_id: "loc789",
-            id: '24hHsk345m',
-            name: 'Brolic Brunches',
-            description: 'Yummy food everyday',
-            liked: true,
-            location: {
-              city: 'Gainesville',
-              state: 'Florida'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const sampleShops: shopPreview[] = [
+        {
+          latitude: 29.6542,
+          longitude: -82.3351,
+          preview: 'https://picsum.photos/300',
+          organization_id: "org456",
+          geohash: '34jn3',
+          location_id: "loc789",
+          id: '24hHsk345m',
+          name: 'Brolic Brunches',
+          description: 'Yummy food everyday',
+          liked: true,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
           },
-          {
-            latitude: 29.6478,
-            longitude: -82.3173,
-            preview: 'https://picsum.photos/200',
-            organization_id: "org446",
-            geohash: '34jn3',
-            location_id: "loc341",
-            id: '24hHsk346m',
-            name: 'Alpha Artichokes',
-            description: 'Delicious food every day',
-            liked: false,
-            location: {
-              city: 'Gainesville',
-              state: 'Florida'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
+        },
+        {
+          latitude: 29.6478,
+          longitude: -82.3173,
+          preview: 'https://picsum.photos/200',
+          organization_id: "org446",
+          geohash: '34jn3',
+          location_id: "loc341",
+          id: '24hHsk346m',
+          name: 'Alpha Artichokes',
+          description: 'Delicious food every day',
+          liked: false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
           },
-          {
-            latitude: 29.6569,
-            longitude: -82.3214,
-            organization_id: "org596",
-            location_id: "loc115",
-            geohash: '34jn3',
-            preview: 'https://picsum.photos/200',
-            id: 'wjn4Sj320B',
-            name: 'Beta Breaky',
-            description: 'Crispy Food for the Hungry',
-            liked: false,
-            location: {
-              city: 'Gainesville',
-              state: 'Florida'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
+        },
+        {
+          latitude: 29.6569,
+          longitude: -82.3214,
+          organization_id: "org596",
+          location_id: "loc115",
+          geohash: '34jn3',
+          preview: 'https://picsum.photos/200',
+          id: 'wjn4Sj320B',
+          name: 'Beta Breaky',
+          description: 'Crispy Food for the Hungry',
+          liked: false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
           },
-          {
-            latitude: 29.6501,
-            longitude: -82.3305,
-            preview: 'https://picsum.photos/200',
-            organization_id: "org123",
-            geohash: '34jn3',
-            location_id: "loc129",
-            id: 'ien5J2k2',
-            name: 'Los Tacos',
-            description: 'Hand made authentic tacos',
-            liked: false,
-            location: {
-              city: 'Gainesville',
-              state: 'Florida'
-            },
-            shop_hours: [
-              { day: "Monday", open: "08:00", close: "20:00" },
-              { day: "Tuesday", open: "08:00", close: "20:00" },
-              { day: "Wednesday", open: "08:00", close: "20:00" },
-              { day: "Thursday", open: "08:00", close: "20:00" },
-              { day: "Friday", open: "08:00", close: "22:00" },
-              { day: "Saturday", open: "09:00", close: "22:00" },
-              { day: "Sunday", open: "00:00", close: "00:00" },
-            ],
-          }
-        ];
-        resolve(sampleShops);
-      }, 1000);
-    });
-  };
-  
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
+        },
+        {
+          latitude: 29.6501,
+          longitude: -82.3305,
+          preview: 'https://picsum.photos/200',
+          organization_id: "org123",
+          geohash: '34jn3',
+          location_id: "loc129",
+          id: 'ien5J2k2',
+          name: 'Los Tacos',
+          description: 'Hand made authentic tacos',
+          liked: false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
+        }
+      ];
+      resolve(sampleShops);
+    }, 1000);
+  });
+};
 
 export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
   return new Promise((resolve) => {
@@ -180,7 +185,7 @@ export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
             { day: "Thursday", open: "08:00", close: "20:00" },
             { day: "Friday", open: "08:00", close: "22:00" },
             { day: "Saturday", open: "09:00", close: "22:00" },
-            { day: "Sunday", open: "00:00", close: "00:00" },
+            { day: "Sunday", open: null, close: null },
           ],
         },
         {
@@ -205,7 +210,7 @@ export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
             { day: "Thursday", open: "08:00", close: "20:00" },
             { day: "Friday", open: "08:00", close: "22:00" },
             { day: "Saturday", open: "09:00", close: "22:00" },
-            { day: "Sunday", open: "00:00", close: "00:00" },
+            { day: "Sunday", open: null, close: null },
           ],
         },
         {
@@ -230,7 +235,7 @@ export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
             { day: "Thursday", open: "08:00", close: "20:00" },
             { day: "Friday", open: "08:00", close: "22:00" },
             { day: "Saturday", open: "09:00", close: "22:00" },
-            { day: "Sunday", open: "00:00", close: "00:00" },
+            { day: "Sunday", open: null, close: null },
           ],
         },
         {
@@ -255,7 +260,7 @@ export const mockDiscoverShops = (user_id:string): Promise<shopPreview[]> => {
             { day: "Thursday", open: "08:00", close: "20:00" },
             { day: "Friday", open: "08:00", close: "22:00" },
             { day: "Saturday", open: "09:00", close: "22:00" },
-            { day: "Sunday", open: "00:00", close: "00:00" },
+            { day: "Sunday", open: null, close: null },
           ],
         }
       ];
@@ -326,10 +331,8 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             },
             visits: 0,
             points: 0,
-            redeemable:false,
             redeemableRewards:[],
             organization_id: "org12345",
-            menu:'www.mock-menu-link.com',
             name:'Los Tacos',
             id:'341Dig',
             firstPlan:true,
@@ -374,10 +377,8 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             },
             visits: 5,
             points: 0,
-            redeemable:false,
             redeemableRewards:[],
             organization_id: "org334",
-            menu:'www.mock-menu-link.com',
             name:'Beta Breaky',
             id:'34nDi3',
             firstPlan:false,
@@ -431,11 +432,9 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         },
         visits: 5,
         points: 0,
-        redeemable:false,
         redeemableRewards:['tier-3'],
         firstPlan:false,
         activePlan:false,
-        menu:'www.mock-menu-link.com',
         organization_id: "org12345",
         name:'Los Tacos',
         id:'341Dig'
@@ -469,25 +468,23 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
               ],
             },
           },
-            exp_rewards: {
-              expenditure: 150,
-              rewardsOptions: [
-                { type: "cost", value: 20, rule:'menu Item' },
-                { type: "percentage", value: 50, rule:'menu Item' },
-                { type: "item", item: 'entree', rule:0},
-              ]
-            }
+          exp_rewards: {
+            expenditure: 150,
+            rewardsOptions: [
+              { type: "cost", value: 20, rule: 'menu Item' },
+              { type: "percentage", value: 50, rule: 'menu Item' },
+              { type: "item", item: 'entree', rule: 0 },
+            ]
+          }
         },
         visits: 6,
         points: 50,
-        redeemable:true,
-        firstPlan:false,
-        redeemableRewards:['tier-6'],
-        menu:undefined,
-        activePlan:false,
+        firstPlan: false,
+        redeemableRewards: ['tier-6'],
+        activePlan: true,
         organization_id: "org12345",
-        name:'Los Tacos',
-        id:'341Dig'
+        name: 'Los Tacos',
+        id: '341Dig',
       };
       const samplePlan3: Plan = 
       {
@@ -529,10 +526,8 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         },
         visits: 2,
         points: 80,
-        redeemable:true,
         firstPlan:false,
-        activePlan:false,
-        menu:'www.mock-menu-link.com',
+        activePlan:true,
         redeemableRewards:[],
         organization_id: "org12345",
         name:'Los Tacos',

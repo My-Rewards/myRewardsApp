@@ -246,7 +246,7 @@ export default function mapPage() {
           onPress={() => {
             locateMe(mapRef);
           }}>
-            <FontAwesome6 name={'location-crosshairs'} size={40} color={color_pallete[2]} />
+            <FontAwesome6 name={'location-crosshairs'} size={32} color={'white'}/>
         </TouchableOpacity>
         }
       </Animated.View>
@@ -282,6 +282,7 @@ export default function mapPage() {
             selectedPin={selectedPin}
             isExpanded={isExpanded}
             setExpansion={setIsExpanded}
+            type={0}
         />}
     </View>
   );
@@ -341,6 +342,10 @@ const styles = StyleSheet.create({
     position:'absolute',
     bottom:0,
     right:0,
-    margin:15
+    margin:15,
+    shadowColor:'black',
+    shadowRadius:5,
+    shadowOpacity:0.5,
+    shadowOffset:{width:0,height:0}
   }
 });
