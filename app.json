@@ -23,6 +23,7 @@
           "remote-notification"
         ],
         "NSLocationWhenInUseUsageDescription": "This app needs access to location while open to show you relevant nearby content.",
+        "LSApplicationQueriesSchemes": ["tel"],
         "deploymentTarget": "14"
       }
     },

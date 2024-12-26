@@ -47,6 +47,8 @@ export const loadingScreen = () => {
      return { triggerLoadingScreen, LoadingModal };
 }
 
+export default loadingScreen;
+
 const styles = StyleSheet.create({
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,

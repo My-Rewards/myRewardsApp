@@ -19,7 +19,7 @@ const { width } = Dimensions.get('window');
 
 export default function plansPage() {  
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { plans, fetchPlans, isLoading} = localData();
+  const { plans, fetchPlans, isPage3Loading} = localData();
 
   const handlePress = (filterSelection: number) => {
     Animated.timing(slideAnim, {
@@ -38,7 +38,7 @@ export default function plansPage() {
   return(
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
-      <PlansPreview plansData={plans} isLoading={isLoading}/>
+      <PlansPreview plansData={plans} isLoading={isPage3Loading}/>
     </View>
   )
 }

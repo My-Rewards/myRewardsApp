@@ -108,6 +108,8 @@ export const useAlert = () => {
   return { alert, AlertModal};
 };
 
+export default useAlert;
+
 const style = StyleSheet.create({
     alertContainer: {
     position: 'absolute',

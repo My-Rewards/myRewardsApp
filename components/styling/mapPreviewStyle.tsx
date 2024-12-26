@@ -14,13 +14,11 @@ export const styles = StyleSheet.create({
     marker: {
       alignItems: 'center',
     },
-    modalContent: {
-      backgroundColor:'white',
+    modalContent1: {
+      backgroundColor:color_pallete[10],
       flex:1,
-      paddingHorizontal: 20,
       margin:10,
       borderRadius:10,
-      paddingTop:10,
       width:width-20,
       alignSelf:'center',
       shadowOffset: { width: 0, height: 5 },
@@ -28,14 +26,35 @@ export const styles = StyleSheet.create({
       shadowRadius: 4,
       elevation: 5,
     },
-    closeButton: {
-      position: 'absolute',
-      right: 10,
-      top: 10,
-      backgroundColor: 'rgba(0,0,0,0.2)',
-      borderRadius: 25,
-      padding: 5,
-      zIndex:100
+    modalContent2: {
+      backgroundColor:color_pallete[5],
+      flex:1,
+      margin:10,
+      borderRadius:10,
+      width:'100%',
+      alignSelf:'center',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.35,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    expandedContainer:{
+      backgroundColor:'white', 
+      flex:1,
+      overflow:'hidden',
+    },
+    mapsPreview:{
+      height:'100%', 
+      width:width-30, 
+      alignSelf:'center', 
+      marginHorizontal:10, 
+      backgroundColor:'transparent'
+    },
+    discoverPreview:{
+      width:'100%', 
+      height:'auto',
+      alignSelf:'center', 
+      backgroundColor:'transparent'
     },
     header:{
       fontSize: 18,
@@ -79,42 +98,50 @@ export const styles = StyleSheet.create({
         color:color_pallete[3],
         opacity:0.8,
     },
-    subText:{
-        fontFamily:'Avenir Next',
-        color:color_pallete[3],
-        fontWeight:'500',
-        fontSize:11,
-        opacity:0.8
+    miniContainer:{
+      flexDirection:'row', 
+      flex:1, 
+      justifyContent:'flex-start', 
+      width:'100%',
+      height:'auto',
+      borderRadius:10,
+      overflow:'hidden',
+      backgroundColor:'transparent'
     },
-    descContainer:{
-        alignSelf:'center', 
-        marginBottom:30
+    heartButton:{
+      padding:4,
+      borderRadius:20
     },
-    text2:{
-        color:color_pallete[2],
-        fontFamily:'Avenir Next',
-        fontSize:12,
-        fontWeight:'500'
+    miniHeader:{
+      flexDirection:'row',
+      alignItems:'center',
+      justifyContent:'space-between',
+      padding:6,
+      paddingHorizontal:10,
+      borderBottomWidth:1,
+      gap:10
     },
-    logo2:{
-        width:30,
-        height:30,
-        borderRadius:30,
-        overflow:'hidden',
-        alignSelf:'center',
-        display:'flex',
-        marginVertical:'auto'
+    headerText:{
+      fontFamily:'Avenir Next',
+      flex:1,
+      fontWeight:'700',
+      fontSize:20,
     },
-    subHeader2:{
-        flexDirection:'column',
+    minitext:{
+      fontFamily:'Avenir Next',
+      fontSize:12,
+      fontWeight:'600',
     },
-    subHeader1:{
-        display:'flex',
-        flexDirection:'row',
-        justifyContent:'center',
-        gap:10,
-        marginBottom:20
-      },
+    minitext2:{
+      fontFamily:'Avenir Next',
+      fontSize:12,
+      fontWeight:'600',
+    },
+    miniSubText:{
+      fontFamily:'Avenir Next',
+      fontSize:10,
+      fontWeight:'400',
+    }
 });
   
 export const modalStyle = StyleSheet.create({
@@ -150,7 +177,7 @@ export const modalStyle = StyleSheet.create({
   image: {
     width: '100%',
     height: undefined,
-    aspectRatio: 2,
+    aspectRatio: 3/2,
     backgroundColor:'gray'
   },
   modalTitle: {
@@ -274,6 +301,67 @@ export const modalStyle = StyleSheet.create({
     fontFamily:'Avenir Next',
     fontWeight:'600',
     fontSize:16
+  },
+  infoRow:{
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+    gap:'30%',
+    paddingLeft:'6%'
+  },
+  internalInfoRow:{
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+    paddingVertical:14,
+  },
+  underline:{
+    position:'absolute',
+    width: '100%',
+    bottom:0,
+    right:0,
+    height:2,
+    backgroundColor:'white',
+    opacity:0.6
+  },
+  underline_infoText:{
+    color:'white',
+    fontFamily:'Avenir Next',
+    fontWeight:'600',
+    fontSize:15,
+    textDecorationLine:'underline'
+  },
+  sub_infoText:{
+    color:'white',
+    fontFamily:'Avenir Next',
+    fontWeight:'500',
+    fontSize:11,
+    opacity:0.8
+  },
+  infoText1:{
+    color:'white',
+    fontFamily:'Avenir Next',
+    fontWeight:'600',
+    fontSize:15,
+  },
+  openText:{
+    color:color_pallete[8],
+    fontFamily:'Avenir Next',
+    fontWeight:'700',
+    fontSize:15,
+  },
+  closedText:{
+    color:color_pallete[9],
+    fontFamily:'Avenir Next',
+    fontWeight:'700',
+    fontSize:15,
+  },
+  hoursContainer:{
+    justifyContent:'space-between',
+    width:'100%', 
+    flexDirection:'row', 
+    paddingRight:10,
   }
 });
 

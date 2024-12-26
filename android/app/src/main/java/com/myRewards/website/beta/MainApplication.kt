@@ -1,4 +1,4 @@
-package com.anonymous.myRewards
+package com.myRewards.website.beta
 
 import android.app.Application
 import android.content.res.Configuration

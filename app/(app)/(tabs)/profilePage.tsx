@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { useSession } from '../../auth/ctx';
+import { useSession } from '../../../auth/ctx';
 import { localData } from '@/app-data/appData';
 
 export default function profilePage() {
@@ -7,7 +7,6 @@ export default function profilePage() {
   const { profile } = localData();
 
   if(!profile){
-    // loading profile silouette
     return(
       <View>
 
