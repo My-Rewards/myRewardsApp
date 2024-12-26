@@ -171,7 +171,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
             <View style={modalStyle.roadmapContainer}>
                 <View style={modalStyle.roadmap}>
                     {milestones.map((milestone, index) => 
-                    <PointStatus milestone={milestone} index={index}/>
+                    <PointStatus milestone={milestone} index={index} key={index}/>
                     )}
                 </View>
             </View>

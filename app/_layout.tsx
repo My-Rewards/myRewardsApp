@@ -4,6 +4,7 @@ import React from 'react';
 import {Amplify} from 'aws-amplify';
 import {amplifyConfiguration} from './amplify-config'
 import { PropsProvider } from './LoadingProp/propsProvider';
+import { StatusBar } from 'expo-status-bar';
 
 console.warn = () => {};
 Amplify.configure(amplifyConfiguration);
@@ -13,6 +14,7 @@ export default function Root() {
   return (
     <PropsProvider>
       <SessionProvider>
+        <StatusBar style="dark" />
         <Stack>
           <Stack.Screen name={'sign-in'} 
             options={{

@@ -1,6 +1,8 @@
 import { 
   mockDiscoverShops, 
+  mockFavoriteShops, 
   mockPlans, 
+  mockPopularShops, 
   mockProfile, 
   mockShopRadius 
 }   from '@/APIs/api';
@@ -14,22 +16,29 @@ import {
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
 import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
-import MapView from 'react-native-maps';
+import Map, { Marker } from 'react-native-maps';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (user_id:string, radius:number) => void; 
-    fetchDiscoverShops: (user_id:string, filterOption:number) => void;
+    fetchDiscoverShops: (user_id:string, filterOption:number, pagination:number) => void;
     fetchPlans: (filterOption:number)=>void;
     fetchProfile: (user_id:string) => void; 
-    locateMe: (map:React.RefObject<MapView>) => void; 
+    locateMe: (map:React.RefObject<Map>) => void; 
     setRegion:(location:regionProp) => void;
+    setShopPreviewCache:(shop:shopPreview) => void;
     region:regionProp;
     radiusShops?: shopPreview[] | null;
-    discoverShops?: shopPreview[] | null;
+    discoverShopsFilter1?: shopPreview[] | null;
+    discoverShopsFilter2?: shopPreview[] | null;
+    discoverShopsFilter3?: shopPreview[] | null;
+    shopPreviewCache?:shopPreview|null
     shop?: shop | null;
     profile?: Profile|null;
     plans?:Plan[]|null;
-    isLoading: boolean;
+    isPage1Loading: boolean;
+    isPage2Loading: boolean;
+    isPage3Loading: boolean;
+    isPage4Loading: boolean;
     userLocation:regionProp|null
     }>({
     fetchShopsByRadius: async () => null,
@@ -38,8 +47,12 @@ const DataContext = createContext<{
     fetchProfile: async () => null,
     locateMe: async () => null,
     setRegion: async () => null,
+    setShopPreviewCache: async () => null,
     radiusShops: null,
-    discoverShops: null,
+    discoverShopsFilter1: null,
+    discoverShopsFilter2: null,
+    discoverShopsFilter3: null,
+    shopPreviewCache:null,
     region:
       {
         latitude: 28.5384,
@@ -50,7 +63,10 @@ const DataContext = createContext<{
     shop: null,
     profile:null,
     plans:null,
-    isLoading: false,
+    isPage1Loading: false,
+    isPage2Loading: false,
+    isPage3Loading: false,
+    isPage4Loading: false,
     userLocation:null
   });
 
@@ -68,8 +84,8 @@ const DataContext = createContext<{
     const { alert } = useProps();
 
     const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();
-    const [discoverShops, setDiscoverShops] = useState<shopPreview[]|null>();
     const [shop, setShop] = useState<shop|null>();
+    const [shopPreviewCache, setShopPreviewCache] = useState<shopPreview|null>();
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
     const [userLocation, setUserLocation] = useState<regionProp|null>(null);
@@ -80,10 +96,18 @@ const DataContext = createContext<{
         longitudeDelta: 0.005,
       });
 
-    const [fetching, setFetching] = useState(false);
+    const [fetchingPage1, setFetchingPage1] = useState(false);
+    const [fetchingPage2, setFetchingPage2] = useState(false);
+    const [fetchingPage3, setFetchingPage3] = useState(false);
+    const [fetchingPage4, setFetchingPage4] = useState(false);
+
+    const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<shopPreview[]|null>();
+    const [discoverShopsFilter2, setDiscoverShopsFilter2] = useState<shopPreview[]|null>();
+    const [discoverShopsFilter3, setDiscoverShopsFilter3] = useState<shopPreview[]|null>();
+
 
     async function getCurrentLocation() {
-      setFetching(true);
+      setFetchingPage2(true);
       try {
         const location = await Location.getCurrentPositionAsync({});
 
@@ -109,11 +133,11 @@ const DataContext = createContext<{
           }
         }
       } finally {
-        setFetching(false);
+        setFetchingPage2(false);
       }
     }    
 
-    async function rebaseUserLocation(map:React.RefObject<MapView>){
+    async function rebaseUserLocation(map:React.RefObject<Map>){
       getCurrentLocation()
       if(userLocation && map.current){
         map.current.animateToRegion({
@@ -134,7 +158,7 @@ const DataContext = createContext<{
           let fetchedProfile;
     
           if (!profile) {
-            setFetching(true);
+            setFetchingPage4(true);
             try {
               // Replace mock API with actual API
               fetchedProfile = await mockProfile();
@@ -142,25 +166,30 @@ const DataContext = createContext<{
             } catch (error) {
               console.error('Error fetching profile:', error);
             } finally {
-              setFetching(false);
+              setFetchingPage4(false);
             }
           }
     
-          if (!discoverShops && fetchedProfile) {
-            setFetching(true);
+          if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3) && fetchedProfile) {
+            setFetchingPage1(true);
             try {
               // Replace mock API with actual API
-              const shops = await mockDiscoverShops(fetchedProfile.id);
-              setDiscoverShops(shops);
+              const shops1 = await mockDiscoverShops(fetchedProfile.id, 0, region)
+              setDiscoverShopsFilter1(shops1);
+              const shops2 = await mockPopularShops(fetchedProfile.id, 0, region)
+              setDiscoverShopsFilter2(shops2);
+              const shops3 = await mockFavoriteShops(fetchedProfile.id, 0, region)
+              setDiscoverShopsFilter3(shops3);
+              
             } catch (error) {
               console.error('Error fetching discover shops:', error);
             } finally {
-              setFetching(false);
+              setFetchingPage1(false);
             }
           }
     
           if (!radiusShops && fetchedProfile) {
-            setFetching(true);
+            setFetchingPage2(true);
             try {
               // Replace mock API with actual API
               const shops = await mockShopRadius(fetchedProfile.id);
@@ -168,12 +197,12 @@ const DataContext = createContext<{
             } catch (error) {
               console.error('Error fetching radius shops:', error);
             } finally {
-              setFetching(false);
+              setFetchingPage2(false);
             }
           }
     
           if (!plans && fetchedProfile) {
-            setFetching(true);
+            setFetchingPage4(true);
             try {
               // Replace mock API with actual API
               const plansData = await mockPlans(fetchedProfile.id);
@@ -181,7 +210,7 @@ const DataContext = createContext<{
             } catch (error) {
               console.error('Error fetching plans:', error);
             } finally {
-              setFetching(false);
+              setFetchingPage4(false);
             }
           }
         } catch (error) {
@@ -198,54 +227,57 @@ const DataContext = createContext<{
             fetchShopsByRadius: async (user_id:string, radius:number) => {
                 // Fetch + Update shops radiusShops given location
             },
-            fetchDiscoverShops: async (user_id:string, filterOption:number) => {
+            fetchDiscoverShops: async (user_id:string, filterOption:number, pagination:number): Promise<void> => {
                 // Fetch + Update shops DiscoverShops given closet/popularity
                 // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
+                setFetchingPage1(true)
                 try {
-                    let shops;
-                    switch (filterOption) {
-                      case 0:
-                        mockDiscoverShops(user_id).then((shops)=>{
-                          setDiscoverShops(shops)
-                       })
-                      .catch((error) => {
-                          console.error('Error fetching shops:', error);
-                        }); // Replace with nearby API call
-                        break;
-                      case 1:
-                        mockDiscoverShops(user_id).then((shops)=>{
-                          setDiscoverShops(shops)
-                       })
-                      .catch((error) => {
-                          console.error('Error fetching shops:', error);
-                        }); // Replace with popular API call
-                        break;
-                      case 2:
-                        mockDiscoverShops(user_id).then((shops)=>{
-                          setDiscoverShops(shops)
-                       })
-                      .catch((error) => {
-                          console.error('Error fetching shops:', error);
-                        }); // Replace with favorite API call
-                        break;
-                      default:
-                        throw new Error("Invalid filter option");
-                    }
-                    setDiscoverShops(shops);
-                  } catch (error) {
-                    console.error("Error fetching shops:", error);
+                  switch (filterOption) {
+                    case 0:
+                      const shop1 = await mockDiscoverShops(user_id, pagination, region)
+                      if(pagination>0){
+                        setDiscoverShopsFilter1((prevShops) => [...(prevShops || []), ...shop1]);
+                        }else{
+                        setDiscoverShopsFilter1(shop1)
+                      }
+                      setFetchingPage1(false)
+                      break;
+                    case 1:
+                      const shops2 = await mockPopularShops(user_id, pagination, region)
+                      if(pagination>0){
+                        setDiscoverShopsFilter2((prevShops) => [...(prevShops || []), ...shops2]);
+                        }
+                      else{
+                        setDiscoverShopsFilter2(shops2)
+                      }                      
+                      setFetchingPage1(false)
+                      break;
+                    case 2:
+                      const shop3 = await mockFavoriteShops(user_id, pagination, region)
+                      if(pagination>0){
+                        setDiscoverShopsFilter3((prevShops) => [...(prevShops || []), ...shop3]);
+                        }else{
+                        setDiscoverShopsFilter3(shop3)
+                      }                     
+                      setFetchingPage1(false)
+                      break;
+                    default:
+                      throw new Error("Invalid filter option");
                   }
+                } catch (error) {
+                  console.error("Error fetching shops:", error);
+                }
             },
             fetchPlans: async (filterOption:number) => {
               try{
-                setFetching(true)
+                setFetchingPage3(true)
                 if(!profile) return;
                 
                 switch (filterOption) {
                   case 0:
                     mockPlans(profile.id).then((plansData)=>{
                       setPlans(plansData)
-                      setFetching(false)
+                      setFetchingPage3(false)
                    })
                   .catch((error) => {
                       console.error('Error fetching shops:', error);
@@ -254,7 +286,7 @@ const DataContext = createContext<{
                   case 1:
                     mockPlans(profile.id).then((plansData)=>{
                       setPlans([])
-                      setFetching(false)
+                      setFetchingPage3(false)
                     })
                     .catch((error) => {
                         console.error('Error fetching shops:', error);
@@ -265,7 +297,7 @@ const DataContext = createContext<{
                     throw new Error("Invalid filter option");
                 }
               }catch(error){
-                setFetching(false)
+                setFetchingPage3(false)
                 console.error("Error fetching shops:", error);
               }
 
@@ -274,15 +306,22 @@ const DataContext = createContext<{
               
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
-            locateMe: async (map:React.RefObject<MapView>)=>{rebaseUserLocation(map)},
+            locateMe: async (map:React.RefObject<Map>)=>{rebaseUserLocation(map)},
+            setShopPreviewCache: async (shop:shopPreview)=>{setShopPreviewCache(shop)},
             radiusShops,
-            discoverShops,
+            discoverShopsFilter1,
+            discoverShopsFilter2,
+            discoverShopsFilter3,
+            shopPreviewCache,
             shop,
             plans,
             region,
             profile,
             userLocation,
-            isLoading: fetching
+            isPage1Loading: fetchingPage1,
+            isPage2Loading: fetchingPage2,
+            isPage3Loading: fetchingPage3,
+            isPage4Loading: fetchingPage4
         }}>
         {children}
       </DataContext.Provider>

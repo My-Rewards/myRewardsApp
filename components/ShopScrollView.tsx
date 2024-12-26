@@ -15,7 +15,6 @@ const HEADER_HEIGHT = 250;
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
   headerBackgroundColor: { dark: string; light: string };
-  type: number;
   name:string;
   description:string;
  setExpansion?: Dispatch<SetStateAction<boolean>> | undefined;
@@ -25,7 +24,6 @@ export default function ShopScrollView({
   children,
   headerImage,
   headerBackgroundColor,
-  type,
   name,
   description,
   setExpansion
@@ -71,15 +69,14 @@ export default function ShopScrollView({
     };
   });
   
-
   return (
     <ThemedView style={styles.container}>
-      <Animated.ScrollView ref={scrollRef} scrollEventThrottle={16} showsVerticalScrollIndicator={false} bounces={type==0}>
+      <Animated.ScrollView ref={scrollRef} scrollEventThrottle={16} showsVerticalScrollIndicator={false} bounces={true}>
         <Animated.View
           style={[
             styles.header,
             { backgroundColor: headerBackgroundColor[colorScheme] },
-            type==0?headerAnimatedStyle:null,
+            headerAnimatedStyle,
           ]}>
           {headerImage}
         </Animated.View>

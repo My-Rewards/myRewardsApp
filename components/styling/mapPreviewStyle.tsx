@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     marker: {
       alignItems: 'center',
     },
-    modalContent: {
+    modalContent1: {
       backgroundColor:color_pallete[10],
       flex:1,
       margin:10,
@@ -25,6 +25,36 @@ export const styles = StyleSheet.create({
       shadowOpacity: 0.35,
       shadowRadius: 4,
       elevation: 5,
+    },
+    modalContent2: {
+      backgroundColor:color_pallete[5],
+      flex:1,
+      margin:10,
+      borderRadius:10,
+      width:'100%',
+      alignSelf:'center',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.35,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    expandedContainer:{
+      backgroundColor:'white', 
+      flex:1,
+      overflow:'hidden',
+    },
+    mapsPreview:{
+      height:'100%', 
+      width:width-30, 
+      alignSelf:'center', 
+      marginHorizontal:10, 
+      backgroundColor:'transparent'
+    },
+    discoverPreview:{
+      width:'100%', 
+      height:'auto',
+      alignSelf:'center', 
+      backgroundColor:'transparent'
     },
     header:{
       fontSize: 18,
@@ -73,12 +103,12 @@ export const styles = StyleSheet.create({
       flex:1, 
       justifyContent:'flex-start', 
       width:'100%',
+      height:'auto',
       borderRadius:10,
       overflow:'hidden',
       backgroundColor:'transparent'
     },
     heartButton:{
-      backgroundColor:color_pallete[3],
       padding:4,
       borderRadius:20
     },
@@ -88,12 +118,10 @@ export const styles = StyleSheet.create({
       justifyContent:'space-between',
       padding:6,
       paddingHorizontal:10,
-      borderBottomColor:color_pallete[2],
       borderBottomWidth:1,
       gap:10
     },
     headerText:{
-      color:color_pallete[2],
       fontFamily:'Avenir Next',
       flex:1,
       fontWeight:'700',
@@ -103,19 +131,16 @@ export const styles = StyleSheet.create({
       fontFamily:'Avenir Next',
       fontSize:12,
       fontWeight:'600',
-      color:color_pallete[2]
     },
     minitext2:{
       fontFamily:'Avenir Next',
       fontSize:12,
       fontWeight:'600',
-      color:color_pallete[3]
     },
     miniSubText:{
       fontFamily:'Avenir Next',
       fontSize:10,
       fontWeight:'400',
-      color:color_pallete[2]
     }
 });
   

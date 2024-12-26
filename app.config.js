@@ -1,13 +1,25 @@
 export default () => {
   const isProd = process.env.APP_ENV === 'prod';
+  const RUNTIMEVERSION = '1.0.0'
 
   return {
     name: 'MyRewards',
     slug:'myrewardsapp',
+    plugins: [
+      [
+        "react-native-nfc-manager",
+        {
+          "nfcPermission": "MyRewards needs access to NFC scanning when using the app",
+          "selectIdentifiers": ["D2760000850100","D2760000850101"],
+          "systemCodes": ["8008", "8005", "0003", "fe00", "90b7", "927a","12FC","86a7"],
+          "includeNdefEntitlement": false,
+        }
+      ]
+    ],
     ios: {
-      bundleIdentifier: isProd ? 'com.my.app' : 'com.anonymous.myRewards',
+      bundleIdentifier: isProd ? 'com.myRewards.website.prod' : 'com.myRewards.website.beta',
       icon: './assets/images/MyRewardsLogo1.png',
-      runtimeVersion: "1.0.0",
+      runtimeVersion: RUNTIMEVERSION,
       infoPlist: {
         UIBackgroundModes: [
           "location",
@@ -15,8 +27,17 @@ export default () => {
           "remote-notification"
         ],
         "NSLocationWhenInUseUsageDescription": "MyRewards needs access to you location when using the app.",
-        "LSApplicationQueriesSchemes": ["tel"]
+        "LSApplicationQueriesSchemes": ["tel"],
       },
+      config:{
+        googleMapsApiKey:'AIzaSyBmgtn62Neco3iFbjYKnWiVTSEYgRelDxk'
+      },
+
+    },
+    android: {
+      package: isProd ? 'com.myRewards.website.prod' : 'com.myRewards.website.beta',
+      icon: './assets/images/MyRewardsLogo1.png',
+      runtimeVersion: RUNTIMEVERSION
     },
     extra: {
       eas: {
@@ -32,10 +53,5 @@ export default () => {
         : "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8",
     },
     runtimeVersion: "1.0.0",
-    android: {
-      package: "com.anonymous.myRewards",
-      icon: './assets/images/MyRewardsLogo1.png',
-      runtimeVersion: "1.0.0"
-    },
   };
 };

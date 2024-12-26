@@ -27,7 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.anonymous.myRewards</string>
+          <string>com.myRewards.website.beta</string>
         </array>
       </dict>
       <dict>
@@ -39,6 +39,8 @@
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
+    <key>GMSApiKey</key>
+    <string>AIzaSyBmgtn62Neco3iFbjYKnWiVTSEYgRelDxk</string>
     <key>LSApplicationQueriesSchemes</key>
     <array>
       <string>tel</string>
@@ -47,6 +49,8 @@
     <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+    <key>NFCReaderUsageDescription</key>
+    <string>MyRewards needs access to NFC scanning when using the app</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -54,8 +58,12 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to location while open to show you relevant nearby content.</string>
+    <string>MyRewards needs access to you location when using the app.</string>
     <key>UIBackgroundModes</key>
     <array>
       <string>location</string>
@@ -90,5 +98,21 @@
     <string>Light</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
+    <array>
+      <string>8008</string>
+      <string>8005</string>
+      <string>0003</string>
+      <string>fe00</string>
+      <string>90b7</string>
+      <string>927a</string>
+      <string>12FC</string>
+      <string>86a7</string>
+    </array>
+    <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+    <array>
+      <string>D2760000850100</string>
+      <string>D2760000850101</string>
+    </array>
   </dict>
 </plist>

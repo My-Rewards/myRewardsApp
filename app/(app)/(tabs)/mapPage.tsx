@@ -1,24 +1,19 @@
 import { color_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Image, Animated, PanResponder, Dimensions, TouchableOpacity, Modal, Text, FlatList } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import { ExpandedShop, ShopPreview } from '../../components/shopPreview';
-import { useProps } from '../LoadingProp/propsProvider';
-import {SvgXml} from 'react-native-svg';
+import { StyleSheet, View, Animated, PanResponder, Dimensions, TouchableOpacity, FlatList } from 'react-native';
+import Map, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView from "react-native-map-clustering";
+import { ExpandedModalShop, ShopPreview } from '../../../components/shopPreview';
+import { SvgXml } from 'react-native-svg';
 import { handStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
-import { ShopHour, shopPreview } from '@/app-data/data-types';
+import { shopPreview } from '@/app-data/data-types';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 const { width } = Dimensions.get('window');
 
-export type PinPointProps = shopPreview & {
-  onPress: () => void;
-};
-
 export default function mapPage() {
-  const { alert } = useProps();
-  const { radiusShops, isLoading, region, setRegion, locateMe } = localData();
+  const { radiusShops, region, locateMe } = localData();
   const [containerHeight, setContainerHeight] = useState(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
@@ -27,9 +22,10 @@ export default function mapPage() {
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const mapHeight = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
+  const [mapLoaded, setMapLoaded] = useState(false); 
   const [isFlatListScrolling, setIsFlatListScrolling] = useState(true);
 
-  const mapRef = useRef<MapView>(null);
+  const mapRef = React.useRef<Map>(null);
   const flatListRef = useRef<FlatList>(null);
   const currentScrollX = useRef(0);
   const memoizedPins = React.useMemo(() => radiusShops, [radiusShops]);
@@ -120,6 +116,9 @@ export default function mapPage() {
           newPos = currPos + 1;
         }
     
+        currentScrollX.current = newPos * width; 
+        setSelectedPin(radiusShops[newPos]);   
+        
         flatListRef.current?.scrollToIndex({index:newPos, animated:true})
         mapRef.current?.animateToRegion({
           latitude: radiusShops[newPos].latitude,
@@ -127,9 +126,6 @@ export default function mapPage() {
           latitudeDelta: region.latitudeDelta,
           longitudeDelta: region.longitudeDelta,
         }, 300);
-    
-        currentScrollX.current = newPos * width; 
-        setSelectedPin(radiusShops[newPos]);   
       }
     },
     onPanResponderTerminate: (_, gestureState) => {
@@ -176,30 +172,9 @@ export default function mapPage() {
     },
   });
 
-  const PinPoint: React.FC<PinPointProps> = React.memo((info) => {
-    const latitude = info.latitude;
-    const longitude = info.longitude;
-  
-    return (
-      <Marker coordinate={{ latitude, longitude }} onPress={info.onPress}>
-        <View style={styles.marker}>
-          <View style={info.id === selectedPin?.id ? styles.circleSelected : styles.circle}>
-            <SvgXml
-              color={info.id === selectedPin?.id ? color_pallete[1] : 'white'}
-              xml={handStar}
-              width="62%"
-              height="62%"
-            />
-          </View>
-          <View style={styles.pin} />
-        </View>
-      </Marker>
-    );
-  });
-
   return (
     <View 
-      style={{ flex: 1, backgroundColor:'white', width:'100%', height:'100%'}}
+      style={[{ flex: 1, backgroundColor:'white', width:'100%', height:'100%'}, {opacity:mapLoaded?1:1}]}
       onLayout={(event) => {
         const { height: newHeight } = event.nativeEvent.layout;
         translateY.setValue(newHeight);
@@ -214,40 +189,49 @@ export default function mapPage() {
           style={styles.map}
           region={region}
           ref={mapRef}
+          loadingBackgroundColor={'rgba(0,0,0,0.5)'}
+          loadingEnabled={true}
           showsUserLocation
           pitchEnabled={false}
           scrollEnabled={!isExpanded}
           zoomEnabled={!isExpanded}
           rotateEnabled={!isExpanded}
+          animationEnabled={!isExpanded}
           onMapReady={()=>{ locateMe(mapRef)}}
+          clusterColor={color_pallete[2]}
+          clusterFontFamily='Avenir Next'
+          clusterTextColor='white'
+          clusteringEnabled={true}
+          radius={18}
           >
           {memoizedPins?.map((shop, index) => (
-            <PinPoint
-              key={shop.id}
-              latitude={shop.latitude}
-              longitude={shop.longitude}
-              preview={shop.preview}
-              id={shop.id}
-              name={shop.name}
-              description={shop.description}
-              organization_id={shop.id} 
-              location_id={shop.location_id} 
-              geohash={shop.geohash} 
-              location={shop.location}
-              shop_hours={shop.shop_hours}
-              onPress={() => {openModal(shop, index)}}
-              liked={shop.liked}
-            />
+            <Marker
+              coordinate={{ latitude: shop.latitude, longitude: shop.longitude }}
+              onPress={()=>openModal(shop, index)}
+              key={shop.id}>
+              <View style={styles.marker}>
+                <View style={selectedPin?.id == shop.id ? styles.circleSelected : styles.circle}>
+                  <SvgXml
+                    color={selectedPin?.id == shop.id ? color_pallete[1] : 'white'}
+                    xml={handStar}
+                    width="62%"
+                    height="62%"
+                  />
+                </View>
+                <View style={styles.pin} />
+              </View>
+            </Marker>
           ))}
         </MapView>
         {!isExpanded && !selectedPin &&  
-        <TouchableOpacity 
-          style={styles.crossHairButton}
-          onPress={() => {
-            locateMe(mapRef);
-          }}>
-            <FontAwesome6 name={'location-crosshairs'} size={32} color={'white'}/>
-        </TouchableOpacity>
+        <View style={styles.crossHairButton}>
+          <TouchableOpacity
+            onPress={() => {
+              locateMe(mapRef);
+            }}>
+              <FontAwesome6 name={'location-crosshairs'} size={32} color={'white'}/>
+          </TouchableOpacity>
+        </View>
         }
       </Animated.View>
       <Animated.View
@@ -260,12 +244,13 @@ export default function mapPage() {
             ref={flatListRef}
             data={radiusShops}
             horizontal
-            style={{shadowOpacity:0, backgroundColor:'transparent'}}
+            style={{backgroundColor:'transparent'}}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <ShopPreview
                 key={item.id}
-                selectedPin={item}      
+                selectedPin={item}  
+                type={0}    
                 />
             )}
             showsHorizontalScrollIndicator={false}
@@ -278,7 +263,7 @@ export default function mapPage() {
           />
         </Animated.View>      
         {isExpanded &&  selectedPin &&
-          <ExpandedShop 
+          <ExpandedModalShop 
             selectedPin={selectedPin}
             isExpanded={isExpanded}
             setExpansion={setIsExpanded}
@@ -295,6 +280,7 @@ const styles = StyleSheet.create({
   map: {
     width: '100%',
     height: '100%',
+    backgroundColor:'transparent'
   },
   marker: {
     alignItems: 'center',
@@ -343,6 +329,7 @@ const styles = StyleSheet.create({
     bottom:0,
     right:0,
     margin:15,
+    backgroundColor:'transparent',
     shadowColor:'black',
     shadowRadius:5,
     shadowOpacity:0.5,
