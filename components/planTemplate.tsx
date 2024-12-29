@@ -1,4 +1,4 @@
-import { Plan, Reward, Tier } from "@/app-data/data-types";
+import { Plan, Reward, Tier, RewardMapProps } from "@/app-data/data-types";
 import { View, Text, Dimensions, TouchableOpacity, Animated, SafeAreaView } from "react-native"
 import Collapsible from 'react-native-collapsible';
 import {dropDown, milestoneStyle, modalStyle} from '@/components/styling/mapPreviewStyle';
@@ -12,6 +12,11 @@ const { width, height } = Dimensions.get('window');
 type RoadMapProps = {
     plan: Plan;
   };
+type CategorizeProps={
+    road_map:RewardMapProps;
+    visits:number;
+    redeemableRewards:string[]
+}
 
 function getNextRewardVisits(plan:Plan) {
     const { reward_plan, visits } = plan;
@@ -71,10 +76,7 @@ function anlyzeInput(reward:Reward){
       }
 }
 
-const categorizeRewards = (plan: Plan) => {
-    const { road_map } = plan.reward_plan;
-    const visits = plan.visits;
-  
+const categorizeRewards = ({road_map, visits, redeemableRewards}:CategorizeProps) => {
     const milestones = Object.keys(road_map)
     .map(key => Number(key))
     .filter(milestone => !isNaN(milestone));
@@ -82,9 +84,9 @@ const categorizeRewards = (plan: Plan) => {
     return milestones.map((milestone) => {
         const tier_id = road_map[milestone].id
       
-        if (milestone <= visits && !plan.redeemableRewards.includes(tier_id)) {
+        if (milestone <= visits && !redeemableRewards.includes(tier_id)) {
           return { milestone, status: "passed", rewards: road_map[milestone] };
-        } else if (plan.redeemableRewards.includes(tier_id) || milestone <= visits ) {
+        } else if (redeemableRewards.includes(tier_id) || milestone <= visits ) {
           return { milestone, status: "current", rewards: road_map[milestone] };
         } else {
           return { milestone, status: "upcoming", rewards: road_map[milestone] };
@@ -122,13 +124,17 @@ const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:bool
 }
 
 export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
+    if(!plan.reward_plan.road_map){
+        return null
+    }
+
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
     const milestones = Object.entries(plan.reward_plan.road_map);
     const lineWidth = ((width - milestones.length * 30) / (milestones.length - 1)) * 0.8;
     const tillNextRew = getNextRewardVisits(plan);
 
-    const taggedRewards = categorizeRewards(plan);
+    const taggedRewards = categorizeRewards({road_map:plan.reward_plan.road_map, visits:plan.visits, redeemableRewards:plan.redeemableRewards});
 
     const PointStatus: React.FC<{milestone:[string, Tier], index:number}> = ({ milestone, index }) => {   
         const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
@@ -238,6 +244,10 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 };
 
 export const ExpendatureMap:React.FC<RoadMapProps> = ({plan}) => {
+    if(!plan.reward_plan.exp_rewards){
+        return null
+    }
+
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     let dark_ratio =  Math.round((plan.points/plan.reward_plan.exp_rewards.expenditure) * 100);
     let pointsTill = plan.reward_plan.exp_rewards.expenditure-plan.points;

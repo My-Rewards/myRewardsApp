@@ -1,27 +1,27 @@
 import { color_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Animated, PanResponder, Dimensions, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, Animated, PanResponder, Dimensions, TouchableOpacity, FlatList, Text, ActivityIndicator } from 'react-native';
 import Map, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MapView from "react-native-map-clustering";
 import { ExpandedModalShop, ShopPreview } from '../../../components/shopPreview';
 import { SvgXml } from 'react-native-svg';
 import { handStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
-import { shopPreview } from '@/app-data/data-types';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { regionProp, shopPreview } from '@/app-data/data-types';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
 
 export default function mapPage() {
-  const { radiusShops, region, locateMe } = localData();
-  const [containerHeight, setContainerHeight] = useState(1);
+  const { radiusShops, region, locateMe, fetchShopsByRadius } = localData();
+  const [containerHeight, setContainerHeight] = useState<number>(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
 
   const [selectedPin, setSelectedPin] = useState<shopPreview | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
-  const mapHeight = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
+  const [pinsRendered, setPinsRendered] = useState(false); 
   const [mapLoaded, setMapLoaded] = useState(false); 
   const [isFlatListScrolling, setIsFlatListScrolling] = useState(true);
 
@@ -31,8 +31,13 @@ export default function mapPage() {
   const memoizedPins = React.useMemo(() => radiusShops, [radiusShops]);
 
   useEffect(()=>{
+    if(radiusShops){
+      setPinsRendered(true)
+    }
+  },[radiusShops])
+
+  useEffect(()=>{
     translateY.setValue(containerHeight);
-    mapHeight.setValue(containerHeight);
   },[containerHeight])
 
   const openModal = (selectedPin?:shopPreview, pos?:number) => {
@@ -52,18 +57,11 @@ export default function mapPage() {
   };
 
   const closeModal = () => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: containerHeight,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(mapHeight, {
-        toValue: containerHeight,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start(()=>{
+    Animated.timing(translateY, {
+      toValue: containerHeight,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(()=>{
       setIsExpanded(false);
       setSelectedPin(null);
     })
@@ -172,95 +170,101 @@ export default function mapPage() {
     },
   });
 
+  function handleMapUpdate(region:regionProp){
+    fetchShopsByRadius(region)
+  }
+
   return (
     <View 
-      style={[{ flex: 1, backgroundColor:'white', width:'100%', height:'100%'}, {opacity:mapLoaded?1:1}]}
+      style={[{ flex: 1, backgroundColor:'white', width:'100%', height:'100%'}]}
       onLayout={(event) => {
         const { height: newHeight } = event.nativeEvent.layout;
         translateY.setValue(newHeight);
-        mapHeight.setValue(newHeight);
         setContainerHeight(newHeight)
       }}>
-      <Animated.View 
-      style={[styles.mapContainer, { height: mapHeight }]} 
-      pointerEvents={isExpanded ? "box-only" : "auto"}
-      >
-        <MapView
-          style={styles.map}
-          region={region}
-          ref={mapRef}
-          loadingBackgroundColor={'rgba(0,0,0,0.5)'}
-          loadingEnabled={true}
-          showsUserLocation
-          pitchEnabled={false}
-          scrollEnabled={!isExpanded}
-          zoomEnabled={!isExpanded}
-          rotateEnabled={!isExpanded}
-          animationEnabled={!isExpanded}
-          onMapReady={()=>{ locateMe(mapRef)}}
-          clusterColor={color_pallete[2]}
-          clusterFontFamily='Avenir Next'
-          clusterTextColor='white'
-          clusteringEnabled={true}
-          radius={18}
-          >
-          {memoizedPins?.map((shop, index) => (
-            <Marker
-              coordinate={{ latitude: shop.latitude, longitude: shop.longitude }}
-              onPress={()=>openModal(shop, index)}
-              key={shop.id}>
-              <View style={styles.marker}>
-                <View style={selectedPin?.id == shop.id ? styles.circleSelected : styles.circle}>
-                  <SvgXml
-                    color={selectedPin?.id == shop.id ? color_pallete[1] : 'white'}
-                    xml={handStar}
-                    width="62%"
-                    height="62%"
-                  />
+        <View 
+        style={[styles.mapContainer, { height: '100%' }]} 
+        pointerEvents={isExpanded ? "box-only" : "auto"}
+        >
+          <MapView
+            style={styles.map}
+            region={region}
+            ref={mapRef}
+            loadingBackgroundColor={'rgba(0,0,0,0.5)'}
+            loadingEnabled={true}
+            showsUserLocation
+            pitchEnabled={false}
+            provider={PROVIDER_GOOGLE}
+            scrollEnabled={!isExpanded}
+            zoomEnabled={!isExpanded}
+            rotateEnabled={!isExpanded}
+            animationEnabled={!isExpanded}
+            onMapReady={()=>{locateMe(mapRef)}}
+            onMapLoaded={()=>setMapLoaded(true)}
+            clusterColor={color_pallete[2]}
+            clusterFontFamily='Avenir Next'
+            clusterTextColor='white'
+            clusteringEnabled={true}
+            radius={15}
+            onRegionChangeComplete={(region)=>{handleMapUpdate(region)}}
+            >
+            {memoizedPins?.map((shop, index) => (
+              <Marker
+                coordinate={{ latitude: shop.latitude, longitude: shop.longitude }}
+                onPress={()=>openModal(shop, index)}
+                key={shop.id}>
+                <View style={styles.marker}>
+                  <View style={selectedPin?.id == shop.id ? styles.circleSelected : styles.circle}>
+                    <SvgXml
+                      color={selectedPin?.id == shop.id ? color_pallete[1] : 'white'}
+                      xml={handStar}
+                      width="62%"
+                      height="62%"
+                    />
+                  </View>
+                  <View style={styles.pin} />
                 </View>
-                <View style={styles.pin} />
-              </View>
-            </Marker>
-          ))}
-        </MapView>
-        {!isExpanded && !selectedPin &&  
-        <View style={styles.crossHairButton}>
-          <TouchableOpacity
-            onPress={() => {
-              locateMe(mapRef);
-            }}>
-              <FontAwesome6 name={'location-crosshairs'} size={32} color={'white'}/>
-          </TouchableOpacity>
+              </Marker>
+            ))}
+          </MapView>
+          {!isExpanded && !selectedPin &&  
+          <View style={styles.crossHairButton}>
+            <TouchableOpacity
+              onPress={() => {
+                locateMe(mapRef);
+              }}>
+                <MaterialIcons name={'my-location'} size={25} color={'white'}/>
+            </TouchableOpacity>
+          </View>
+          }
         </View>
-        }
-      </Animated.View>
-      <Animated.View
-        style={[styles.bottomModal, 
-          { transform: [{ translateY }], 
-          height:MODAL_COLLAPSED_HEIGHT}]}
-        {...panResponder.panHandlers}
-        >                
-          <FlatList
-            ref={flatListRef}
-            data={radiusShops}
-            horizontal
-            style={{backgroundColor:'transparent'}}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <ShopPreview
-                key={item.id}
-                selectedPin={item}  
-                type={0}    
-                />
-            )}
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={width}
-            snapToAlignment="center"
-            decelerationRate="fast"
-            onScrollBeginDrag={() => setIsFlatListScrolling(true)}
-            onScrollEndDrag={() => setIsFlatListScrolling(false)}
-            onMomentumScrollEnd={() => setIsFlatListScrolling(false)}
-          />
+        <Animated.View
+          style={[styles.bottomModal, 
+            { transform: [{ translateY }], 
+            height:MODAL_COLLAPSED_HEIGHT}]}
+          {...panResponder.panHandlers}
+          >                
+            <FlatList
+              ref={flatListRef}
+              data={radiusShops}
+              horizontal
+              style={{backgroundColor:'transparent'}}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <ShopPreview
+                  key={item.id}
+                  selectedPin={item}  
+                  type={0}    
+                  />
+              )}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={width}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              onScrollBeginDrag={() => setIsFlatListScrolling(true)}
+              onScrollEndDrag={() => setIsFlatListScrolling(false)}
+              onMomentumScrollEnd={() => setIsFlatListScrolling(false)}
+            />
         </Animated.View>      
         {isExpanded &&  selectedPin &&
           <ExpandedModalShop 
@@ -269,6 +273,11 @@ export default function mapPage() {
             setExpansion={setIsExpanded}
             type={0}
         />}
+        {(!mapLoaded || containerHeight===1 || !pinsRendered) && (
+          <View style={styles.mapLoading}>
+            <ActivityIndicator />
+          </View>
+        )}
     </View>
   );
 }
@@ -329,10 +338,18 @@ const styles = StyleSheet.create({
     bottom:0,
     right:0,
     margin:15,
-    backgroundColor:'transparent',
-    shadowColor:'black',
-    shadowRadius:5,
-    shadowOpacity:0.5,
-    shadowOffset:{width:0,height:0}
+    padding:10,
+    borderRadius:50,
+    backgroundColor:color_pallete[3],
+  },
+  mapLoading:{
+    flex:1, 
+    position:'absolute', 
+    width:'100%', 
+    height:'100%', 
+    backgroundColor:'white', 
+    opacity:1,
+    justifyContent:'center',
+    alignItems:'center'
   }
 });

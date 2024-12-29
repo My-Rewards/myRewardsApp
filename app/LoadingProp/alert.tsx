@@ -1,3 +1,4 @@
+import { toast_pallete } from '@/constants/Colors';
 import React, { useState, useRef, useMemo } from 'react';
 import { Animated, Modal, StyleSheet, Text, View, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -122,7 +123,6 @@ const style = StyleSheet.create({
   },
   alertBox: {
     borderRadius: 20,
-    opacity:0.8,
     padding: 15,
     paddingVertical:20,
     width: '100%',
@@ -138,21 +138,23 @@ const style = StyleSheet.create({
     shadowRadius: 4
   },
   successColor:{
-    backgroundColor:'#407C9C'
+    backgroundColor:toast_pallete[0]
   },
   errorColor:{
-    backgroundColor: '#EF5E43',
+    backgroundColor:toast_pallete[1]
   },
   title: {
     fontWeight: 'bold',
     color: 'white',
     fontSize: 12,
     width:'auto',
+    fontFamily:'Avenir Next'
   },
   description: {
     color: 'white',
     fontSize: 12,
     width:'auto',
+    fontFamily:'Avenir Next'
   },
 });
 

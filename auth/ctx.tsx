@@ -13,13 +13,13 @@ const AuthContext = createContext<{
   signIn: (profile: userSignIn) => Promise<string>; 
   signUp: (profile: userSignUp) => Promise<boolean>; 
   signOut: () => void;
-  session?: string | null;
+  userSub: string|null;
   isLoading: boolean;
 }>({
   signIn: async () => 'error',
   signUp: async () => false,
   signOut: async () => null,
-  session: null,
+  userSub: null,
   isLoading: false,
 });
 
@@ -35,14 +35,14 @@ export function useSession() {
 }
 
 export function SessionProvider({ children }: PropsWithChildren) {
-  const [session, setSession] = useState<string|null>();
+  const [userSub, setUserSub] = useState<string|null>(null);
   const [fetching, setFetching] = useState(false);
 
   const checkUserSession = async () => {
     setFetching(true);
 
     // REMOVE THIS WHEN DONE TESTING
-    setSession('testToken');
+    setUserSub('mockSub');
     setFetching(false);
     // 
 
@@ -50,12 +50,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
     // try {
     //   const currentSession = await fetchAuthSession();
     //   if(currentSession.tokens?.idToken && currentSession.userSub){
-    //     setSession(currentSession.userSub);
+    //     setUserSub(currentSession.userSub);
     //   }else{
-    //     setSession(null);
+    //     setUserSub(null);
     //   }
     // } catch (error) {
-    //   setSession(null);
+    //   setUserSub(null);
     // } finally {
     //   setFetching(false);
     // }
@@ -155,9 +155,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signOut: () => {
           signOut();
-          setSession(null);
+          setUserSub(null);
         },
-        session,
+        userSub,
         isLoading: fetching
       }}>
       {children}
