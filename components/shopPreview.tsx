@@ -24,7 +24,7 @@ type ShopPreviewProps = {
   type:number
 };
 
-type PrewviewShopProps = {
+type PrevwiewShopProps = {
   selectedPin: shopPreview;
   isExpanded:boolean;
   setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
@@ -45,28 +45,30 @@ export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
     <View style={[type==0?styles.mapsPreview:styles.discoverPreview]}>
       <View style={[type==0?styles.modalContent1:styles.modalContent2]}>
         <View style={styles.miniContainer}>
-          <View style={{flex:0.4}}>
-            <Image style={{height:'100%', width:'100%', resizeMode:'cover'}} source={{uri: selectedPin.preview}}/>
-          </View>
-          <View style={{flex:0.6, flexDirection:'column'}}>
-            <View style={[styles.miniHeader, type==0?{borderBottomColor:color_pallete[2]}:{borderBottomColor:'white'}]}>
-              <Text style={[styles.headerText, type==0?{color:color_pallete[2]}:{color:'white'}]}>{selectedPin.name}</Text>
-                {
+          <View style={[type==0?{flex:0.4, borderWidth:2}:{flex:0.5, aspectRatio:1}, styles.imageContainer]}>
+            <Image style={{height:'100%', resizeMode:'cover',}} source={{uri: selectedPin.preview}}/>
+            <View style={{position:'absolute', margin:5}}>
+              {
                 selectedPin.liked &&
-                  <View style={[styles.heartButton, type==0?{backgroundColor:color_pallete[3]}:{backgroundColor:'white'}]}> 
-                    <Ionicons name='heart' size={16} color={type==0?color_pallete[10]:color_pallete[5]}/>
+                  <View style={[styles.heartButton, type==0?{backgroundColor:color_pallete[2]}:{backgroundColor:color_pallete[2]}]}> 
+                    <Ionicons name='heart' size={16} color={type==0?color_pallete[10]:color_pallete[10]}/>
                   </View>
                 }
             </View>
+          </View>
+          <View style={{flex:type==0?0.6:0.5, flexDirection:'column'}}>
+            <View style={[styles.miniHeader, type==0?{borderBottomColor:color_pallete[2], padding:6}:{borderBottomColor:color_pallete[2]}]}>
+              <Text style={[styles.headerText, type==0?{color:color_pallete[2]}:{color:color_pallete[2]}]}>{selectedPin.name}</Text>
+            </View>
             <View style={{padding:10, flex:1, flexDirection:'column', gap:10}}>
               <View>
-                <Text style={[styles.minitext, type==0?{color:color_pallete[2]}:{color:'white'}]}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
-                <Text style={[styles.miniSubText, type==0?{color:color_pallete[2]}:{color:'white'}]}>{distance} miles away</Text>
+                <Text style={[styles.minitext, type==0?{color:color_pallete[2]}:{color:color_pallete[2]}]}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+                <Text style={[styles.miniSubText, type==0?{color:color_pallete[2], fontSize:10}:{color:color_pallete[2]}]}>{distance} miles away</Text>
               </View>
               <View>
-                <Text style={[styles.minitext2, type==0?{color:color_pallete[2]}:{color:shopStatus.status=='Open'?color_pallete[8]:color_pallete[9]}]}>{shopStatus.status}</Text>
+                <Text style={[styles.minitext2, {color:shopStatus.status=='Open'?color_pallete[3]:color_pallete[9]}]}>{shopStatus.status}</Text>
                 { shopStatus.hours && shopStatus.hours.open && shopStatus.hours.close ?
-                  <Text style={[styles.miniSubText, type==0?{color:color_pallete[2]}:{color:'white'}]}>{convertTo12HourFormat(shopStatus.hours?.open)} - {convertTo12HourFormat(shopStatus.hours?.close)}</Text>:
+                  <Text style={[styles.miniSubText, type==0?{color:color_pallete[2], fontSize:10}:{color:color_pallete[2]}]}>{convertTo12HourFormat(shopStatus.hours?.open)} - {convertTo12HourFormat(shopStatus.hours?.close)}</Text>:
                   null
                 }
               </View>
@@ -83,7 +85,7 @@ export const ExpandedShop = ({
   selectedPin,
   type,
   setExpansion,
-}: PrewviewShopProps) => {
+}: PrevwiewShopProps) => {
   const { alert } = useProps();
   const { profile } = localData();
 
@@ -205,15 +207,19 @@ export const ExpandedShop = ({
       return (
         <View>
           <Animated.View
-            style={[modalStyle.wrapper, { transform: [{ translateX }] }]}
-            {...panResponder.panHandlers}
+            style={[modalStyle.wrapper, 
+              (plan.reward_planAvail && plan.exp_rewardsAvail)?
+              {width: width * 2}:{width: width}, { transform: [{ translateX }] }]}
+            {...(plan.reward_planAvail && plan.exp_rewardsAvail) && panResponder.panHandlers}
           >
-            <View style={{ width, flexDirection: 'column' }}>
+            {plan.reward_planAvail &&
+            <View style={{ width }}>
               <RoadMap plan={plan} />
-            </View>
+            </View>}
+            {plan.exp_rewardsAvail &&
             <View style={{ width }}>
               <ExpendatureMap plan={plan} />
-            </View>
+            </View>}
           </Animated.View>
         </View>
       );
@@ -256,7 +262,7 @@ export const ExpandedShop = ({
 
   const handleLike = () =>{
     if(!liked){
-      alert('Shop added to Favoriites', '', 'success')
+      alert('Saved to favorites! ', '', 'success')
     }
     setLiked(!liked)
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
@@ -277,7 +283,7 @@ export const ExpandedShop = ({
           headerBackgroundColor={{ light: 'rgba(64, 124, 156, 1)', dark: 'rgba(64, 124, 156, 1)' }}
           headerImage={<Image source={{ uri: shopDetails.banner }} style={modalStyle.image} resizeMode="contain"/>}
           name={selectedPin.name}
-          description={selectedPin.description}
+          description={shopDetails.description}
           setExpansion={setExpansion}
           >
             <View>
@@ -295,43 +301,41 @@ export const ExpandedShop = ({
                     </TouchableOpacity>
                   </View>
                 </View>
-                <View>
-                  <View style={modalStyle.infoRow}>
-                    <View style={{position:'relative', height:'100%', width:25}}>
-                      <AntDesign name={'clockcircleo'} color={'white'} size={25} style={{position:'absolute', alignSelf:'center', top:15,}}/>
-                    </View>
-                    <View style={{flexDirection:'column', flex:1}}>
-                      <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{setExpandHours(!expandHours)}}>
-                        <Text style={shopStatus.status == 'Open'? modalStyle.openText: modalStyle.closedText}>{shopStatus.status}</Text>
-                        <Ionicons name='chevron-up' size={25} color={'white'}  style={{transform:[{rotate:!expandHours?'90deg':'180deg'}], marginRight:10}}/>
-                      </TouchableOpacity>
-                      <View>
-                        <Collapsible collapsed={!expandHours}>
-                          <View style={{marginBottom:10, gap:2}}>
-                            {selectedPin.shop_hours.map((shopDay, index)=>{
-                              if(shopDay.open && shopDay.close){
-                                return(
-                                  <View style={modalStyle.hoursContainer} key={index}>
-                                    <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
-                                    <View>
-                                      <Text style={modalStyle.infoText1}>{convertTo12HourFormat(shopDay.open)} - {convertTo12HourFormat(shopDay.close)}</Text>
-                                    </View>
+                <View style={modalStyle.infoRow}>
+                  <View style={{position:'relative', height:'100%', width:25}}>
+                    <AntDesign name={'clockcircleo'} color={'white'} size={25} style={{position:'absolute', alignSelf:'center', top:15,}}/>
+                  </View>
+                  <View style={{flexDirection:'column', flex:1}}>
+                    <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{setExpandHours(!expandHours)}}>
+                      <Text style={shopStatus.status == 'Open'? modalStyle.openText: modalStyle.closedText}>{shopStatus.status}</Text>
+                      <Ionicons name='chevron-up' size={25} color={'white'}  style={{transform:[{rotate:!expandHours?'90deg':'180deg'}], marginRight:10}}/>
+                    </TouchableOpacity>
+                    <View>
+                      <Collapsible collapsed={!expandHours}>
+                        <View style={{marginBottom:10, gap:2}}>
+                          {selectedPin.shop_hours.map((shopDay, index)=>{
+                            if(shopDay.open && shopDay.close){
+                              return(
+                                <View style={modalStyle.hoursContainer} key={index}>
+                                  <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
+                                  <View>
+                                    <Text style={modalStyle.infoText1}>{convertTo12HourFormat(shopDay.open)} - {convertTo12HourFormat(shopDay.close)}</Text>
                                   </View>
-                                )
-                              }else{
-                                return(
-                                  <View style={modalStyle.hoursContainer} key={index}>
-                                    <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
-                                    <Text style={modalStyle.infoText1}>Closed</Text>
-                                  </View>
-                                )
-                              }
-                            })}
-                          </View>
-                        </Collapsible>
-                      </View>
-                    <View  style={modalStyle.underline}/>
+                                </View>
+                              )
+                            }else{
+                              return(
+                                <View style={modalStyle.hoursContainer} key={index}>
+                                  <Text style={modalStyle.infoText1}>{shopDay.day}</Text>
+                                  <Text style={modalStyle.infoText1}>Closed</Text>
+                                </View>
+                              )
+                            }
+                          })}
+                        </View>
+                      </Collapsible>
                     </View>
+                  <View  style={modalStyle.underline}/>
                   </View>
                 </View>
                 {shopDetails.menu && 
@@ -360,7 +364,7 @@ export const ExpandedShop = ({
                     </View>
                   </View>
               </View>
-
+              { (plan?.exp_rewardsAvail && plan?.reward_planAvail) &&
               <View style={{width:'100%',backgroundColor:'white'}}>
                 <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
                   <View style={modalStyle.toggleSection}>
@@ -372,7 +376,7 @@ export const ExpandedShop = ({
                     </TouchableOpacity>
                   </View>
               </View>
-
+              }
               <View>
                 <View style={styles.subHeader}>
                   <View style={styles.titleContainer}>
@@ -396,7 +400,7 @@ export const ExpandedShop = ({
 };
 
 // The modal wrapper component
-export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type }: PrewviewShopProps) => {
+export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type }: PrevwiewShopProps) => {
 
   return (
     <Modal

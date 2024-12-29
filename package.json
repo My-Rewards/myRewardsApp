@@ -29,6 +29,7 @@
     "@react-navigation/stack": "^7.1.1",
     "aws-amplify": "^6.6.2",
     "dotenv": "^16.4.5",
+    "eas-cli": "^14.2.0",
     "expo": "^52.0.0",
     "expo-constants": "~17.0.3",
     "expo-dev-client": "~5.0.6",
@@ -60,7 +61,8 @@
     "react-native-svg": "15.8.0",
     "react-native-swipe-gestures": "^1.0.5",
     "react-native-web": "~0.19.10",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "expo-screen-orientation": "~8.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

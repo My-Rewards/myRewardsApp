@@ -27,16 +27,16 @@ export const styles = StyleSheet.create({
       elevation: 5,
     },
     modalContent2: {
-      backgroundColor:color_pallete[5],
+      backgroundColor:'white',
       flex:1,
       margin:10,
       borderRadius:10,
       width:'100%',
       alignSelf:'center',
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.35,
+      shadowColor:'black',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.4,
       shadowRadius: 4,
-      elevation: 5,
     },
     expandedContainer:{
       backgroundColor:'white', 
@@ -116,8 +116,7 @@ export const styles = StyleSheet.create({
       flexDirection:'row',
       alignItems:'center',
       justifyContent:'space-between',
-      padding:6,
-      paddingHorizontal:10,
+      padding:10,
       borderBottomWidth:1,
       gap:10
     },
@@ -125,22 +124,29 @@ export const styles = StyleSheet.create({
       fontFamily:'Avenir Next',
       flex:1,
       fontWeight:'700',
-      fontSize:20,
+      fontSize:18,
     },
     minitext:{
       fontFamily:'Avenir Next',
-      fontSize:12,
+      fontSize:14,
       fontWeight:'600',
     },
     minitext2:{
       fontFamily:'Avenir Next',
-      fontSize:12,
+      fontSize:14,
       fontWeight:'600',
     },
     miniSubText:{
       fontFamily:'Avenir Next',
-      fontSize:10,
+      fontSize:12,
       fontWeight:'400',
+    },
+    imageContainer:{
+      borderTopRightRadius:10,
+      borderBottomRightRadius:10, 
+      borderRadius:10, 
+      borderColor:'white', 
+      overflow:'hidden'
     }
 });
   
@@ -259,7 +265,6 @@ export const modalStyle = StyleSheet.create({
   },
   wrapper: {
     flexDirection: 'row',
-    width: width * 2,
     backgroundColor:'transparent',
     flex:1,
   },

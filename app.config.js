@@ -13,6 +13,12 @@ export default () => {
           "selectIdentifiers": ["D2760000850100","D2760000850101"],
           "systemCodes": ["8008", "8005", "0003", "fe00", "90b7", "927a","12FC","86a7"],
           "includeNdefEntitlement": false,
+        },
+      ],
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
         }
       ]
     ],
@@ -20,6 +26,7 @@ export default () => {
       bundleIdentifier: isProd ? 'com.myRewards.website.prod' : 'com.myRewards.website.beta',
       icon: './assets/images/MyRewardsLogo1.png',
       runtimeVersion: RUNTIMEVERSION,
+      requireFullScreen: true,
       infoPlist: {
         UIBackgroundModes: [
           "location",

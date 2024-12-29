@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Animated, Easing, StyleSheet, ActivityIndicator} from "react-native"
+import { View, Animated, Easing, StyleSheet, ActivityIndicator} from "react-native"
 
 export const LoadingScreen = ({isLoading, setLoadingScreen}:any) =>{
     const [visibleLoading, setVisibleLoading] = useState(false);

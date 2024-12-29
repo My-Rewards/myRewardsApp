@@ -7,9 +7,9 @@ const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
 export const color_pallete = [
-  '#FBC19F', 
-  '#F35E43', 
-  '#7F513A',
+  'rgba(251, 193, 159,1)', 
+  'rgba(243, 94, 67,1)', 
+  'rgba(127, 81, 58,1)',
   'rgba(249, 139, 78, 1)',
   'rgba(249, 139, 78, 0.5)', 
   'rgba(64, 124, 156, 1)',
@@ -18,6 +18,11 @@ export const color_pallete = [
   'rgba(163, 241, 161, 1)',
   'rgba(255, 158, 151, 1)',
   'rgba(255, 251, 246, 1)',
+]
+
+export const toast_pallete= [
+  'rgba(64, 124, 156, 1)',
+  'rgba(239, 94, 67, 1)'
 ]
 
 export const Colors = {

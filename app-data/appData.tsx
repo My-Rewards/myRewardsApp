@@ -16,13 +16,16 @@ import {
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
 import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
-import Map, { Marker } from 'react-native-maps';
+import Map from 'react-native-maps';
+import { useSession } from '@/auth/ctx';
+import * as Auth from 'aws-amplify/auth';
+import { router } from 'expo-router';
 
 const DataContext = createContext<{
-    fetchShopsByRadius: (user_id:string, radius:number) => void; 
-    fetchDiscoverShops: (user_id:string, filterOption:number, pagination:number) => void;
+    fetchShopsByRadius: (currRegion:regionProp) => void; 
+    fetchDiscoverShops: (filterOption:number, pagination:number) => void;
     fetchPlans: (filterOption:number)=>void;
-    fetchProfile: (user_id:string) => void; 
+    fetchProfile: () => void; 
     locateMe: (map:React.RefObject<Map>) => void; 
     setRegion:(location:regionProp) => void;
     setShopPreviewCache:(shop:shopPreview) => void;
@@ -32,7 +35,6 @@ const DataContext = createContext<{
     discoverShopsFilter2?: shopPreview[] | null;
     discoverShopsFilter3?: shopPreview[] | null;
     shopPreviewCache?:shopPreview|null
-    shop?: shop | null;
     profile?: Profile|null;
     plans?:Plan[]|null;
     isPage1Loading: boolean;
@@ -60,7 +62,6 @@ const DataContext = createContext<{
         latitudeDelta: 0.008,
         longitudeDelta: 0.008,
       },
-    shop: null,
     profile:null,
     plans:null,
     isPage1Loading: false,
@@ -80,11 +81,8 @@ const DataContext = createContext<{
     return value;
   }
 
-  export function AppData({ children }: PropsWithChildren) {
-    const { alert } = useProps();
-
+  export function AppData({ children, userSub }: PropsWithChildren & { userSub: string }) {    const { alert } = useProps();
     const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();
-    const [shop, setShop] = useState<shop|null>();
     const [shopPreviewCache, setShopPreviewCache] = useState<shopPreview|null>();
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
@@ -95,6 +93,12 @@ const DataContext = createContext<{
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
+    const [furthestFetch, setFurthestFetch] = useState({
+      latitude: 28.5384,
+      longitude: -81.3789,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    });
 
     const [fetchingPage1, setFetchingPage1] = useState(false);
     const [fetchingPage2, setFetchingPage2] = useState(false);
@@ -105,6 +109,69 @@ const DataContext = createContext<{
     const [discoverShopsFilter2, setDiscoverShopsFilter2] = useState<shopPreview[]|null>();
     const [discoverShopsFilter3, setDiscoverShopsFilter3] = useState<shopPreview[]|null>();
 
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          if (!userLocation) {
+            await getCurrentLocation();
+          }
+          let fetchedProfile;
+    
+          if (!profile) {
+            setFetchingPage4(true);
+            try {
+              // Replace mock API with actual API
+              fetchedProfile = await mockProfile();
+              setProfile(fetchedProfile);
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            } finally {
+              setFetchingPage4(false);
+            }
+          }
+    
+          if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3) && fetchedProfile) {
+            setFetchingPage1(true);
+            setFetchingPage2(true);
+            try {
+              // Replace mock API with actual API
+              // set discover and maps to same value because theyre identical upon load
+              const shops1 = await mockDiscoverShops(fetchedProfile.id, region)
+              setDiscoverShopsFilter1(shops1);
+              setRadiusShops(shops1);
+
+              const shops2 = await mockPopularShops(fetchedProfile.id, 0, region)
+              setDiscoverShopsFilter2(shops2);
+              const shops3 = await mockFavoriteShops(fetchedProfile.id, 0, region)
+              setDiscoverShopsFilter3(shops3);
+              
+            } catch (error) {
+              console.error('Error fetching discover shops:', error);
+            } finally {
+              setFetchingPage1(false);
+              setFetchingPage2(false);
+            }
+          }
+    
+          if (!plans && fetchedProfile) {
+            setFetchingPage4(true);
+            try {
+              // Replace mock API with actual API
+              const plansData = await mockPlans(fetchedProfile.id);
+              setPlans(plansData);
+            } catch (error) {
+              console.error('Error fetching plans:', error);
+            } finally {
+              setFetchingPage4(false);
+            }
+          }
+        } catch (error) {
+          console.error('Error in fetchData sequence:', error);
+        }
+      };
+    
+      fetchData(); // Call the async function
+    }, []);
 
     async function getCurrentLocation() {
       setFetchingPage2(true);
@@ -149,92 +216,30 @@ const DataContext = createContext<{
       }
     }
 
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          if (!userLocation) {
-            await getCurrentLocation();
-          }
-          let fetchedProfile;
-    
-          if (!profile) {
-            setFetchingPage4(true);
-            try {
-              // Replace mock API with actual API
-              fetchedProfile = await mockProfile();
-              setProfile(fetchedProfile);
-            } catch (error) {
-              console.error('Error fetching profile:', error);
-            } finally {
-              setFetchingPage4(false);
-            }
-          }
-    
-          if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3) && fetchedProfile) {
-            setFetchingPage1(true);
-            try {
-              // Replace mock API with actual API
-              const shops1 = await mockDiscoverShops(fetchedProfile.id, 0, region)
-              setDiscoverShopsFilter1(shops1);
-              const shops2 = await mockPopularShops(fetchedProfile.id, 0, region)
-              setDiscoverShopsFilter2(shops2);
-              const shops3 = await mockFavoriteShops(fetchedProfile.id, 0, region)
-              setDiscoverShopsFilter3(shops3);
-              
-            } catch (error) {
-              console.error('Error fetching discover shops:', error);
-            } finally {
-              setFetchingPage1(false);
-            }
-          }
-    
-          if (!radiusShops && fetchedProfile) {
-            setFetchingPage2(true);
-            try {
-              // Replace mock API with actual API
-              const shops = await mockShopRadius(fetchedProfile.id);
-              setRadiusShops(shops);
-            } catch (error) {
-              console.error('Error fetching radius shops:', error);
-            } finally {
-              setFetchingPage2(false);
-            }
-          }
-    
-          if (!plans && fetchedProfile) {
-            setFetchingPage4(true);
-            try {
-              // Replace mock API with actual API
-              const plansData = await mockPlans(fetchedProfile.id);
-              setPlans(plansData);
-            } catch (error) {
-              console.error('Error fetching plans:', error);
-            } finally {
-              setFetchingPage4(false);
-            }
-          }
-        } catch (error) {
-          console.error('Error in fetchData sequence:', error);
-        }
-      };
-    
-      fetchData(); // Call the async function
-    }, []);
-    
     return (
       <DataContext.Provider
         value={{
-            fetchShopsByRadius: async (user_id:string, radius:number) => {
-                // Fetch + Update shops radiusShops given location
+            fetchShopsByRadius: async (currRegion:regionProp) => {
+              // Fetch + Update shops radiusShops given location
+              // if(currRegion.latitudeDelta > furthestFetch.latitudeDelta*1.2 
+              //   && currRegion.longitudeDelta > furthestFetch.longitudeDelta*1.2
+              //   && !fetchingPage2){
+              //   setFetchingPage2(true)
+              //   setFurthestFetch(currRegion)
+              //   console.log(currRegion)
+              //   setTimeout(()=>{
+              //     setFetchingPage2(false)
+              //   },2000)
+              // }
             },
-            fetchDiscoverShops: async (user_id:string, filterOption:number, pagination:number): Promise<void> => {
+            fetchDiscoverShops: async (filterOption:number, pagination:number): Promise<void> => {
                 // Fetch + Update shops DiscoverShops given closet/popularity
                 // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
                 setFetchingPage1(true)
                 try {
                   switch (filterOption) {
                     case 0:
-                      const shop1 = await mockDiscoverShops(user_id, pagination, region)
+                      const shop1 = await mockDiscoverShops(userSub, region)
                       if(pagination>0){
                         setDiscoverShopsFilter1((prevShops) => [...(prevShops || []), ...shop1]);
                         }else{
@@ -243,7 +248,7 @@ const DataContext = createContext<{
                       setFetchingPage1(false)
                       break;
                     case 1:
-                      const shops2 = await mockPopularShops(user_id, pagination, region)
+                      const shops2 = await mockPopularShops(userSub, pagination, region)
                       if(pagination>0){
                         setDiscoverShopsFilter2((prevShops) => [...(prevShops || []), ...shops2]);
                         }
@@ -253,7 +258,7 @@ const DataContext = createContext<{
                       setFetchingPage1(false)
                       break;
                     case 2:
-                      const shop3 = await mockFavoriteShops(user_id, pagination, region)
+                      const shop3 = await mockFavoriteShops(userSub, pagination, region)
                       if(pagination>0){
                         setDiscoverShopsFilter3((prevShops) => [...(prevShops || []), ...shop3]);
                         }else{
@@ -302,7 +307,7 @@ const DataContext = createContext<{
               }
 
             },
-            fetchProfile: async (user_id:string) => {
+            fetchProfile: async () => {
               
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
@@ -313,7 +318,6 @@ const DataContext = createContext<{
             discoverShopsFilter2,
             discoverShopsFilter3,
             shopPreviewCache,
-            shop,
             plans,
             region,
             profile,

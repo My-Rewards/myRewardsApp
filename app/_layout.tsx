@@ -1,13 +1,15 @@
 import {Stack} from 'expo-router';
 import { SessionProvider } from '../auth/ctx';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Amplify} from 'aws-amplify';
 import {amplifyConfiguration} from './amplify-config'
 import { PropsProvider } from './LoadingProp/propsProvider';
 import { StatusBar } from 'expo-status-bar';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 console.warn = () => {};
 Amplify.configure(amplifyConfiguration);
+ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP)
 
 export default function Root() {
 

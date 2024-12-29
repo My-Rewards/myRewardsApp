@@ -6,48 +6,51 @@ import { Plan, Profile, shop, shopPreview } from "@/app-data/data-types";
 // When APIS are ready create them here then replace the mock with the real APIs
 
 export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if(shop_id === '24hHsk345m'){
-          resolve({
-            id: "24hHsk345m",
-            organization_id: "org456",
-            location_id: "loc789",
-            geohash: "dr5regw3n",
-            banner: "https://picsum.photos/300/200",
-            menu:undefined,
-            phoneNumber:'5614455304',
-            logo: 'https://picsum.photos/200',
-            liked:true,
-          });
-        }else if (shop_id === '24hHsk346m'){
-          resolve({
-            id: "24hHsk346m",
-            organization_id: "org456",
-            location_id: "loc789",
-            geohash: "dr5regw3n",
-            menu:'https://www.mock-menu-link.com',
-            phoneNumber:'5614936645',
-            banner: "https://picsum.photos/300/200",
-            logo: 'https://picsum.photos/200',
-            liked:false,
-          });
-        }else{
-          resolve({
-            id: "ien5J2k2",
-            organization_id: "org456",
-            location_id: "loc789",
-            geohash: "dr5regw3n",
-            menu:'https://www.mock-menu-link.com',
-            phoneNumber:'5612331223',
-            banner: "https://picsum.photos/300/200",
-            logo: 'https://picsum.photos/200',
-            liked:false,
-          });
-        }
-      }, 500);
-    });
-  };
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if(shop_id === '24hHsk345m'){
+        resolve({
+          id: "24hHsk345m",
+          organization_id: "org456",
+          location_id: "loc789",
+          geohash: "dr5regw3n",
+          banner: "https://picsum.photos/300/200",
+          menu:undefined,
+          phoneNumber:'5614455304',
+          logo: 'https://picsum.photos/200',
+          description:'Super Yummy food',
+          liked:true,
+        });
+      }else if (shop_id === '24hHsk346m'){
+        resolve({
+          id: "24hHsk346m",
+          organization_id: "org456",
+          location_id: "loc789",
+          geohash: "dr5regw3n",
+          menu:'https://www.mock-menu-link.com',
+          phoneNumber:'5614936645',
+          banner: "https://picsum.photos/300/200",
+          logo: 'https://picsum.photos/200',
+          description:'Declicous handmade meals, with fresh ingredients',
+          liked:false,
+        });
+      }else{
+        resolve({
+          id: "ien5J2k2",
+          organization_id: "org456",
+          location_id: "loc789",
+          geohash: "dr5regw3n",
+          menu:'https://www.mock-menu-link.com',
+          phoneNumber:'5612331223',
+          banner: "https://picsum.photos/300/200",
+          logo: 'https://picsum.photos/200',
+          description:'Mixed mexican and italian cuisine',
+          liked:false,
+        });
+      }
+    }, 500);
+  });
+};
 
 export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
   return new Promise((resolve) => {
@@ -58,11 +61,9 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
           longitude: -82.3351,
           preview: 'https://picsum.photos/300',
           organization_id: "org456",
-          geohash: '34jn3',
           location_id: "loc789",
           id: '24hHsk345m',
           name: 'Brolic Brunches',
-          description: 'Yummy food everyday',
           liked: true,
           location: {
             city: 'Gainesville',
@@ -83,11 +84,9 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
           longitude: -82.3173,
           preview: 'https://picsum.photos/200',
           organization_id: "org446",
-          geohash: '34jn3',
           location_id: "loc341",
           id: '24hHsk346m',
           name: 'Alpha Artichokes',
-          description: 'Delicious food every day',
           liked: false,
           location: {
             city: 'Gainesville',
@@ -108,11 +107,9 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
           longitude: -82.3214,
           organization_id: "org596",
           location_id: "loc115",
-          geohash: '34jn3',
           preview: 'https://picsum.photos/200',
           id: 'wjn4Sj320B',
           name: 'Beta Breaky',
-          description: 'Crispy Food for the Hungry',
           liked: false,
           location: {
             city: 'Gainesville',
@@ -133,11 +130,9 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
           longitude: -82.3305,
           preview: 'https://picsum.photos/200',
           organization_id: "org123",
-          geohash: '34jn3',
           location_id: "loc129",
           id: 'ien5J2k2',
           name: 'Los Tacos',
-          description: 'Hand made authentic tacos',
           liked: false,
           location: {
             city: 'Gainesville',
@@ -159,7 +154,6 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
   });
 };
 
-  
 export const mockProfile = (): Promise<Profile> => {
   return new Promise((resolve) => {
       setTimeout(() => {
@@ -223,6 +217,8 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             visits: 0,
             points: 0,
             redeemableRewards:[],
+            reward_planAvail:true,
+            exp_rewardsAvail:true,
             organization_id: "org12345",
             name:'Los Tacos',
             id:'341Dig',
@@ -269,6 +265,8 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             visits: 5,
             points: 0,
             redeemableRewards:[],
+            reward_planAvail:true,
+            exp_rewardsAvail:true,
             organization_id: "org334",
             name:'Beta Breaky',
             id:'34nDi3',
@@ -324,6 +322,8 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         visits: 5,
         points: 0,
         redeemableRewards:['tier-3'],
+        reward_planAvail:true,
+        exp_rewardsAvail:true,
         firstPlan:false,
         activePlan:false,
         organization_id: "org12345",
@@ -372,6 +372,8 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         points: 50,
         firstPlan: false,
         redeemableRewards: ['tier-6'],
+        reward_planAvail:true,
+        exp_rewardsAvail:true,
         activePlan: true,
         organization_id: "org12345",
         name: 'Los Tacos',
@@ -420,6 +422,8 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
         firstPlan:false,
         activePlan:true,
         redeemableRewards:[],
+        reward_planAvail:true,
+        exp_rewardsAvail:true,
         organization_id: "org12345",
         name:'Los Tacos',
         id:'341Dig'
@@ -437,7 +441,7 @@ export const mockPlan = (user_id:string, shop_id:string): Promise<Plan> =>{
   });
 }
 
-export const mockDiscoverShops = (user_id: string, pagination: number, region: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number; }): Promise<shopPreview[]> => {
+export const mockDiscoverShops = (user_id: string, region: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number; }): Promise<shopPreview[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const sampleShops: shopPreview[] = [
@@ -446,11 +450,9 @@ export const mockDiscoverShops = (user_id: string, pagination: number, region: {
           longitude: -82.3351,
           preview: 'https://picsum.photos/200',
           organization_id: "org456",
-          geohash: '34jn3',
           location_id: "loc789",
           id: '24hHsk345m',
           name: 'Brolic Brunches',
-          description: 'Yummy food everyday',
           liked: true,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -460,11 +462,9 @@ export const mockDiscoverShops = (user_id: string, pagination: number, region: {
           longitude: -82.3173,
           preview: 'https://picsum.photos/200',
           organization_id: "org446",
-          geohash: '34jn3',
           location_id: "loc341",
           id: '24hHsk346m',
           name: 'Alpha Artichokes',
-          description: 'Delicious food every day',
           liked: false,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -474,11 +474,9 @@ export const mockDiscoverShops = (user_id: string, pagination: number, region: {
           longitude: -82.3214,
           organization_id: "org596",
           location_id: "loc115",
-          geohash: '34jn3',
           preview: 'https://picsum.photos/200',
           id: 'wjn4Sj320B',
           name: 'Beta Breaky',
-          description: 'Crispy Food for the Hungry',
           liked: false,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -488,11 +486,9 @@ export const mockDiscoverShops = (user_id: string, pagination: number, region: {
           longitude: -82.3305,
           preview: 'https://picsum.photos/200',
           organization_id: "org123",
-          geohash: '34jn3',
           location_id: "loc129",
           id: 'ien5J2k2',
           name: 'Los Tacos',
-          description: 'Hand made authentic tacos',
           liked: false,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -512,11 +508,9 @@ export const mockPopularShops = (user_id: string, pagination: number, region: { 
           longitude: -82.3411,
           preview: 'https://picsum.photos/200',
           organization_id: "org892",
-          geohash: '34jn3',
           location_id: "loc456",
           id: 'pop1234',
           name: 'Golden Griddles',
-          description: 'Fresh pancakes served daily',
           liked: true,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -526,11 +520,9 @@ export const mockPopularShops = (user_id: string, pagination: number, region: { 
           longitude: -82.3194,
           preview: 'https://picsum.photos/200',
           organization_id: "org128",
-          geohash: '34jn3',
           location_id: "loc987",
           id: 'pop5678',
           name: 'Burger Bazaar',
-          description: 'A paradise for burger lovers',
           liked: false,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -550,11 +542,9 @@ export const mockFavoriteShops = (user_id: string, pagination: number, region: {
           longitude: -82.3408,
           preview: 'https://picsum.photos/200',
           organization_id: "org444",
-          geohash: '34jn3',
           location_id: "loc542",
           id: 'fav1234',
           name: 'Coffee Haven',
-          description: 'Where mornings begin',
           liked: true,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),
@@ -564,11 +554,9 @@ export const mockFavoriteShops = (user_id: string, pagination: number, region: {
           longitude: -82.3367,
           preview: 'https://picsum.photos/200',
           organization_id: "org333",
-          geohash: '34jn3',
           location_id: "loc331",
           id: 'fav5678',
           name: 'Pizza Palace',
-          description: 'Authentic Italian pizza',
           liked: true,
           location: { city: 'Gainesville', state: 'Florida' },
           shop_hours: generateShopHours(),

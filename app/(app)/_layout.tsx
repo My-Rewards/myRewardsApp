@@ -8,19 +8,18 @@ import NfcManager from 'react-native-nfc-manager';
 NfcManager.start();
 
 export default function AppLayout() {
-  const { session, isLoading } = useSession();
+  const { userSub, isLoading } = useSession();
 
   if (isLoading) {
     return LoadingScreenDefault();
   }
 
-  if (!session) {
+  if (!userSub) {
     return <Redirect href="/sign-in" />;
   }
-  
 
   return (
-    <AppData>
+    <AppData userSub={userSub}>
       <Stack
       screenOptions={{
         gestureDirection:'horizontal',
