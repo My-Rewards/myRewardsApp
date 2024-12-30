@@ -162,18 +162,32 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
         )
     }
 
+    const StatusText = () =>{
+
+        if(!plan.activePlan && plan.firstPlan){
+            return(
+                <Text style={modalStyle.visitsText}>
+                    Start Your Plan now and Get 
+                </Text>
+            )
+        }
+        return(
+            <Text style={modalStyle.visitsText}>
+                {tillNextRew && tillNextRew>0 ?
+                `${tillNextRew} ${tillNextRew === 1 ? 'Visit' : 'Visits'} until your next reward!`
+                :
+                `Redeem a reward on your next visit!`
+                }
+            </Text>
+        )
+    }
+
     return (
         <View style={{gap:30, marginBottom:height/10}}>
             <View style={{ alignItems: 'center', marginTop:10}}>
-                <Text style={modalStyle.visitsText}>
-                    {tillNextRew && tillNextRew>0 ?
-                    `${tillNextRew} ${tillNextRew === 1 ? 'Visit' : 'Visits'} until your next reward!`
-                    :
-                    `Redeem a reward on your next visit!`
-                    }
-                </Text>
+                <StatusText />
             </View>
-            {/* Completion Bar */}
+            {/* roadMap Bar */}
             <View style={modalStyle.roadmapContainer}>
                 <View style={modalStyle.roadmap}>
                     {milestones.map((milestone, index) => 

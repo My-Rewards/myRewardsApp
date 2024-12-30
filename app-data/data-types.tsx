@@ -32,12 +32,20 @@ export interface shop {
   organization_id: string; 
   location_id: string;
   geohash: string;
+  name:string;
   banner: string;
   logo:string;
   liked:boolean;
   menu:string|undefined;
   phoneNumber:string;
-  description:string
+  description:string;
+  shop_hours: ShopHour[];
+  location:{
+    city:string,
+    state:string
+  };
+  latitude: number;
+  longitude: number;
 }
 
 export interface Profile {
@@ -57,7 +65,8 @@ export type Reward = {
   type: 'cost'|'percentage'|'item'; 
   value?: number; 
   item?: string;
-  rule?: string|number;
+  rule: string|number;
+  bonusReward?: string
 };
 
 export interface Tier {
@@ -80,6 +89,7 @@ export interface RewardSystem {
 }
 
 export interface Plan{
+  id:string,
   reward_plan:RewardSystem,
   visits:number,
   points:number,
@@ -90,7 +100,7 @@ export interface Plan{
   firstPlan:boolean,
   activePlan:boolean,
   redeemableRewards:string[],
-  id?:string
+  bonusRewards?: Reward[],
 }
 
 export interface PlanPreviewProps extends Plan{

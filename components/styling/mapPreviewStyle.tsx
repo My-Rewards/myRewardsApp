@@ -34,9 +34,9 @@ export const styles = StyleSheet.create({
       width:'100%',
       alignSelf:'center',
       shadowColor:'black',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
     },
     expandedContainer:{
       backgroundColor:'white', 

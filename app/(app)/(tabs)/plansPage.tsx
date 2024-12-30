@@ -11,9 +11,10 @@ import {
 import React, { useRef } from 'react';
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
-import { Plan } from '@/app-data/data-types';
+import { Plan, shopPreview } from '@/app-data/data-types';
 import { SvgXml } from 'react-native-svg';
 import { mediumLogo } from '@/assets/images/MR-logos';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -35,10 +36,14 @@ export default function plansPage() {
     });
   };
 
+  const openShopPage = (shop_id:string) =>{
+    router.push({ pathname: "/shopPage", params:{ parentPage:'Plans', shop_id }});
+  }
+
   return(
     <View style={styles.page}>
-      <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
-      <PlansPreview plansData={plans} isLoading={isPage3Loading}/>
+      <FilterBar slideAnim={slideAnim} handlePress={handlePress}/>
+      <PlansPreview plansData={plans} isLoading={isPage3Loading} openShop={openShopPage}/>
     </View>
   )
 }
@@ -68,7 +73,8 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
   );
 });
 
-const PlansPreview = React.memo(({ plansData, isLoading }: { plansData: Plan[]|null|undefined; isLoading: boolean }) => {
+const PlansPreview = React.memo(({ plansData, isLoading, openShop }:
+   { plansData: Plan[]|null|undefined; isLoading: boolean, openShop:(shop_id: string)=>void }) => {
 
   if (!isLoading && plansData) {
     return (
@@ -81,8 +87,10 @@ const PlansPreview = React.memo(({ plansData, isLoading }: { plansData: Plan[]|n
             {          
               plansData.map((plan:Plan) => (
                 <View key={plan.id}>
-                  <Text>{plan.name}</Text>
-                  <Text>{plan.points}</Text>
+                  <TouchableOpacity onPress={()=>openShop(plan.id)}>
+                    <Text>{plan.name}</Text>
+                    <Text>{plan.points}</Text>
+                  </TouchableOpacity>
                 </View>
               ))
             }

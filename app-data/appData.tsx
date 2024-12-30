@@ -17,9 +17,6 @@ import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
 import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
 import Map from 'react-native-maps';
-import { useSession } from '@/auth/ctx';
-import * as Auth from 'aws-amplify/auth';
-import { router } from 'expo-router';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
@@ -28,7 +25,6 @@ const DataContext = createContext<{
     fetchProfile: () => void; 
     locateMe: (map:React.RefObject<Map>) => void; 
     setRegion:(location:regionProp) => void;
-    setShopPreviewCache:(shop:shopPreview) => void;
     region:regionProp;
     radiusShops?: shopPreview[] | null;
     discoverShopsFilter1?: shopPreview[] | null;
@@ -49,7 +45,6 @@ const DataContext = createContext<{
     fetchProfile: async () => null,
     locateMe: async () => null,
     setRegion: async () => null,
-    setShopPreviewCache: async () => null,
     radiusShops: null,
     discoverShopsFilter1: null,
     discoverShopsFilter2: null,
@@ -82,10 +77,10 @@ const DataContext = createContext<{
   }
 
   export function AppData({ children, userSub }: PropsWithChildren & { userSub: string }) {    const { alert } = useProps();
-    const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();
-    const [shopPreviewCache, setShopPreviewCache] = useState<shopPreview|null>();
+    const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();    
     const [profile, setProfile] = useState<Profile|null>();
     const [plans, setPlans] = useState<Plan[]|null>();
+    const [filteredPlans, setFilteredPlans] = useState<Plan[]|null>();
     const [userLocation, setUserLocation] = useState<regionProp|null>(null);
     const [region, setRegion] = useState({
         latitude: 28.5384,
@@ -115,13 +110,12 @@ const DataContext = createContext<{
           if (!userLocation) {
             await getCurrentLocation();
           }
-          let fetchedProfile;
     
           if (!profile) {
             setFetchingPage4(true);
             try {
               // Replace mock API with actual API
-              fetchedProfile = await mockProfile();
+              const fetchedProfile = await mockProfile(userSub);
               setProfile(fetchedProfile);
             } catch (error) {
               console.error('Error fetching profile:', error);
@@ -130,19 +124,19 @@ const DataContext = createContext<{
             }
           }
     
-          if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3) && fetchedProfile) {
+          if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3)) {
             setFetchingPage1(true);
             setFetchingPage2(true);
             try {
               // Replace mock API with actual API
               // set discover and maps to same value because theyre identical upon load
-              const shops1 = await mockDiscoverShops(fetchedProfile.id, region)
+              const shops1 = await mockDiscoverShops(userSub, region)
               setDiscoverShopsFilter1(shops1);
               setRadiusShops(shops1);
 
-              const shops2 = await mockPopularShops(fetchedProfile.id, 0, region)
+              const shops2 = await mockPopularShops(userSub, 0, region)
               setDiscoverShopsFilter2(shops2);
-              const shops3 = await mockFavoriteShops(fetchedProfile.id, 0, region)
+              const shops3 = await mockFavoriteShops(userSub, 0, region)
               setDiscoverShopsFilter3(shops3);
               
             } catch (error) {
@@ -153,12 +147,13 @@ const DataContext = createContext<{
             }
           }
     
-          if (!plans && fetchedProfile) {
+          if (!plans) {
             setFetchingPage4(true);
             try {
               // Replace mock API with actual API
-              const plansData = await mockPlans(fetchedProfile.id);
+              const plansData = await mockPlans(userSub);
               setPlans(plansData);
+              setFilteredPlans(plansData)
             } catch (error) {
               console.error('Error fetching plans:', error);
             } finally {
@@ -274,29 +269,19 @@ const DataContext = createContext<{
                 }
             },
             fetchPlans: async (filterOption:number) => {
+              // this will sort plans to show only the favorite 
               try{
                 setFetchingPage3(true)
                 if(!profile) return;
                 
                 switch (filterOption) {
                   case 0:
-                    mockPlans(profile.id).then((plansData)=>{
-                      setPlans(plansData)
-                      setFetchingPage3(false)
-                   })
-                  .catch((error) => {
-                      console.error('Error fetching shops:', error);
-                    }); // Replace with nearby API call
+                    setFilteredPlans(plans)
+                    setFetchingPage3(false)
                     break;
                   case 1:
-                    mockPlans(profile.id).then((plansData)=>{
-                      setPlans([])
-                      setFetchingPage3(false)
-                    })
-                    .catch((error) => {
-                        console.error('Error fetching shops:', error);
-                    }); // Replace with popular API call
-                    // reorder with favorites first
+                    setFilteredPlans([])
+                    setFetchingPage3(false)
                     break;
                   default:
                     throw new Error("Invalid filter option");
@@ -312,13 +297,11 @@ const DataContext = createContext<{
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
             locateMe: async (map:React.RefObject<Map>)=>{rebaseUserLocation(map)},
-            setShopPreviewCache: async (shop:shopPreview)=>{setShopPreviewCache(shop)},
             radiusShops,
             discoverShopsFilter1,
             discoverShopsFilter2,
             discoverShopsFilter3,
-            shopPreviewCache,
-            plans,
+            plans:filteredPlans,
             region,
             profile,
             userLocation,

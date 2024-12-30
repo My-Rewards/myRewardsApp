@@ -12,6 +12,9 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
         resolve({
           id: "24hHsk345m",
           organization_id: "org456",
+          latitude: 29.6542,
+          longitude: -82.3351,
+          name: 'Brolic Brunches',
           location_id: "loc789",
           geohash: "dr5regw3n",
           banner: "https://picsum.photos/300/200",
@@ -20,11 +23,27 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           logo: 'https://picsum.photos/200',
           description:'Super Yummy food',
           liked:true,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
         });
       }else if (shop_id === '24hHsk346m'){
         resolve({
           id: "24hHsk346m",
           organization_id: "org456",
+          latitude: 29.6478,
+          longitude: -82.3173,
+          name: 'Alpha Artichokes',
           location_id: "loc789",
           geohash: "dr5regw3n",
           menu:'https://www.mock-menu-link.com',
@@ -33,11 +52,27 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           logo: 'https://picsum.photos/200',
           description:'Declicous handmade meals, with fresh ingredients',
           liked:false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
         });
       }else{
         resolve({
           id: "ien5J2k2",
           organization_id: "org456",
+          name: 'Beta Breaky',
+          latitude: 29.6569,
+          longitude: -82.3214,
           location_id: "loc789",
           geohash: "dr5regw3n",
           menu:'https://www.mock-menu-link.com',
@@ -46,6 +81,19 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           logo: 'https://picsum.photos/200',
           description:'Mixed mexican and italian cuisine',
           liked:false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
         });
       }
     }, 500);
@@ -154,7 +202,7 @@ export const mockShopRadius = (user_id: string): Promise<shopPreview[]> => {
   });
 };
 
-export const mockProfile = (): Promise<Profile> => {
+export const mockProfile = (user_id:string): Promise<Profile> => {
   return new Promise((resolve) => {
       setTimeout(() => {
         const sampleProfile: Profile = {
@@ -205,14 +253,14 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
                 ],
               },
             },
-              exp_rewards: {
-                expenditure: 150,
-                rewardsOptions: [
-                  { type: "cost", value: 15, rule:'menu Item' },
-                  { type: "percentage", value: 25, rule:'menu Item' },
-                  { type: "item", item: 'entree', rule:15},
-                ]
-              }
+            exp_rewards: {
+              expenditure: 150,
+              rewardsOptions: [
+                { type: "cost", value: 15, rule:'menu Item' },
+                { type: "percentage", value: 25, rule:'menu Item' },
+                { type: "item", item: 'entree', rule:15},
+              ]
+            }
             },
             visits: 0,
             points: 0,
@@ -220,12 +268,16 @@ export const mockPlans = (user_id:string): Promise<Plan[]> => {
             reward_planAvail:true,
             exp_rewardsAvail:true,
             organization_id: "org12345",
-            name:'Los Tacos',
-            id:'341Dig',
+            name:'Brolic Brunches',
+            id:'24hHsk345m',
             firstPlan:true,
-            activePlan:false
-        }, 
-        {
+            activePlan:false,
+            bonusRewards:[
+              { type: "cost", value: 10, rule:'menu Item', bonusReward:'birthday'},
+              { type: "percentage", value: 20, rule:'menu Item', bonusReward:'firstPlanr'},
+            ]
+          },
+          {
           reward_plan: {
           road_map: {
             3: {

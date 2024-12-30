@@ -13,7 +13,7 @@ import {
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
 import { ShopPreview } from '@/components/shopPreview';
-import { shopPreview } from '@/app-data/data-types';
+import { shopPreview, shop } from '@/app-data/data-types';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -122,7 +122,7 @@ const ShopPreviews = React.memo((
   { discoverShops, loadMoreData }: 
   {discoverShops:shopPreview[]| null | undefined, loadMoreData:() => Promise<void>}) => {
 
-  const { setShopPreviewCache, isPage1Loading } = localData();
+  const { isPage1Loading } = localData();
 
   const handleScroll = async (event: any) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
@@ -131,9 +131,8 @@ const ShopPreviews = React.memo((
     }
   };
 
-  const openShopPage = (shop:shopPreview) =>{
-    setShopPreviewCache(shop);
-    router.push({ pathname: "/shopPage", params:{ parentPage:'Discover' }});
+  const openShopPage = (shop_id:string) =>{
+    router.push({ pathname: "/shopPage", params:{ parentPage:'Discover', shop_id }});
   }
 
   if(discoverShops){
@@ -147,9 +146,9 @@ const ShopPreviews = React.memo((
           scrollEventThrottle={20}
           showsVerticalScrollIndicator={false}
         >
-          {discoverShops.map((shop: any, index: number) => (
+          {discoverShops.map((shop: shopPreview, index: number) => (
             <View key={index} style={{ marginHorizontal: 15 }}>
-              <TouchableOpacity onPress={()=>openShopPage(shop)}>
+              <TouchableOpacity onPress={()=>openShopPage(shop.id)}>
                 <ShopPreview 
                 selectedPin={shop} 
                 type={1} />

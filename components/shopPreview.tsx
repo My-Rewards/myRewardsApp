@@ -19,13 +19,13 @@ import { useProps } from '@/app/LoadingProp/propsProvider';
 
 const { width } = Dimensions.get('window');
 
-type ShopPreviewProps = {
+type MiniPreviewPropShops = {
   selectedPin: shopPreview;
   type:number
 };
 
-type PrevwiewShopProps = {
-  selectedPin: shopPreview;
+type PreviewPropShops = {
+  shopId: string;
   isExpanded:boolean;
   setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
   type:number
@@ -37,8 +37,9 @@ type OpenMapArgs = {
   label: string;
 };
 
-export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
-  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
+export const ShopPreview = ({selectedPin, type}: MiniPreviewPropShops) => {
+  const { userLocation } = localData();
+  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude, userLocation)
   const shopStatus = getShopStatus(selectedPin.shop_hours);
 
   return (
@@ -82,17 +83,18 @@ export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
 
 // The reusable content component
 export const ExpandedShop = ({
-  selectedPin,
+  shopId,
   type,
   setExpansion,
-}: PrevwiewShopProps) => {
+}: PreviewPropShops) => {
   const { alert } = useProps();
-  const { profile } = localData();
+  const { profile, userLocation } = localData();
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [liked, setLiked] = useState<boolean>(false);
   const [expandHours, setExpandHours] = useState<boolean>(false);
+  const [distance, setDistance] = useState<string |null>(null);
 
   const [loading, setLoading] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
@@ -101,16 +103,14 @@ export const ExpandedShop = ({
   const translateX = useRef(new Animated.Value(0)).current;
   const currentScreen = useRef(0);
 
-  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude);
-  const shopStatus = getShopStatus(selectedPin.shop_hours);
-
   useEffect(() => {
     const fetchShopDetails = async () => {
       if (profile) {
         setLoading(true);
         try {
-          const shopData = await mockShop(selectedPin.id, profile.id);
+          const shopData = await mockShop(shopId, profile.id);
           setShopDetails(shopData);
+          setDistance(calculateDistance(shopData.latitude, shopData.longitude, userLocation));
           setLiked(shopData.liked);
           const planData = await mockPlan(profile.id, shopData.id);
           setPlan(planData);
@@ -121,9 +121,8 @@ export const ExpandedShop = ({
         }
       }
     };
-
     fetchShopDetails();
-  }, [selectedPin]);
+  }, [shopId]);
 
   useEffect(() => {
     const startGlow = Animated.loop(
@@ -179,8 +178,7 @@ export const ExpandedShop = ({
     },
     onPanResponderMove: (_, gestureState) => {
       const nextTranslateX = width * currentScreen.current + gestureState.dx;
-      const underlineTranslation =
-        -(width / 2 * currentScreen.current) - 15 - gestureState.dx / 2;
+      const underlineTranslation = -(width / 2 * currentScreen.current) - 15 - gestureState.dx / 2;
 
       if (
         (currentScreen.current === 0 && gestureState.dx > 0) ||
@@ -271,7 +269,7 @@ export const ExpandedShop = ({
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end'}}>
       <View style={type==0?modalStyle.container:styles.expandedContainer}>
-        {loading || !shopDetails ? (
+        {loading || !shopDetails || !distance ? (
           <View style={modalStyle.loadingContainer}>
             <Animated.View style={[{height:250, width:'100%'},{backgroundColor: animatedBackgroundColor }]} />
             <View style={{alignContent:'center', justifyContent:'center', flex:1}}>
@@ -282,7 +280,7 @@ export const ExpandedShop = ({
           <ShopScrollView
           headerBackgroundColor={{ light: 'rgba(64, 124, 156, 1)', dark: 'rgba(64, 124, 156, 1)' }}
           headerImage={<Image source={{ uri: shopDetails.banner }} style={modalStyle.image} resizeMode="contain"/>}
-          name={selectedPin.name}
+          name={shopDetails.name}
           description={shopDetails.description}
           setExpansion={setExpansion}
           >
@@ -291,9 +289,9 @@ export const ExpandedShop = ({
                 <View>
                   <View style={modalStyle.infoRow}>
                     <Ionicons name={'location-outline'} color={'white'} size={25}/>
-                    <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{openMap({lat:selectedPin.latitude, lng:selectedPin.longitude, label:'Open maps'})}}>
+                    <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{openMap({lat:shopDetails.latitude, lng:shopDetails.longitude, label:'Open maps'})}}>
                       <View style={{flex:1}}>
-                        <Text style={modalStyle.underline_infoText}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+                        <Text style={modalStyle.underline_infoText}>{shopDetails.location.city}, {shopDetails.location.state}</Text>
                         <Text style={modalStyle.sub_infoText}>{distance} miles away</Text>
                       </View>
                       <Ionicons name='arrow-forward' style={{transform:[{rotate:'-45deg'}], marginRight:10}} color={'white'} size={25} />
@@ -307,13 +305,15 @@ export const ExpandedShop = ({
                   </View>
                   <View style={{flexDirection:'column', flex:1}}>
                     <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{setExpandHours(!expandHours)}}>
-                      <Text style={shopStatus.status == 'Open'? modalStyle.openText: modalStyle.closedText}>{shopStatus.status}</Text>
+                      <Text style={getShopStatus(shopDetails.shop_hours).status == 'Open'? modalStyle.openText: modalStyle.closedText}>
+                        {getShopStatus(shopDetails.shop_hours).status}
+                      </Text>
                       <Ionicons name='chevron-up' size={25} color={'white'}  style={{transform:[{rotate:!expandHours?'90deg':'180deg'}], marginRight:10}}/>
                     </TouchableOpacity>
                     <View>
                       <Collapsible collapsed={!expandHours}>
                         <View style={{marginBottom:10, gap:2}}>
-                          {selectedPin.shop_hours.map((shopDay, index)=>{
+                          {shopDetails.shop_hours.map((shopDay, index)=>{
                             if(shopDay.open && shopDay.close){
                               return(
                                 <View style={modalStyle.hoursContainer} key={index}>
@@ -364,7 +364,7 @@ export const ExpandedShop = ({
                     </View>
                   </View>
               </View>
-              { (plan?.exp_rewardsAvail && plan?.reward_planAvail) &&
+              {(plan?.exp_rewardsAvail && plan?.reward_planAvail) &&
               <View style={{width:'100%',backgroundColor:'white'}}>
                 <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
                   <View style={modalStyle.toggleSection}>
@@ -381,9 +381,9 @@ export const ExpandedShop = ({
                 <View style={styles.subHeader}>
                   <View style={styles.titleContainer}>
                     <View style={styles.logo}>
-                      <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: selectedPin.preview}}/>
+                      <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: shopDetails.logo}}/>
                     </View>
-                    <Text style={styles.text1}>{selectedPin.name}</Text>
+                    <Text style={styles.text1}>{shopDetails.name}</Text>
                   </View>
                   <TouchableOpacity onPress={handleLike}>
                     <TabBarIcon color={color_pallete[2]} name={liked?'heart':'heart-outline'} />
@@ -400,8 +400,7 @@ export const ExpandedShop = ({
 };
 
 // The modal wrapper component
-export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type }: PrevwiewShopProps) => {
-
+export const ExpandedModalShop = ({ shopId, setExpansion, isExpanded, type }: PreviewPropShops) => {
   return (
     <Modal
       animationType="slide"
@@ -411,7 +410,7 @@ export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type 
     >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
         <ExpandedShop
-          selectedPin={selectedPin}
+          shopId={shopId}
           type={type}
           setExpansion={setExpansion} 
           isExpanded={isExpanded}        

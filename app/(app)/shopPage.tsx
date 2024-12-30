@@ -13,48 +13,10 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-
 export default function shopPage() {
-  const { shopPreviewCache } = localData();
-  const { parentPage } = useLocalSearchParams<{ parentPage: string }>();
-
-  if(shopPreviewCache){
-    return(
-      <View style={{ flex: 1 }}>
-        <View>
-          <SafeAreaView />
-          <View style={[styles.header, {paddingBottom:5}]}>
-              <SafeAreaView />
-              <TouchableOpacity style={styles.headerContainerButton} onPress={()=>{router.back()}}>
-                <Ionicons name={'chevron-back'} size={16} color={color_pallete[2]}/>
-                <Text style={styles.headerText}>
-                  Back to {parentPage}
-                </Text>
-              </TouchableOpacity>
-            </View>
-        </View>
-        {shopPreviewCache?
-        <View style={{ flex: 1 }}>
-          <ExpandedShop 
-          selectedPin={shopPreviewCache} 
-          isExpanded={true} 
-          setExpansion={undefined} 
-          type={1} 
-          />
-        </View>
-        :
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>
-            <ActivityIndicator />
-          </Text>
-        </View>
-      }
-      </View>
-    )
-  }
-  
+  const { parentPage, shop_id } = useLocalSearchParams<{ parentPage: string, shop_id:string }>();
   return(
-    <View>
+    <View style={{flex:1}}>
       <View>
         <SafeAreaView />
         <View style={[styles.header, {paddingBottom:5}]}>
@@ -62,15 +24,15 @@ export default function shopPage() {
             <TouchableOpacity style={styles.headerContainerButton} onPress={()=>{router.back()}}>
               <Ionicons name={'chevron-back'} size={16} color={color_pallete[2]}/>
               <Text style={styles.headerText}>
-                Back
+                Return to {parentPage}
               </Text>
             </TouchableOpacity>
           </View>
       </View>
-      {shopPreviewCache?
+      {shop_id?
       <View style={{ flex: 1 }}>
         <ExpandedShop 
-        selectedPin={shopPreviewCache} 
+        shopId={shop_id} 
         isExpanded={true} 
         setExpansion={undefined} 
         type={1} 
@@ -78,9 +40,7 @@ export default function shopPage() {
       </View>
       :
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>
-          <ActivityIndicator />
-        </Text>
+        <ActivityIndicator />
       </View>
     }
     </View>
