@@ -7,7 +7,7 @@ import { ExpandedModalShop, ShopPreview } from '../../../components/shopPreview'
 import { SvgXml } from 'react-native-svg';
 import { handStar } from '@/assets/images/MR-logos';
 import { localData } from '@/app-data/appData';
-import { regionProp, shopPreview } from '@/app-data/data-types';
+import { regionProp, ShopPreviewProps } from '@/app-data/data-types';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
@@ -18,7 +18,7 @@ export default function mapPage() {
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
 
-  const [selectedPin, setSelectedPin] = useState<shopPreview | null>(null);
+  const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false); 
   const [pinsRendered, setPinsRendered] = useState(false); 
@@ -40,7 +40,7 @@ export default function mapPage() {
     translateY.setValue(containerHeight);
   },[containerHeight])
 
-  const openModal = (selectedPin?:shopPreview, pos?:number) => {
+  const openModal = (selectedPin?:ShopPreviewProps, pos?:number) => {
     if(selectedPin && pos!== undefined){
       setSelectedPin(selectedPin);
       flatListRef.current?.scrollToIndex({index:pos, animated:false})
@@ -264,14 +264,17 @@ export default function mapPage() {
               onScrollBeginDrag={() => setIsFlatListScrolling(true)}
               onScrollEndDrag={() => setIsFlatListScrolling(false)}
               onMomentumScrollEnd={() => setIsFlatListScrolling(false)}
+              initialNumToRender={10}
+              maxToRenderPerBatch={10}
+              onEndReachedThreshold={0.8}
             />
         </Animated.View>      
         {isExpanded &&  selectedPin &&
           <ExpandedModalShop 
-            selectedPin={selectedPin}
-            isExpanded={isExpanded}
-            setExpansion={setIsExpanded}
-            type={0}
+          isExpanded={isExpanded}
+          setExpansion={setIsExpanded}
+          type={0} 
+          shopId={selectedPin.shop_id}  
         />}
         {(!mapLoaded || containerHeight===1 || !pinsRendered) && (
           <View style={styles.mapLoading}>
