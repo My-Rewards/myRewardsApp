@@ -286,20 +286,28 @@ export const modalStyle = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#FFF',
+    backgroundColor: 'white',
     borderWidth: 2,
     borderColor: color_pallete[2],
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf:'center',
+    marginHorizontal:-2,
   },
   circleText: {
     color: '#835C3B',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 14
   },
   line: {
-    height: 2,
+    height: 10,
+    backgroundColor: color_pallete[11],
+  },
+  completion: {
     backgroundColor: color_pallete[2],
+    height:'100%',
+    top:0,
+    left:0
   },
   visitsText:{
     color:color_pallete[3],

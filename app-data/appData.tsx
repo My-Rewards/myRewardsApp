@@ -15,7 +15,7 @@ import {
 } from 'react';
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
-import { Plan, Profile, regionProp, shop, shopPreview } from './data-types';
+import { Plan, PreviewPlanProp, Profile, regionProp, ShopPreviewProps } from './data-types';
 import Map from 'react-native-maps';
 
 const DataContext = createContext<{
@@ -26,13 +26,13 @@ const DataContext = createContext<{
     locateMe: (map:React.RefObject<Map>) => void; 
     setRegion:(location:regionProp) => void;
     region:regionProp;
-    radiusShops?: shopPreview[] | null;
-    discoverShopsFilter1?: shopPreview[] | null;
-    discoverShopsFilter2?: shopPreview[] | null;
-    discoverShopsFilter3?: shopPreview[] | null;
-    shopPreviewCache?:shopPreview|null
+    radiusShops?: ShopPreviewProps[] | null;
+    discoverShopsFilter1?: ShopPreviewProps[] | null;
+    discoverShopsFilter2?: ShopPreviewProps[] | null;
+    discoverShopsFilter3?: ShopPreviewProps[] | null;
+    shopPreviewCache?:ShopPreviewProps|null
     profile?: Profile|null;
-    plans?:Plan[]|null;
+    plans?:PreviewPlanProp[]|null;
     isPage1Loading: boolean;
     isPage2Loading: boolean;
     isPage3Loading: boolean;
@@ -77,11 +77,14 @@ const DataContext = createContext<{
   }
 
   export function AppData({ children, userSub }: PropsWithChildren & { userSub: string }) {    const { alert } = useProps();
-    const [radiusShops, setRadiusShops] = useState<shopPreview[]|null>();    
+    const [radiusShops, setRadiusShops] = useState<ShopPreviewProps[]|null>();    
     const [profile, setProfile] = useState<Profile|null>();
-    const [plans, setPlans] = useState<Plan[]|null>();
-    const [filteredPlans, setFilteredPlans] = useState<Plan[]|null>();
     const [userLocation, setUserLocation] = useState<regionProp|null>(null);
+
+    // plans never gets updated (sort with filteredPlans)
+    const [plans, setPlans] = useState<PreviewPlanProp[]|null>();
+    const [filteredPlans, setFilteredPlans] = useState<PreviewPlanProp[]|null>();
+
     const [region, setRegion] = useState({
         latitude: 28.5384,
         longitude: -81.3789,
@@ -100,9 +103,9 @@ const DataContext = createContext<{
     const [fetchingPage3, setFetchingPage3] = useState(false);
     const [fetchingPage4, setFetchingPage4] = useState(false);
 
-    const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<shopPreview[]|null>();
-    const [discoverShopsFilter2, setDiscoverShopsFilter2] = useState<shopPreview[]|null>();
-    const [discoverShopsFilter3, setDiscoverShopsFilter3] = useState<shopPreview[]|null>();
+    const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<ShopPreviewProps[]|null>();
+    const [discoverShopsFilter2, setDiscoverShopsFilter2] = useState<ShopPreviewProps[]|null>();
+    const [discoverShopsFilter3, setDiscoverShopsFilter3] = useState<ShopPreviewProps[]|null>();
 
     useEffect(() => {
       const fetchData = async () => {

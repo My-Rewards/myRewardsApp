@@ -13,7 +13,7 @@ import {
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
 import { ShopPreview } from '@/components/shopPreview';
-import { shopPreview, shop } from '@/app-data/data-types';
+import { ShopPreviewProps, shop } from '@/app-data/data-types';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -62,7 +62,6 @@ export default function index() {
 
   const loadMoreData = async () => {
     if (!loadingMore) {
-      console.log('fetching more data...');
       try {
         setLoadingMore(true);
         await fetchDiscoverShops(savedFilterSelection, 1);
@@ -120,7 +119,7 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
 
 const ShopPreviews = React.memo((
   { discoverShops, loadMoreData }: 
-  {discoverShops:shopPreview[]| null | undefined, loadMoreData:() => Promise<void>}) => {
+  {discoverShops:ShopPreviewProps[]| null | undefined, loadMoreData:() => Promise<void>}) => {
 
   const { isPage1Loading } = localData();
 
@@ -146,9 +145,9 @@ const ShopPreviews = React.memo((
           scrollEventThrottle={20}
           showsVerticalScrollIndicator={false}
         >
-          {discoverShops.map((shop: shopPreview, index: number) => (
+          {discoverShops.map((shop: ShopPreviewProps, index: number) => (
             <View key={index} style={{ marginHorizontal: 15 }}>
-              <TouchableOpacity onPress={()=>openShopPage(shop.id)}>
+              <TouchableOpacity onPress={()=>openShopPage(shop.shop_id)}>
                 <ShopPreview 
                 selectedPin={shop} 
                 type={1} />
@@ -160,7 +159,7 @@ const ShopPreviews = React.memo((
     );
   }else{
     return(
-    <View style={{flex:1}}>
+    <View style={styles.loading}>
       <ActivityIndicator />
     </View>
     )
@@ -168,6 +167,12 @@ const ShopPreviews = React.memo((
 });
 
 const styles = StyleSheet.create({
+  loading:{
+    flex:1,
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+  },
   filterBar: {
     position: 'relative',
     display: 'flex',
@@ -199,11 +204,6 @@ const styles = StyleSheet.create({
     width: width / 3 + 30,
     backgroundColor: color_pallete[0],
     borderRadius: 20,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loadingMore: {
     paddingVertical: 20,

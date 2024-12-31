@@ -11,15 +11,15 @@ export interface ShopHour {
   close: string | null;
 }
 
-export interface shopPreview {
+export interface ShopPreviewProps {
   id: string; 
   organization_id: string; 
-  location_id: string;
+  shop_id: string;
   preview:string;
   name:string;
   latitude: number;
   longitude: number;
-  liked:boolean;
+  favorite:boolean;
   location:{
     city:string,
     state:string
@@ -27,15 +27,22 @@ export interface shopPreview {
   shop_hours: ShopHour[];
 }
 
+export interface OrganizationProps{
+  name: string;
+  description:string;
+  banner: string;
+  logo: string;
+}
+
 export interface shop {
-  id: string; 
+  shop_id: string; 
   organization_id: string; 
   location_id: string;
   geohash: string;
   name:string;
   banner: string;
   logo:string;
-  liked:boolean;
+  favorite:boolean;
   menu:string|undefined;
   phoneNumber:string;
   description:string;
@@ -96,6 +103,22 @@ export interface Plan{
   organization_id:string
   reward_planAvail:boolean,
   exp_rewardsAvail:boolean,
+  firstPlan:boolean,
+  activePlan:boolean,
+  redeemableRewards:string[],
+  bonusRewards?: Reward[],
+}
+
+export interface PlanProps{
+  id:string,
+  reward_plan:RewardSystem,
+  visits:number,
+  points:number,
+  organization_id:string
+  shop_id: string,
+  favorite:boolean,
+  reward_planAvail:boolean,
+  exp_rewardsAvail:boolean,
   name:string,
   firstPlan:boolean,
   activePlan:boolean,
@@ -103,6 +126,6 @@ export interface Plan{
   bonusRewards?: Reward[],
 }
 
-export interface PlanPreviewProps extends Plan{
-  liked:boolean
+export interface PreviewPlanProp extends PlanProps{
+  banner: string,
 }
