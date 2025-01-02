@@ -246,7 +246,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
             { day: "Sunday", open: null, close: null },
           ],
         });
-      }else{
+      }else if(shop_id === shopIds[2]){
         resolve({
           organization_id: organizationIds[2],
           name: shopNames[2],
@@ -260,6 +260,35 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           description:orgDescription[2],
+          favorite:false,
+          location: {
+            city: 'Gainesville',
+            state: 'Florida'
+          },
+          shop_hours: [
+            { day: "Monday", open: "08:00", close: "20:00" },
+            { day: "Tuesday", open: "08:00", close: "20:00" },
+            { day: "Wednesday", open: "08:00", close: "20:00" },
+            { day: "Thursday", open: "08:00", close: "20:00" },
+            { day: "Friday", open: "08:00", close: "22:00" },
+            { day: "Saturday", open: "09:00", close: "22:00" },
+            { day: "Sunday", open: null, close: null },
+          ],
+        });
+      }else{
+        resolve({
+          organization_id: organizationIds[3],
+          name: shopNames[3],
+          shop_id,
+          latitude: 29.6569,
+          longitude: -82.3214,
+          location_id: "loc789",
+          geohash: "dr5regw3n",
+          menu:'https://www.mock-menu-link.com',
+          phoneNumber:'5612331223',
+          banner: "https://picsum.photos/300/200",
+          logo: 'https://picsum.photos/200',
+          description:orgDescription[3],
           favorite:false,
           location: {
             city: 'Gainesville',
@@ -523,10 +552,10 @@ export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
       const samplePlan4: PlanProps = 
       {
         reward_plan: rewardTemplates[3],
-        visits: visits[3],
-        points: points[3],
-        firstPlan:false,
-        activePlan:true,
+        visits: 0,
+        points: 0,
+        firstPlan:true,
+        activePlan:false,
         redeemableRewards:[],
         reward_planAvail:true,
         exp_rewardsAvail:true,
@@ -732,3 +761,19 @@ const generateShopHours = () => [
   { day: "Saturday", open: "09:00", close: "22:00" },
   { day: "Sunday", open: null, close: null },
 ];
+
+export const mockfetchNearestShop = (org_id:string, region: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number;}): Promise<string> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if(org_id === organizationIds[0]){
+        resolve(shopIds[0]);
+      }else if (org_id === organizationIds[1]){
+        resolve(shopIds[1]);
+      }else if(org_id === organizationIds[2]){
+        resolve(shopIds[2]);
+      }else{
+        resolve(shopIds[3]);
+      }
+    }, 500);
+  });
+};

@@ -5,6 +5,7 @@ export default () => {
   return {
     name: 'MyRewards',
     slug:'myrewardsapp',
+    scheme: "myRewards",
     plugins: [
       [
         "react-native-nfc-manager",

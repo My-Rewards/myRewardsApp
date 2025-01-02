@@ -4,10 +4,11 @@ import { useSession } from '../auth/ctx';
 import { userSignIn } from '@/params/auth';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
+import { signInWithRedirect } from 'aws-amplify/auth';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
-  const { signIn, isLoading } = useSession();
+  const { signIn, isLoading, googleSignIn } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { triggerLoadingScreen, alert } = useProps();
@@ -27,6 +28,17 @@ export default function SignIn() {
       }
     });
   };
+
+  const gsFunction = () =>{
+    googleSignIn().then((status) => {
+      if (status === 'success') {
+        router.replace('/');
+      } else if (status === 'unverified') {
+        router.replace('/verificationScreen');
+      } else {
+        alert('', 'Invalid email or password', 'error');
+      }
+    });  }
 
   return (
     <View style={styles.container}>
@@ -61,7 +73,7 @@ export default function SignIn() {
       <GoogleSigninButton
         size={GoogleSigninButton.Size.Standard}
         color={GoogleSigninButton.Color.Light}
-        onPress={() => console.log('sign in with google')}
+        onPress={() => gsFunction()}
         style={styles.googleButton}
       />
       <View style={styles.signUpContainer}>

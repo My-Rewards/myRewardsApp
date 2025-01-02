@@ -16,6 +16,7 @@ import * as Linking from "expo-linking";
 import * as Haptics from 'expo-haptics';
 import { calculateDistance, convertTo12HourFormat, getShopStatus } from '@/constants/functions';
 import { useProps } from '@/app/LoadingProp/propsProvider';
+import { SafeAreaView } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -397,6 +398,11 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
+                {!plan?.activePlan && <View style={{alignSelf:'center', marginBottom:'20%', width:'100%'}}>
+                  <TouchableOpacity style={styles.startPlanBttn}>
+                    <Text style={styles.startPlanBttnText}>Start Plan</Text>
+                  </TouchableOpacity>
+                </View>}
               </View>
             </View>
           </ShopScrollView>
@@ -545,7 +551,7 @@ export const ExpandedPlan = ({
   const planSection = () => {
     if (plan) {
       return (
-        <View>
+        <View style={{flex:1, flexDirection:'column'}}>
           <Animated.View
             style={[modalStyle.wrapper, 
               (plan.reward_planAvail && plan.exp_rewardsAvail)?

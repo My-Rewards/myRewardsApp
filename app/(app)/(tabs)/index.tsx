@@ -8,7 +8,8 @@ import {
   Dimensions, 
   ActivityIndicator, 
   TouchableOpacity, 
-  ScrollView 
+  ScrollView, 
+  FlatList
 } from 'react-native';
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
@@ -137,24 +138,28 @@ const ShopPreviews = React.memo((
   if(discoverShops){
     return (
       <View style={{flex:1, width:'100%', height:'100%', zIndex:100}}>
-        <ScrollView
-          overScrollMode="always"
-          bounces={true}
-          style={{ flex: 1, width: '100%', height:'100%' }}
-          onScrollEndDrag={handleScroll}
-          scrollEventThrottle={20}
-          showsVerticalScrollIndicator={false}
-        >
-          {discoverShops.map((shop: ShopPreviewProps, index: number) => (
-            <View key={index} style={{ marginHorizontal: 15 }}>
-              <TouchableOpacity onPress={()=>openShopPage(shop.shop_id)}>
-                <ShopPreview 
-                selectedPin={shop} 
-                type={1} />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
+        <FlatList
+        data={discoverShops}
+        horizontal={false}
+        renderItem={({item})=>(
+          <View key={item.id} style={{ marginHorizontal: 15 }}>
+            <TouchableOpacity onPress={()=>openShopPage(item.shop_id)}>
+              <ShopPreview 
+              selectedPin={item} 
+              type={1} />
+            </TouchableOpacity>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, width: '100%', height:'100%' }}
+        scrollEventThrottle={20}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        onScrollEndDrag={handleScroll}
+        keyExtractor={item => item.id}
+        removeClippedSubviews={false}
+        windowSize={2}
+        />
       </View>
     );
   }else{

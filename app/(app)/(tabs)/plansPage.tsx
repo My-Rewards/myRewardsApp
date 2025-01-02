@@ -56,7 +56,7 @@ export default function plansPage() {
   };
 
   const openShopPage = (org_id:string) =>{
-    router.push({ pathname: "/planPage", params:{ parentPage:'Plans', org_id }});
+    router.push({ pathname: "/shopPage", params:{ parentPage:'Plans', org_id }});
   }
 
   return(
@@ -217,9 +217,9 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
           <Text style={previewPlanStyle.orgText}>{plan.name}</Text>
           <TouchableOpacity onPress={()=>handleLike()}>
             {liked?
-            <Ionicons name='heart' color='white'size={30}/>
+            <Ionicons name='heart' color='white'size={25}/>
             :
-            <Ionicons name='heart-outline' color={'white'} size={30}/>
+            <Ionicons name='heart-outline' color={'white'} size={25}/>
             }
           </TouchableOpacity>
         </View>
@@ -355,22 +355,23 @@ const styles = StyleSheet.create({
   },
   card:{
     alignSelf:'center',
-    width:'90%',
+    backgroundColor:'transparent',
+    width:'94%',
     borderRadius:10,
-    shadowColor:'black',
+  },
+  cardContainer:{
+    backgroundColor:color_pallete[5],
+    justifyContent:'center',
+    gap:15,
+    padding:8,
+    paddingBottom:20,
+    borderRadius:10,
+        shadowColor:'black',
     shadowOffset:{
       height:3,width:0
     },
     shadowOpacity:0.3,
     shadowRadius:3
-  },
-  cardContainer:{
-    backgroundColor:color_pallete[5],
-    justifyContent:'center',
-    gap:20,
-    padding:10,
-    paddingBottom:20,
-    borderRadius:10
   }
 });
 
@@ -436,12 +437,13 @@ const previewPlanStyle = StyleSheet.create({
   text:{
     fontFamily:'Avenir Next',
     fontWeight:'500',
-    color:'white'
+    color:'white',
+    fontSize:12
   },
   visitContainer:{
     position:'absolute', 
     right:-10, 
-    bottom:-6,
+    bottom:-7,
     width:18,
     height:18,
     backgroundColor:'white',
@@ -480,7 +482,7 @@ const previewPlanStyle = StyleSheet.create({
     marginHorizontal:20,
     flexDirection:'row',
     justifyContent:'space-between',
-    alignItems:'center'
+    alignItems:'center',
   },
   orgText:{
     fontFamily: 'Avenir Next',

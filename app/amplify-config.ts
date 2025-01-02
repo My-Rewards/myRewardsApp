@@ -8,15 +8,16 @@ export const amplifyConfiguration:ResourcesConfig = {
       identityPoolId:process.env.EXPO_PUBLIC_IDENTITY_POOL_ID||'',
       loginWith: { 
         oauth: {
-          domain: process.env.EXPO_PUBLIC_COGNITO_DOMAIN||'',
+          domain: `${process.env.EXPO_PUBLIC_COGNITO_DOMAIN}.auth.us-east-1.amazoncognito.com`,
           scopes: ['openid','email','profile'],
-          redirectSignIn: ['exp://127.0.0.1:19000/--/'],
-          redirectSignOut: ['exp://127.0.0.1:19000/--/'],
+          redirectSignIn: ['exp://127.0.0.1:19000/--/', 'myRewards://'],
+          redirectSignOut: ['exp://127.0.0.1:19000/--/', 'myRewards://'],
           responseType: 'code',
+          providers: ['Google'] 
         },
         email: true,
         phone: false,
-      }
+      },
     }
   }
 }

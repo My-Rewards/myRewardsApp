@@ -147,6 +147,22 @@ export const styles = StyleSheet.create({
       borderRadius:10, 
       borderColor:'white', 
       overflow:'hidden'
+    },
+    startPlanBttn:{
+      borderWidth:3, 
+      borderColor:color_pallete[5], 
+      width:'70%',
+      textAlign:'center',
+      alignItems:'center',
+      alignSelf:'center',
+      padding:10,
+      borderRadius:10
+    },
+    startPlanBttnText:{
+      fontFamily:'Avenir Next',
+      fontSize:16,
+      fontWeight:'600',
+      color:color_pallete[5]
     }
 });
   
@@ -413,9 +429,11 @@ export const dropDown = StyleSheet.create({
     rewardContainer:{
       paddingVertical:15,
       paddingHorizontal:10,
+      paddingRight:15,
       justifyContent:'space-between',
       flexDirection:'row',
-      alignItems:"center"
+      alignItems:"center",
+      backgroundColor:color_pallete[7]
     },
     rewardText:{
       fontFamily:'Avenir Next',
@@ -432,7 +450,7 @@ export const dropDown = StyleSheet.create({
       fontSize:12,
       fontWeight:'500',
       fontFamily:'Avenir Next',
-    }
+    },
 })
 
 export const milestoneStyle = StyleSheet.create({

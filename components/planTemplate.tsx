@@ -81,15 +81,17 @@ const categorizeRewards = ({road_map, visits, redeemableRewards}:CategorizeProps
     .map(key => Number(key))
     .filter(milestone => !isNaN(milestone));
 
+
     return milestones.map((milestone) => {
         const tier_id = road_map[milestone].id
+        const redeemable = redeemableRewards.includes(tier_id);
       
-        if (milestone <= visits && !redeemableRewards.includes(tier_id)) {
-          return { milestone, status: "passed", rewards: road_map[milestone] };
-        } else if (redeemableRewards.includes(tier_id) || milestone <= visits ) {
-          return { milestone, status: "current", rewards: road_map[milestone] };
+        if (milestone <= visits && !redeemable) {
+          return { milestone, status: "passed", rewards: road_map[milestone], redeemable};
+        } else if (redeemable || milestone <= visits ) {
+          return { milestone, status: "current", rewards: road_map[milestone], redeemable };
         } else {
-          return { milestone, status: "upcoming", rewards: road_map[milestone] };
+          return { milestone, status: "upcoming", rewards: road_map[milestone], redeemable };
         }
       });
 };
@@ -105,13 +107,14 @@ const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:bool
                             <View style={dropDown.seperaterLine} />
                         )}   
                         <View key={index} 
-                        style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[7]}]:[dropDown.rewardContainer]}>
+                        style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[6]}]:[dropDown.rewardContainer]}>
                             <Text style={dropDown.rewardText}> {rewardOption}</Text>
-                            {redeemable &&
+                            {redeemable ?
                                 <TouchableOpacity style={dropDown.redeemBtn}>
                                     <Text style={dropDown.redeemText}>Redeem</Text>
-                                </TouchableOpacity>
-                            }
+                                </TouchableOpacity>:
+                                <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
+                                }
                         </View>
                         {index < rewardList.length - 1 && (
                             <View style={dropDown.seperaterLine} />
@@ -179,7 +182,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
         if(!plan.activePlan && plan.firstPlan){
             return(
                 <Text style={modalStyle.visitsText}>
-                    Start Your Plan now and Get 
+                    Start Your Plan now!
                 </Text>
             )
         }
@@ -210,7 +213,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
             {/* Drop Down */}
             <View style={[modalStyle.roadmapContainer, {marginTop:10}]}>
                 <Animated.View style={dropDown.container}>
-                    {taggedRewards.map(({ status, rewards }, index) => (
+                    {taggedRewards.map(({ status, rewards, redeemable }, index) => (
                         <React.Fragment key={index}>
                         {status === 'passed' && (
                             <TouchableOpacity activeOpacity={1} style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[6]}]}>
@@ -236,7 +239,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <ListRewards 
                                         rewardList={rewards.rewards} 
                                         option={0} 
-                                        redeemable={tillNextRew === 0}
+                                        redeemable={redeemable}
                                     />
                                 </Collapsible>
                             </View>
@@ -254,7 +257,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
                                 </TouchableOpacity>
                                 <Collapsible collapsed={selectedIndex !== index}>
-                                    <ListRewards rewardList={rewards.rewards} option={1} redeemable={false}/>
+                                    <ListRewards rewardList={rewards.rewards} option={1} redeemable={redeemable}/>
                                 </Collapsible>
                             </View>
                         )}

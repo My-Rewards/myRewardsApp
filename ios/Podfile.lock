@@ -1,6 +1,8 @@
 PODS:
   - AmplifyRTNCore (1.1.6):
     - React-Core
+  - AmplifyRTNWebBrowser (1.1.1):
+    - React-Core
   - AppAuth (1.7.6):
     - AppAuth/Core (= 1.7.6)
     - AppAuth/ExternalUserAgent (= 1.7.6)
@@ -2049,6 +2051,7 @@ PODS:
 
 DEPENDENCIES:
   - "AmplifyRTNCore (from `../node_modules/@aws-amplify/react-native`)"
+  - "AmplifyRTNWebBrowser (from `../node_modules/@aws-amplify/rtn-web-browser`)"
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EASClient (from `../node_modules/expo-eas-client/ios`)
@@ -2173,6 +2176,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AmplifyRTNCore:
     :path: "../node_modules/@aws-amplify/react-native"
+  AmplifyRTNWebBrowser:
+    :path: "../node_modules/@aws-amplify/rtn-web-browser"
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -2385,6 +2390,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AmplifyRTNCore: fed43e0ab4504c7ae49291204c3c704da4963255
+  AmplifyRTNWebBrowser: 56813d9858f5d196d096a598aa9aa8651c7863fd
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385

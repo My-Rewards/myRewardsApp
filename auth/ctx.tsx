@@ -1,7 +1,7 @@
 import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
-import { signIn, signUp, fetchAuthSession, signOut } from 'aws-amplify/auth'
+import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect } from 'aws-amplify/auth'
 import { userSignIn, userSignUp} from '@/params/auth';
-
+import 'aws-amplify/auth/enable-oauth-listener';
 /* 
   Serves to check authentication inclosing the app, each time a new screen is triggered this code is referenced and checks
   to see if the user is still autenticated.
@@ -12,12 +12,14 @@ import { userSignIn, userSignUp} from '@/params/auth';
 const AuthContext = createContext<{
   signIn: (profile: userSignIn) => Promise<string>; 
   signUp: (profile: userSignUp) => Promise<boolean>; 
+  googleSignIn: ()=> Promise<string>,
   signOut: () => void;
   userSub: string|null;
   isLoading: boolean;
 }>({
   signIn: async () => 'error',
   signUp: async () => false,
+  googleSignIn: async () => 'error',
   signOut: async () => null,
   userSub: null,
   isLoading: false,
@@ -152,6 +154,15 @@ export function SessionProvider({ children }: PropsWithChildren) {
             setFetching(false); 
             return false;
           }
+        },
+        googleSignIn: async() =>{
+          try{
+            const status = await signInWithRedirect({ provider: "Google" })
+            console.log(status)
+          }catch(error){
+            console.log(error)
+          }
+          return 'success'
         },
         signOut: () => {
           signOut();
