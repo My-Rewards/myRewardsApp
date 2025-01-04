@@ -5,7 +5,7 @@ export default () => {
   return {
     name: 'MyRewards',
     slug:'myrewardsapp',
-    scheme: "myRewards",
+    scheme: "myrewards",
     plugins: [
       [
         "react-native-nfc-manager",
@@ -53,6 +53,12 @@ export default () => {
           ? "988bf54c-1d84-4d0b-a539-7be1ee48f0dd"
           : "4e3dda5a-96f6-4d5f-89fe-af470de180a8",
       },
+      userPoolId: process.env.USERPOOL_ID,
+      webClientId: process.env.WEB_CLIENT_ID,
+      cognitoDomain: process.env.COGNITO_DOMAIN,
+      identityPoolId: process.env.IDENTITY_POOL_ID,
+      awsRegion: process.env.AWS_REGION,
+      appEnv: process.env.APP_ENV,
     },
     owner: "myrewards",
     updates: {
