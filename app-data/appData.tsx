@@ -91,12 +91,6 @@ const DataContext = createContext<{
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
-    const [furthestFetch, setFurthestFetch] = useState({
-      latitude: 28.5384,
-      longitude: -81.3789,
-      latitudeDelta: 0.005,
-      longitudeDelta: 0.005,
-    });
 
     const [fetchingPage1, setFetchingPage1] = useState(false);
     const [fetchingPage2, setFetchingPage2] = useState(false);
@@ -132,11 +126,10 @@ const DataContext = createContext<{
             setFetchingPage2(true);
             try {
               // Replace mock API with actual API
-              // set discover and maps to same value because theyre identical upon load
+              // set discover and maps to same value because theyre identical upon load until we figure more optimal method
               const shops1 = await mockDiscoverShops(userSub, region)
               setDiscoverShopsFilter1(shops1);
               setRadiusShops(shops1);
-
               const shops2 = await mockPopularShops(userSub, 0, region)
               setDiscoverShopsFilter2(shops2);
               const shops3 = await mockFavoriteShops(userSub, 0, region)
@@ -238,11 +231,7 @@ const DataContext = createContext<{
                   switch (filterOption) {
                     case 0:
                       const shop1 = await mockDiscoverShops(userSub, region)
-                      if(pagination>0){
-                        setDiscoverShopsFilter1((prevShops) => [...(prevShops || []), ...shop1]);
-                        }else{
-                        setDiscoverShopsFilter1(shop1)
-                      }
+                      setDiscoverShopsFilter1(shop1)
                       setFetchingPage1(false)
                       break;
                     case 1:

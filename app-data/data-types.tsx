@@ -128,4 +128,5 @@ export interface PlanProps{
 
 export interface PreviewPlanProp extends PlanProps{
   banner: string,
+  logo:string
 }

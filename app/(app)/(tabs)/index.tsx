@@ -61,26 +61,29 @@ export default function index() {
     }
   };
 
-  const loadMoreData = async () => {
-    if (!loadingMore) {
-      try {
-        setLoadingMore(true);
-        await fetchDiscoverShops(savedFilterSelection, 1);
-      } catch (error) {
-        console.error("Error fetching more shops:", error);
-      } finally {
-        setLoadingMore(false);
-      }
-    }
-  };
+  // TBD on wheter/when this will be implemented
+
+  // const loadMoreData = async () => {
+  //   if (!loadingMore) {
+  //     try {
+  //       setLoadingMore(true);
+  //       await fetchDiscoverShops(savedFilterSelection, 1);
+  //     } catch (error) {
+  //       console.error("Error fetching more shops:", error);
+  //     } finally {
+  //       setLoadingMore(false);
+  //     }
+  //   }
+  // };
 
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
       {!loadingNewFilter? 
         <ShopPreviews 
-          discoverShops={sendShopOption()} 
-          loadMoreData={loadMoreData}
+          discoverShops={sendShopOption()}
+          filterSelection={savedFilterSelection} 
+          // loadMoreData={loadMoreData}
         />:
         <View style={{flex:1}}>
           <ActivityIndicator />
@@ -118,18 +121,17 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
   </View>
 ));
 
-const ShopPreviews = React.memo((
-  { discoverShops, loadMoreData }: 
-  {discoverShops:ShopPreviewProps[]| null | undefined, loadMoreData:() => Promise<void>}) => {
+const ShopPreviews = React.memo(({discoverShops, filterSelection}:{discoverShops:ShopPreviewProps[]| null | undefined, filterSelection:number}) => {
+  // loadMoreData:() => Promise<void>
 
-  const { isPage1Loading } = localData();
+  const { isPage1Loading, fetchDiscoverShops} = localData();
 
-  const handleScroll = async (event: any) => {
-    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
-      loadMoreData(); 
-    }
-  };
+  // const handleScroll = async (event: any) => {
+  //   const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+  //   if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
+  //     loadMoreData(); 
+  //   }
+  // };
 
   const openShopPage = (shop_id:string) =>{
     router.push({ pathname: "/shopPage", params:{ parentPage:'Discover', shop_id }});
@@ -155,10 +157,12 @@ const ShopPreviews = React.memo((
         scrollEventThrottle={20}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
-        onScrollEndDrag={handleScroll}
         keyExtractor={item => item.id}
         removeClippedSubviews={false}
+        refreshing={isPage1Loading}
+        onRefresh={()=>{fetchDiscoverShops(filterSelection,0)}}
         windowSize={2}
+        // onScrollEndDrag={handleScroll}
         />
       </View>
     );

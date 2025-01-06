@@ -7,8 +7,8 @@ import {
   Dimensions, 
   ActivityIndicator, 
   TouchableOpacity,
-  ScrollView,
-  Image
+  Image,
+  FlatList
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { color_pallete } from '@/constants/Colors';
@@ -18,8 +18,6 @@ import { SvgXml } from 'react-native-svg';
 import { mediumLogo } from '@/assets/images/MR-logos';
 import { router } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Haptics from 'expo-haptics';
-import { useProps } from '@/app/LoadingProp/propsProvider';
 
 const { width } = Dimensions.get('window');
 
@@ -93,23 +91,45 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
 });
 
 const PlansPreview = React.memo(({ plansData, isLoading, openShop }:PlansPreviewProps) => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      console.log('Data refreshed!');
+      setRefreshing(false);
+    }, 1000);
+  };
 
   if (!isLoading && plansData) {
     return (
-      <ScrollView style={{flex:1, width:'100%'}} showsVerticalScrollIndicator={false}>
+      <View 
+      style={{flex:1, width:'100%'}}>
         {plansData && plansData.length !== 0? 
-          <View  style={styles.previewContainer}>
-            <TouchableOpacity style={styles.discoverButton} onPress={()=>router.navigate('/')}>
-              <Text style={styles.btnText}>discover more</Text>
+          <FlatList
+            data={plansData}
+            horizontal={false}
+            renderItem={({item}:{item:PreviewPlanProp})=>(
+            <TouchableOpacity onPress={()=>openShop(item.organization_id)} key={item.id} style={styles.card}>
+              <PlanPreviewCard plan={item} />
             </TouchableOpacity>
-            {          
-              plansData.map((plan:PreviewPlanProp) => (
-                <TouchableOpacity onPress={()=>openShop(plan.organization_id)} key={plan.id} style={styles.card}>
-                  <PlanPreviewCard plan={plan} />
-                </TouchableOpacity>
-              ))
-            }
-          </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            style={{flex: 1, width: '100%', height:'100%', paddingTop:10}}
+            scrollEventThrottle={20}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            keyExtractor={item => item.id}
+            removeClippedSubviews={false}
+            refreshing={isLoading}
+            onRefresh={()=>{onRefresh()}}
+            windowSize={2}
+            ListFooterComponent={()=>(
+              <TouchableOpacity style={styles.discoverButton} onPress={()=>router.navigate('/')}>
+                <Text style={styles.btnText}>discover more</Text>
+              </TouchableOpacity>
+            )}
+            />
         :
         (
           <View style={styles.empty}>
@@ -125,7 +145,7 @@ const PlansPreview = React.memo(({ plansData, isLoading, openShop }:PlansPreview
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
+      </View>
     );
   }
   else {
@@ -143,7 +163,6 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
   const [parentWidth, setParentWidth] = useState<number | null>(null);
   const [checkpoints, setCheckPoints] = useState<number[] | null>(null);
   const [liked, setLiked] = useState<boolean>(plan.favorite);
-  const { alert } = useProps();
 
   useEffect(()=>{
     if(plan.reward_plan.road_map){
@@ -155,13 +174,6 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
     }
   },[])
 
-  const handleLike = () =>{
-    if(!liked){
-      alert('Saved to favorites! ', '', 'success')
-    }
-    setLiked(!liked)
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-  }
   
   const PointStatus: React.FC<PlansVisitMap> = ({ milestone, index, numMilestones, parentWidth, checkpoints }) => {   
     const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
@@ -191,15 +203,15 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
             </View>
           )}
           {plan.visits >= checkpoint && !rewardRedeemable ? (
-          <View style={[previewPlanStyle.circle, { backgroundColor: 'white' }]}>
-              <Ionicons name="checkmark" color={color_pallete[5]} />
+          <View style={[previewPlanStyle.circle, {backgroundColor:color_pallete[2], borderColor: color_pallete[2]}]}>
+              <Ionicons name="checkmark" color={'white'} />
           </View>
           ) : rewardRedeemable ?(                            
-          <View style={[previewPlanStyle.circle, {backgroundColor:'white'}]}>
-              <Ionicons name="star" color={color_pallete[5]} />
+          <View style={[previewPlanStyle.circle, {backgroundColor:color_pallete[2], borderColor: color_pallete[2]}]}>
+              <Ionicons name="star" color={'white'} />
           </View>
           ):(
-          <View style={[previewPlanStyle.circle]}>
+          <View style={[previewPlanStyle.circle, {borderColor: color_pallete[11]}]}>
               <Text style={previewPlanStyle.circleText}>{checkpoint}</Text>
           </View>
           )}
@@ -208,56 +220,69 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
   }
   
   return(
-    <View>
+    <View style={{marginVertical:10}}>
       <View style={previewPlanStyle.imageContainer}>
         <Image style={previewPlanStyle.image} source={{uri: plan.banner}} resizeMode="cover"/>
       </View>
-      <View style={styles.cardContainer}>
-        <View style={previewPlanStyle.orgContainer}>
-          <Text style={previewPlanStyle.orgText}>{plan.name}</Text>
-          <TouchableOpacity onPress={()=>handleLike()}>
-            {liked?
-            <Ionicons name='heart' color='white'size={25}/>
-            :
-            <Ionicons name='heart-outline' color={'white'} size={25}/>
-            }
-          </TouchableOpacity>
+      <View style={previewPlanStyle.logoContainer}>
+        <View style={previewPlanStyle.logoPosition}>
+          <Image style={previewPlanStyle.logo} source={{uri: plan.logo}} resizeMode="cover"/>
         </View>
-        {milestonePlan && (
-          <View
-            style={{ position: 'relative', width: '100%' }}
-            onLayout={(event) => {
-              const containerWidth = event.nativeEvent.layout.width;
-              setParentWidth(containerWidth);
-            }}
-          >
-            <View style={previewPlanStyle.roadmapContainer}>
-              <View style={previewPlanStyle.roadmap}>
-                {parentWidth && checkpoints &&
-                  milestonePlan.map((milestone, index) => (
-                    <PointStatus
-                      milestone={milestone}
-                      index={index}
-                      key={index}
-                      numMilestones={milestonePlan.length}
-                      parentWidth={parentWidth}
-                      checkpoints={checkpoints}
-                    />
-                  ))}
-              </View>
+      </View>
+      <View style={{
+        shadowColor:'black',
+        shadowOffset:{
+          height:3,width:0
+        },
+        shadowOpacity:0.3,
+        shadowRadius:3
+      }}>
+        <View style={styles.cardContainer}>
+          <View style={previewPlanStyle.orgContainer}>
+            <Text style={previewPlanStyle.orgText}>{plan.name}</Text>
+            <View>
+              {liked?
+              <Ionicons name='heart' color={color_pallete[2]} size={25}/>
+              :
+              null
+              }
             </View>
           </View>
-        )}
-        {expenditurePlan && (
-          <View style={previewPlanStyle.barConatiner}>
-              <Text style={previewPlanStyle.text}>{plan.points}</Text>
-              <View style={previewPlanStyle.bar}>
-                  <View style={[previewPlanStyle.darker, {width:`${Math.round((plan.points/expenditurePlan.expenditure) * 100)}%`}]}/>
+          {milestonePlan && (
+            <View
+              style={{ position: 'relative', width: '100%' }}
+              onLayout={(event) => {
+                const containerWidth = event.nativeEvent.layout.width;
+                setParentWidth(containerWidth);
+              }}
+            >
+              <View style={previewPlanStyle.roadmapContainer}>
+                <View style={previewPlanStyle.roadmap}>
+                  {parentWidth && checkpoints &&
+                    milestonePlan.map((milestone, index) => (
+                      <PointStatus
+                        milestone={milestone}
+                        index={index}
+                        key={index}
+                        numMilestones={milestonePlan.length}
+                        parentWidth={parentWidth}
+                        checkpoints={checkpoints}
+                      />
+                    ))}
+                </View>
               </View>
-              <Text style={previewPlanStyle.text}>{expenditurePlan.expenditure}</Text>
-          </View>
-        )}
-
+            </View>
+          )}
+          {expenditurePlan && (
+            <View style={previewPlanStyle.barConatiner}>
+                <Text style={previewPlanStyle.text}>{plan.points}</Text>
+                <View style={previewPlanStyle.bar}>
+                    <View style={[previewPlanStyle.darker, {width:`${Math.round((plan.points/expenditurePlan.expenditure) * 100)}%`}]}/>
+                </View>
+                <Text style={previewPlanStyle.text}>{expenditurePlan.expenditure}</Text>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   )
@@ -279,6 +304,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+    backgroundColor:color_pallete[10]
   },
   filterText: {
     fontFamily: 'Avenir Next',
@@ -314,19 +340,19 @@ const styles = StyleSheet.create({
     height:'100%',
     flex:1,
     paddingVertical:'10%',
-    gap:'0%'
+    gap:14
   },
   discoverButton:{
     borderRadius:10,
-    borderWidth:1.5, 
-    borderColor:color_pallete[5],
+    backgroundColor:color_pallete[5],
     alignSelf:'center',
     width:'80%',
     padding:10,
-    marginBottom:'5%',
+    marginVertical:50,
+    marginBottom:80
   },
   btnText:{
-    color:color_pallete[5],
+    color:'white',
     fontFamily:'Avenir Next',
     fontSize:18,
     alignSelf:'center',
@@ -360,18 +386,18 @@ const styles = StyleSheet.create({
     borderRadius:10,
   },
   cardContainer:{
-    backgroundColor:color_pallete[5],
+    backgroundColor:color_pallete[10],
     justifyContent:'center',
     gap:15,
     padding:8,
     paddingBottom:20,
-    borderRadius:10,
-        shadowColor:'black',
-    shadowOffset:{
-      height:3,width:0
-    },
-    shadowOpacity:0.3,
-    shadowRadius:3
+    paddingTop:25,
+    borderBottomLeftRadius:10,
+    borderBottomRightRadius:10,
+    borderLeftWidth:1,
+    borderBottomWidth:1, 
+    borderRightWidth:1,
+    borderColor:color_pallete[3],
   }
 });
 
@@ -394,29 +420,28 @@ const previewPlanStyle = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 15,
-    backgroundColor: color_pallete[5],
+    backgroundColor: 'white',
     borderWidth: 2,
-    borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal:-2,
   },
   circleText: {
-    color: 'white',
+    color: color_pallete[2],
     fontWeight: '600',
     fontSize: 12,
   },
   line: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: color_pallete[11],
   },
   completion: {
     height: 4,
-    backgroundColor: 'white',
+    backgroundColor: color_pallete[2],
   },
   bar:{
     flex:1,
-    backgroundColor:color_pallete[6],
+    backgroundColor:color_pallete[11],
     height:14,
     alignSelf:'center',
     borderRadius:3,
@@ -429,7 +454,7 @@ const previewPlanStyle = StyleSheet.create({
     marginHorizontal:'6%',
   },
   darker:{
-    backgroundColor:'white',
+    backgroundColor:color_pallete[2],
     height:'100%',
     position:'absolute',
     left:0
@@ -437,7 +462,7 @@ const previewPlanStyle = StyleSheet.create({
   text:{
     fontFamily:'Avenir Next',
     fontWeight:'500',
-    color:'white',
+    color:color_pallete[2],
     fontSize:12
   },
   visitContainer:{
@@ -446,7 +471,7 @@ const previewPlanStyle = StyleSheet.create({
     bottom:-7,
     width:18,
     height:18,
-    backgroundColor:'white',
+    backgroundColor:color_pallete[2],
     borderRadius:10,
     justifyContent:'center'
   },
@@ -455,27 +480,48 @@ const previewPlanStyle = StyleSheet.create({
     fontWeight:'800',
     alignSelf:'center',
     textAlign:'center',
-    color:color_pallete[5],
+    color:'white',
   },
   header:{
     fontSize:18,
     fontWeight:'600',
     fontFamily: 'Avenir Next',
-    color:'white'
+    color:'white',
+    shadowOpacity:0
   },
   imageContainer: {
     justifyContent: 'flex-start',
     width: '100%',
     backgroundColor: '#f0f0f0',
-    bottom:-20,
     borderTopRightRadius:10,
     borderTopLeftRadius:10,
+    overflow:'hidden'
+  },
+  logoContainer:{
+    height:0,
+    width: '100%',
+    overflow:'visible',
+    marginLeft:20,
+    zIndex:100
+  },
+  logoPosition:{
+    position:'absolute',
+    height:60,
+    top:-40,
+    borderRadius:100,
+    borderWidth:2,
+    borderColor:color_pallete[2],
     overflow:'hidden'
   },
   image: {
     width: '100%',
     height: undefined,
     aspectRatio: 2,
+    backgroundColor:'gray',
+  },
+  logo:{
+    height: '100%',
+    aspectRatio: 1,
     backgroundColor:'gray',
   },
   orgContainer:{
@@ -486,8 +532,8 @@ const previewPlanStyle = StyleSheet.create({
   },
   orgText:{
     fontFamily: 'Avenir Next',
-    color:'white',
+    color:color_pallete[2],
     fontWeight:'600',
-    fontSize:18,
+    fontSize:20,
   },
 });

@@ -30,6 +30,8 @@ export const styles = StyleSheet.create({
       backgroundColor:'white',
       flex:1,
       margin:10,
+      borderWidth:1,
+      borderColor:color_pallete[0],
       borderRadius:10,
       width:'100%',
       alignSelf:'center',
@@ -110,7 +112,14 @@ export const styles = StyleSheet.create({
     },
     heartButton:{
       padding:4,
-      borderRadius:20
+      borderRadius:20,
+      shadowRadius:3,
+      shadowColor:color_pallete[2],
+      shadowOpacity:1,
+      shadowOffset:{
+        height:0,
+        width:0
+      }
     },
     miniHeader:{
       flexDirection:'row',
