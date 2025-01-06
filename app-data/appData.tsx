@@ -21,7 +21,7 @@ import Map from 'react-native-maps';
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
     fetchDiscoverShops: (filterOption:number, pagination:number) => void;
-    fetchPlans: (filterOption:number)=>void;
+    fetchPlans: ()=>void;
     fetchProfile: () => void; 
     locateMe: (map:React.RefObject<Map>) => void; 
     setRegion:(location:regionProp) => void;
@@ -33,6 +33,7 @@ const DataContext = createContext<{
     shopPreviewCache?:ShopPreviewProps|null
     profile?: Profile|null;
     plans?:PreviewPlanProp[]|null;
+    favoritePlans?:PreviewPlanProp[]|null;
     isPage1Loading: boolean;
     isPage2Loading: boolean;
     isPage3Loading: boolean;
@@ -59,6 +60,7 @@ const DataContext = createContext<{
       },
     profile:null,
     plans:null,
+    favoritePlans:null,
     isPage1Loading: false,
     isPage2Loading: false,
     isPage3Loading: false,
@@ -83,7 +85,7 @@ const DataContext = createContext<{
 
     // plans never gets updated (sort with filteredPlans)
     const [plans, setPlans] = useState<PreviewPlanProp[]|null>();
-    const [filteredPlans, setFilteredPlans] = useState<PreviewPlanProp[]|null>();
+    const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]|null>();
 
     const [region, setRegion] = useState({
         latitude: 28.5384,
@@ -122,7 +124,6 @@ const DataContext = createContext<{
           }
     
           if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3)) {
-            setFetchingPage1(true);
             setFetchingPage2(true);
             try {
               // Replace mock API with actual API
@@ -130,6 +131,7 @@ const DataContext = createContext<{
               const shops1 = await mockDiscoverShops(userSub, region)
               setDiscoverShopsFilter1(shops1);
               setRadiusShops(shops1);
+
               const shops2 = await mockPopularShops(userSub, 0, region)
               setDiscoverShopsFilter2(shops2);
               const shops3 = await mockFavoriteShops(userSub, 0, region)
@@ -138,7 +140,6 @@ const DataContext = createContext<{
             } catch (error) {
               console.error('Error fetching discover shops:', error);
             } finally {
-              setFetchingPage1(false);
               setFetchingPage2(false);
             }
           }
@@ -149,7 +150,9 @@ const DataContext = createContext<{
               // Replace mock API with actual API
               const plansData = await mockPlans(userSub);
               setPlans(plansData);
-              setFilteredPlans(plansData)
+
+              // find favorites and set it
+              setFavoritePlans([])
             } catch (error) {
               console.error('Error fetching plans:', error);
             } finally {
@@ -260,24 +263,16 @@ const DataContext = createContext<{
                   console.error("Error fetching shops:", error);
                 }
             },
-            fetchPlans: async (filterOption:number) => {
+            fetchPlans: async () => {
               // this will sort plans to show only the favorite 
               try{
                 setFetchingPage3(true)
-                if(!profile) return;
-                
-                switch (filterOption) {
-                  case 0:
-                    setFilteredPlans(plans)
-                    setFetchingPage3(false)
-                    break;
-                  case 1:
-                    setFilteredPlans([])
-                    setFetchingPage3(false)
-                    break;
-                  default:
-                    throw new Error("Invalid filter option");
-                }
+                const fetchedPlans = await mockPlans(userSub);
+                setPlans(fetchedPlans)
+                // Filter Plans again and set it
+                setFavoritePlans(fetchedPlans)
+                setFetchingPage3(false)
+
               }catch(error){
                 setFetchingPage3(false)
                 console.error("Error fetching shops:", error);
@@ -293,7 +288,8 @@ const DataContext = createContext<{
             discoverShopsFilter1,
             discoverShopsFilter2,
             discoverShopsFilter3,
-            plans:filteredPlans,
+            plans:plans,
+            favoritePlans:favoritePlans,
             region,
             profile,
             userLocation,

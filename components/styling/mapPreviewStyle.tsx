@@ -113,13 +113,6 @@ export const styles = StyleSheet.create({
     heartButton:{
       padding:4,
       borderRadius:20,
-      shadowRadius:3,
-      shadowColor:color_pallete[2],
-      shadowOpacity:1,
-      shadowOffset:{
-        height:0,
-        width:0
-      }
     },
     miniHeader:{
       flexDirection:'row',

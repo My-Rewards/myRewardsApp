@@ -107,7 +107,7 @@ const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:bool
                             <View style={dropDown.seperaterLine} />
                         )}   
                         <View key={index} 
-                        style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[6]}]:[dropDown.rewardContainer]}>
+                        style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[7]}]:[dropDown.rewardContainer]}>
                             <Text style={dropDown.rewardText}> {rewardOption}</Text>
                             {redeemable ?
                                 <TouchableOpacity style={dropDown.redeemBtn}>

@@ -25,6 +25,7 @@ type PlansPreviewProps = {
   plansData: PreviewPlanProp[] |null|undefined; 
   isLoading: boolean;
   openShop:(shop_id: string)=>void;
+  fetchPlans: (filterOption: number) => void;
 }
 
 type PlansVisitMap = {
@@ -37,7 +38,8 @@ type PlansVisitMap = {
 
 export default function plansPage() {  
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { plans, fetchPlans, isPage3Loading} = localData();
+  const { plans, favoritePlans, fetchPlans, isPage3Loading} = localData();
+  const [filterOption, setFilterOption] = useState(0)
 
   const handlePress = (filterSelection: number) => {
     Animated.timing(slideAnim, {
@@ -46,7 +48,7 @@ export default function plansPage() {
       useNativeDriver: true,
     }).start(() => {
       try {
-        fetchPlans(filterSelection);
+        setFilterOption(filterSelection)
       } catch (error) {
         console.error("Error fetching shops:", error);
       }
@@ -60,7 +62,7 @@ export default function plansPage() {
   return(
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress}/>
-      <PlansPreview plansData={plans} isLoading={isPage3Loading} openShop={openShopPage}/>
+      <PlansPreview plansData={filterOption===0?plans:favoritePlans} isLoading={isPage3Loading} openShop={openShopPage} fetchPlans={fetchPlans}/>
     </View>
   )
 }
@@ -90,18 +92,14 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
   );
 });
 
-const PlansPreview = React.memo(({ plansData, isLoading, openShop }:PlansPreviewProps) => {
+const PlansPreview = React.memo(({ plansData, isLoading, openShop, fetchPlans }:PlansPreviewProps) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      console.log('Data refreshed!');
-      setRefreshing(false);
-    }, 1000);
+    fetchPlans(0)
   };
 
-  if (!isLoading && plansData) {
+  if (plansData) {
     return (
       <View 
       style={{flex:1, width:'100%'}}>
@@ -230,6 +228,8 @@ const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
         </View>
       </View>
       <View style={{
+        backgroundColor:color_pallete[10],
+        borderRadius:10,
         shadowColor:'black',
         shadowOffset:{
           height:3,width:0
@@ -428,7 +428,7 @@ const previewPlanStyle = StyleSheet.create({
   },
   circleText: {
     color: color_pallete[2],
-    fontWeight: '600',
+    fontWeight: '500',
     fontSize: 12,
   },
   line: {
@@ -441,7 +441,7 @@ const previewPlanStyle = StyleSheet.create({
   },
   bar:{
     flex:1,
-    backgroundColor:color_pallete[11],
+    backgroundColor:color_pallete[4],
     height:14,
     alignSelf:'center',
     borderRadius:3,
@@ -454,7 +454,7 @@ const previewPlanStyle = StyleSheet.create({
     marginHorizontal:'6%',
   },
   darker:{
-    backgroundColor:color_pallete[2],
+    backgroundColor:color_pallete[3],
     height:'100%',
     position:'absolute',
     left:0
@@ -462,7 +462,7 @@ const previewPlanStyle = StyleSheet.create({
   text:{
     fontFamily:'Avenir Next',
     fontWeight:'500',
-    color:color_pallete[2],
+    color:color_pallete[3],
     fontSize:12
   },
   visitContainer:{
@@ -477,7 +477,7 @@ const previewPlanStyle = StyleSheet.create({
   },
   visitText:{
     fontSize:12, 
-    fontWeight:'800',
+    fontWeight:'500',
     alignSelf:'center',
     textAlign:'center',
     color:'white',
@@ -533,7 +533,7 @@ const previewPlanStyle = StyleSheet.create({
   orgText:{
     fontFamily: 'Avenir Next',
     color:color_pallete[2],
-    fontWeight:'600',
+    fontWeight:'700',
     fontSize:20,
   },
 });

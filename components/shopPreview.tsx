@@ -60,7 +60,18 @@ export const ShopPreview = ({selectedPin, type}: MiniPreviewPropShops) => {
               {
                 selectedPin.favorite &&
                   <View style={[styles.heartButton]}> 
-                    <Ionicons name='heart' size={16} color={type==0?color_pallete[10]:color_pallete[10]}/>
+                    <Ionicons 
+                      name='heart' 
+                      size={type==0?16:20} 
+                      color={type==0?color_pallete[10]:color_pallete[10]} 
+                      style={{      
+                        shadowRadius:3,
+                        shadowColor:color_pallete[2],
+                        shadowOpacity:1,
+                        shadowOffset:{
+                          height:0,
+                          width:0
+                      }}}/>
                   </View>
                 }
             </View>
