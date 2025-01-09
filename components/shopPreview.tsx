@@ -1,8 +1,8 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { View, Text, TouchableOpacity, Animated, Modal, Dimensions, Image, ActivityIndicator, PanResponder, Platform} from 'react-native';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { Plan, shop, ShopHour, shopPreview } from '@/app-data/data-types';
-import { mockPlan, mockShop } from '@/APIs/api';
+import { Plan, OrganizationProps, shop, ShopPreviewProps } from '@/app-data/data-types';
+import { mockOrg, mockPlan, mockShop } from '@/APIs/api';
 import ShopScrollView from './ShopScrollView';
 import { localData } from '@/app-data/appData';
 import {modalStyle, styles} from './styling/mapPreviewStyle'
@@ -16,16 +16,24 @@ import * as Linking from "expo-linking";
 import * as Haptics from 'expo-haptics';
 import { calculateDistance, convertTo12HourFormat, getShopStatus } from '@/constants/functions';
 import { useProps } from '@/app/LoadingProp/propsProvider';
+import { SafeAreaView } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-type ShopPreviewProps = {
-  selectedPin: shopPreview;
+type MiniPreviewPropShops = {
+  selectedPin: ShopPreviewProps;
   type:number
 };
 
-type PrevwiewShopProps = {
-  selectedPin: shopPreview;
+type PreviewPropShops = {
+  shopId: string;
+  isExpanded:boolean;
+  setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
+  type:number
+};
+
+type PreviewPropPlans = {
+  orgId: string;
   isExpanded:boolean;
   setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
   type:number
@@ -37,8 +45,9 @@ type OpenMapArgs = {
   label: string;
 };
 
-export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
-  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude)
+export const ShopPreview = ({selectedPin, type}: MiniPreviewPropShops) => {
+  const { userLocation } = localData();
+  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude, userLocation)
   const shopStatus = getShopStatus(selectedPin.shop_hours);
 
   return (
@@ -49,15 +58,26 @@ export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
             <Image style={{height:'100%', resizeMode:'cover',}} source={{uri: selectedPin.preview}}/>
             <View style={{position:'absolute', margin:5}}>
               {
-                selectedPin.liked &&
-                  <View style={[styles.heartButton, type==0?{backgroundColor:color_pallete[2]}:{backgroundColor:color_pallete[2]}]}> 
-                    <Ionicons name='heart' size={16} color={type==0?color_pallete[10]:color_pallete[10]}/>
+                selectedPin.favorite &&
+                  <View style={[styles.heartButton]}> 
+                    <Ionicons 
+                      name='heart' 
+                      size={type==0?16:20} 
+                      color={type==0?color_pallete[10]:color_pallete[10]} 
+                      style={{      
+                        shadowRadius:3,
+                        shadowColor:color_pallete[2],
+                        shadowOpacity:1,
+                        shadowOffset:{
+                          height:0,
+                          width:0
+                      }}}/>
                   </View>
                 }
             </View>
           </View>
           <View style={{flex:type==0?0.6:0.5, flexDirection:'column'}}>
-            <View style={[styles.miniHeader, type==0?{borderBottomColor:color_pallete[2], padding:6}:{borderBottomColor:color_pallete[2]}]}>
+            <View style={[styles.miniHeader, type==0?{borderBottomColor:color_pallete[2], padding:6}:{borderBottomColor:color_pallete[0]}]}>
               <Text style={[styles.headerText, type==0?{color:color_pallete[2]}:{color:color_pallete[2]}]}>{selectedPin.name}</Text>
             </View>
             <View style={{padding:10, flex:1, flexDirection:'column', gap:10}}>
@@ -82,17 +102,18 @@ export const ShopPreview = ({selectedPin, type}: ShopPreviewProps) => {
 
 // The reusable content component
 export const ExpandedShop = ({
-  selectedPin,
+  shopId,
   type,
   setExpansion,
-}: PrevwiewShopProps) => {
+}: PreviewPropShops) => {
   const { alert } = useProps();
-  const { profile } = localData();
+  const { profile, userLocation } = localData();
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [liked, setLiked] = useState<boolean>(false);
   const [expandHours, setExpandHours] = useState<boolean>(false);
+  const [distance, setDistance] = useState<string |null>(null);
 
   const [loading, setLoading] = useState(false);
   const backgroundColor = useRef(new Animated.Value(0)).current;
@@ -101,18 +122,16 @@ export const ExpandedShop = ({
   const translateX = useRef(new Animated.Value(0)).current;
   const currentScreen = useRef(0);
 
-  const distance = calculateDistance(selectedPin.latitude, selectedPin.longitude);
-  const shopStatus = getShopStatus(selectedPin.shop_hours);
-
   useEffect(() => {
     const fetchShopDetails = async () => {
       if (profile) {
         setLoading(true);
         try {
-          const shopData = await mockShop(selectedPin.id, profile.id);
+          const shopData = await mockShop(shopId, profile.id);
           setShopDetails(shopData);
-          setLiked(shopData.liked);
-          const planData = await mockPlan(profile.id, shopData.id);
+          setDistance(calculateDistance(shopData.latitude, shopData.longitude, userLocation));
+          setLiked(shopData.favorite);
+          const planData = await mockPlan(profile.id, shopData.organization_id);
           setPlan(planData);
         } catch (error) {
           console.error('Error fetching shop details:', error);
@@ -121,9 +140,8 @@ export const ExpandedShop = ({
         }
       }
     };
-
     fetchShopDetails();
-  }, [selectedPin]);
+  }, [shopId]);
 
   useEffect(() => {
     const startGlow = Animated.loop(
@@ -179,8 +197,7 @@ export const ExpandedShop = ({
     },
     onPanResponderMove: (_, gestureState) => {
       const nextTranslateX = width * currentScreen.current + gestureState.dx;
-      const underlineTranslation =
-        -(width / 2 * currentScreen.current) - 15 - gestureState.dx / 2;
+      const underlineTranslation = -(width / 2 * currentScreen.current) - 15 - gestureState.dx / 2;
 
       if (
         (currentScreen.current === 0 && gestureState.dx > 0) ||
@@ -271,7 +288,7 @@ export const ExpandedShop = ({
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end'}}>
       <View style={type==0?modalStyle.container:styles.expandedContainer}>
-        {loading || !shopDetails ? (
+        {loading || !shopDetails || !distance ? (
           <View style={modalStyle.loadingContainer}>
             <Animated.View style={[{height:250, width:'100%'},{backgroundColor: animatedBackgroundColor }]} />
             <View style={{alignContent:'center', justifyContent:'center', flex:1}}>
@@ -282,7 +299,7 @@ export const ExpandedShop = ({
           <ShopScrollView
           headerBackgroundColor={{ light: 'rgba(64, 124, 156, 1)', dark: 'rgba(64, 124, 156, 1)' }}
           headerImage={<Image source={{ uri: shopDetails.banner }} style={modalStyle.image} resizeMode="contain"/>}
-          name={selectedPin.name}
+          name={shopDetails.name}
           description={shopDetails.description}
           setExpansion={setExpansion}
           >
@@ -291,9 +308,9 @@ export const ExpandedShop = ({
                 <View>
                   <View style={modalStyle.infoRow}>
                     <Ionicons name={'location-outline'} color={'white'} size={25}/>
-                    <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{openMap({lat:selectedPin.latitude, lng:selectedPin.longitude, label:'Open maps'})}}>
+                    <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{openMap({lat:shopDetails.latitude, lng:shopDetails.longitude, label:'Open maps'})}}>
                       <View style={{flex:1}}>
-                        <Text style={modalStyle.underline_infoText}>{selectedPin.location.city}, {selectedPin.location.state}</Text>
+                        <Text style={modalStyle.underline_infoText}>{shopDetails.location.city}, {shopDetails.location.state}</Text>
                         <Text style={modalStyle.sub_infoText}>{distance} miles away</Text>
                       </View>
                       <Ionicons name='arrow-forward' style={{transform:[{rotate:'-45deg'}], marginRight:10}} color={'white'} size={25} />
@@ -307,13 +324,15 @@ export const ExpandedShop = ({
                   </View>
                   <View style={{flexDirection:'column', flex:1}}>
                     <TouchableOpacity style={modalStyle.internalInfoRow} activeOpacity={1} onPress={()=>{setExpandHours(!expandHours)}}>
-                      <Text style={shopStatus.status == 'Open'? modalStyle.openText: modalStyle.closedText}>{shopStatus.status}</Text>
+                      <Text style={getShopStatus(shopDetails.shop_hours).status == 'Open'? modalStyle.openText: modalStyle.closedText}>
+                        {getShopStatus(shopDetails.shop_hours).status}
+                      </Text>
                       <Ionicons name='chevron-up' size={25} color={'white'}  style={{transform:[{rotate:!expandHours?'90deg':'180deg'}], marginRight:10}}/>
                     </TouchableOpacity>
                     <View>
                       <Collapsible collapsed={!expandHours}>
                         <View style={{marginBottom:10, gap:2}}>
-                          {selectedPin.shop_hours.map((shopDay, index)=>{
+                          {shopDetails.shop_hours.map((shopDay, index)=>{
                             if(shopDay.open && shopDay.close){
                               return(
                                 <View style={modalStyle.hoursContainer} key={index}>
@@ -364,7 +383,7 @@ export const ExpandedShop = ({
                     </View>
                   </View>
               </View>
-              { (plan?.exp_rewardsAvail && plan?.reward_planAvail) &&
+              {(plan?.exp_rewardsAvail && plan?.reward_planAvail) &&
               <View style={{width:'100%',backgroundColor:'white'}}>
                 <Animated.View style={[{left:highlightPosition}, modalStyle.toggleHighlight]}/>
                   <View style={modalStyle.toggleSection}>
@@ -381,15 +400,20 @@ export const ExpandedShop = ({
                 <View style={styles.subHeader}>
                   <View style={styles.titleContainer}>
                     <View style={styles.logo}>
-                      <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: selectedPin.preview}}/>
+                      <Image style={{flex:1, backgroundColor:'gray'}} source={{uri: shopDetails.logo}}/>
                     </View>
-                    <Text style={styles.text1}>{selectedPin.name}</Text>
+                    <Text style={styles.text1}>{shopDetails.name}</Text>
                   </View>
                   <TouchableOpacity onPress={handleLike}>
                     <TabBarIcon color={color_pallete[2]} name={liked?'heart':'heart-outline'} />
                   </TouchableOpacity>
                 </View>
                 {planSection()}
+                {!plan?.activePlan && <View style={{alignSelf:'center', marginBottom:'20%', width:'100%'}}>
+                  <TouchableOpacity style={styles.startPlanBttn}>
+                    <Text style={styles.startPlanBttnText}>Start Plan</Text>
+                  </TouchableOpacity>
+                </View>}
               </View>
             </View>
           </ShopScrollView>
@@ -400,8 +424,7 @@ export const ExpandedShop = ({
 };
 
 // The modal wrapper component
-export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type }: PrevwiewShopProps) => {
-
+export const ExpandedModalShop = ({ shopId, setExpansion, isExpanded, type }: PreviewPropShops) => {
   return (
     <Modal
       animationType="slide"
@@ -411,7 +434,7 @@ export const ExpandedModalShop = ({ selectedPin, setExpansion, isExpanded, type 
     >
       <View style={{ flex: 1, justifyContent: 'flex-end' }}>
         <ExpandedShop
-          selectedPin={selectedPin}
+          shopId={shopId}
           type={type}
           setExpansion={setExpansion} 
           isExpanded={isExpanded}        

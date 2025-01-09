@@ -18,7 +18,7 @@ type Props = PropsWithChildren<{
   headerBackgroundColor: { dark: string; light: string };
   name:string;
   description:string;
- setExpansion?: Dispatch<SetStateAction<boolean>> | undefined;
+  setExpansion?: Dispatch<SetStateAction<boolean>> | undefined;
 }>;
 
 export default function ShopScrollView({
@@ -74,7 +74,9 @@ export default function ShopScrollView({
       scrollEventThrottle={16} 
       showsVerticalScrollIndicator={false} 
       bounces={true}
-      onScroll={(scroll)=>{
+      disableScrollViewPanResponder={true}
+      keyboardShouldPersistTaps="handled"
+      onScroll={()=>{
         if(scrollOffset.value <-height*.12){
           setExpansion && setExpansion(false);
         }

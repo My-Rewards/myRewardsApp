@@ -18,6 +18,7 @@ export const color_pallete = [
   'rgba(163, 241, 161, 1)',
   'rgba(255, 158, 151, 1)',
   'rgba(255, 251, 246, 1)',
+  'rgba(127, 81, 58,0.5)',
 ]
 
 export const toast_pallete= [

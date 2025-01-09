@@ -18,10 +18,13 @@ export default function SignUp() {
   }, [isLoading]);
 
   const userSignUpData = {
-    email: email,
-    password: password,
-    firstName: 'FirstName',
-    lastName: 'LastName',
+    email: 'test@gmail.com',
+    password: 'Testing@123',
+    birthdate: '1990-01-01',
+    fullName: {
+      firstName:'John',
+      lastName:'Doe'
+    }
   };
 
   const signUpFunc = async () => {

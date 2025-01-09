@@ -6,20 +6,40 @@ import {
   StyleSheet, 
   Dimensions, 
   ActivityIndicator, 
-  TouchableOpacity 
+  TouchableOpacity,
+  Image,
+  FlatList
 } from 'react-native';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
-import { Plan } from '@/app-data/data-types';
+import { ExpentiureProps, PreviewPlanProp, Tier } from '@/app-data/data-types';
 import { SvgXml } from 'react-native-svg';
 import { mediumLogo } from '@/assets/images/MR-logos';
+import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
+type PlansPreviewProps = {
+  plansData: PreviewPlanProp[] |null|undefined; 
+  isLoading: boolean;
+  openShop:(shop_id: string)=>void;
+  fetchPlans: (filterOption: number) => void;
+}
+
+type PlansVisitMap = {
+  milestone:[string, Tier], 
+  index:number, 
+  numMilestones:number, 
+  parentWidth:number,
+  checkpoints:number[]
+}
+
 export default function plansPage() {  
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { plans, fetchPlans, isPage3Loading} = localData();
+  const { plans, favoritePlans, fetchPlans, isPage3Loading} = localData();
+  const [filterOption, setFilterOption] = useState(0)
 
   const handlePress = (filterSelection: number) => {
     Animated.timing(slideAnim, {
@@ -28,17 +48,21 @@ export default function plansPage() {
       useNativeDriver: true,
     }).start(() => {
       try {
-        fetchPlans(filterSelection);
+        setFilterOption(filterSelection)
       } catch (error) {
         console.error("Error fetching shops:", error);
       }
     });
   };
 
+  const openShopPage = (org_id:string) =>{
+    router.push({ pathname: "/shopPage", params:{ parentPage:'Plans', org_id }});
+  }
+
   return(
     <View style={styles.page}>
-      <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
-      <PlansPreview plansData={plans} isLoading={isPage3Loading}/>
+      <FilterBar slideAnim={slideAnim} handlePress={handlePress}/>
+      <PlansPreview plansData={filterOption===0?plans:favoritePlans} isLoading={isPage3Loading} openShop={openShopPage} fetchPlans={fetchPlans}/>
     </View>
   )
 }
@@ -68,25 +92,42 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
   );
 });
 
-const PlansPreview = React.memo(({ plansData, isLoading }: { plansData: Plan[]|null|undefined; isLoading: boolean }) => {
+const PlansPreview = React.memo(({ plansData, isLoading, openShop, fetchPlans }:PlansPreviewProps) => {
+  const [refreshing, setRefreshing] = useState(false);
 
-  if (!isLoading && plansData) {
+  const onRefresh = () => {
+    fetchPlans(0)
+  };
+
+  if (plansData) {
     return (
-      <View style={{flex:1, width:'100%'}}>
+      <View 
+      style={{flex:1, width:'100%'}}>
         {plansData && plansData.length !== 0? 
-          <View  style={styles.previewContainer}>
-            <TouchableOpacity style={styles.discoverButton}>
-              <Text style={styles.btnText}>discover more</Text>
+          <FlatList
+            data={plansData}
+            horizontal={false}
+            renderItem={({item}:{item:PreviewPlanProp})=>(
+            <TouchableOpacity onPress={()=>openShop(item.organization_id)} key={item.id} style={styles.card}>
+              <PlanPreviewCard plan={item} />
             </TouchableOpacity>
-            {          
-              plansData.map((plan:Plan) => (
-                <View key={plan.id}>
-                  <Text>{plan.name}</Text>
-                  <Text>{plan.points}</Text>
-                </View>
-              ))
-            }
-          </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            style={{flex: 1, width: '100%', height:'100%', paddingTop:10}}
+            scrollEventThrottle={20}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            keyExtractor={item => item.id}
+            removeClippedSubviews={false}
+            refreshing={isLoading}
+            onRefresh={()=>{onRefresh()}}
+            windowSize={2}
+            ListFooterComponent={()=>(
+              <TouchableOpacity style={styles.discoverButton} onPress={()=>router.navigate('/')}>
+                <Text style={styles.btnText}>discover more</Text>
+              </TouchableOpacity>
+            )}
+            />
         :
         (
           <View style={styles.empty}>
@@ -114,6 +155,139 @@ const PlansPreview = React.memo(({ plansData, isLoading }: { plansData: Plan[]|n
   }
 });
 
+const PlanPreviewCard = ({plan}:{plan:PreviewPlanProp}) =>{
+  const [milestonePlan, setMilestonePlan] = useState<[string, Tier][]>();
+  const [expenditurePlan, setExpenditurePlan] = useState<ExpentiureProps>();
+  const [parentWidth, setParentWidth] = useState<number | null>(null);
+  const [checkpoints, setCheckPoints] = useState<number[] | null>(null);
+  const [liked, setLiked] = useState<boolean>(plan.favorite);
+
+  useEffect(()=>{
+    if(plan.reward_plan.road_map){
+      setMilestonePlan(Object.entries(plan.reward_plan.road_map))
+      setCheckPoints(Object.entries(plan.reward_plan.road_map).map(([checkpoint]) => parseInt(checkpoint, 10)));
+    }
+    if(plan.reward_plan.exp_rewards){
+      setExpenditurePlan(plan.reward_plan.exp_rewards)
+    }
+  },[])
+
+  
+  const PointStatus: React.FC<PlansVisitMap> = ({ milestone, index, numMilestones, parentWidth, checkpoints }) => {   
+    const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
+    const checkpoint = parseInt(milestone[0],10);
+    const lineWidth = ((parentWidth - numMilestones * 25) / (numMilestones - 1)) * 0.8;
+
+    const prevCheckpoint = checkpoints
+    .filter((findCheckpoint:number) => findCheckpoint < checkpoint)
+    .pop(); 
+
+    const completion = prevCheckpoint ? plan.visits < prevCheckpoint ? 0 : plan.visits >= checkpoint ? 1 : (plan.visits%checkpoint)/checkpoint : 0;
+
+    return(
+      <View key={index} style={previewPlanStyle.stepContainer}>
+          {index > 0 && (
+            <View style={[previewPlanStyle.line, { width: lineWidth+2 }]}>
+              <View style={[
+                previewPlanStyle.completion, 
+                { width: lineWidth*(completion), position:'absolute' },
+                completion != 1 ? {borderTopRightRadius:4, borderBottomRightRadius:4}:null ]}>
+                {completion > 0 && completion < 1 && (
+                  <View style={previewPlanStyle.visitContainer}>
+                    <Text style={previewPlanStyle.visitText}>{plan.visits}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+          {plan.visits >= checkpoint && !rewardRedeemable ? (
+          <View style={[previewPlanStyle.circle, {backgroundColor:color_pallete[2], borderColor: color_pallete[2]}]}>
+              <Ionicons name="checkmark" color={'white'} />
+          </View>
+          ) : rewardRedeemable ?(                            
+          <View style={[previewPlanStyle.circle, {backgroundColor:color_pallete[2], borderColor: color_pallete[2]}]}>
+              <Ionicons name="star" color={'white'} />
+          </View>
+          ):(
+          <View style={[previewPlanStyle.circle, {borderColor: color_pallete[11]}]}>
+              <Text style={previewPlanStyle.circleText}>{checkpoint}</Text>
+          </View>
+          )}
+      </View>
+    )
+  }
+  
+  return(
+    <View style={{marginVertical:10}}>
+      <View style={previewPlanStyle.imageContainer}>
+        <Image style={previewPlanStyle.image} source={{uri: plan.banner}} resizeMode="cover"/>
+      </View>
+      <View style={previewPlanStyle.logoContainer}>
+        <View style={previewPlanStyle.logoPosition}>
+          <Image style={previewPlanStyle.logo} source={{uri: plan.logo}} resizeMode="cover"/>
+        </View>
+      </View>
+      <View style={{
+        backgroundColor:color_pallete[10],
+        borderRadius:10,
+        shadowColor:'black',
+        shadowOffset:{
+          height:3,width:0
+        },
+        shadowOpacity:0.3,
+        shadowRadius:3
+      }}>
+        <View style={styles.cardContainer}>
+          <View style={previewPlanStyle.orgContainer}>
+            <Text style={previewPlanStyle.orgText}>{plan.name}</Text>
+            <View>
+              {liked?
+              <Ionicons name='heart' color={color_pallete[2]} size={25}/>
+              :
+              null
+              }
+            </View>
+          </View>
+          {milestonePlan && (
+            <View
+              style={{ position: 'relative', width: '100%' }}
+              onLayout={(event) => {
+                const containerWidth = event.nativeEvent.layout.width;
+                setParentWidth(containerWidth);
+              }}
+            >
+              <View style={previewPlanStyle.roadmapContainer}>
+                <View style={previewPlanStyle.roadmap}>
+                  {parentWidth && checkpoints &&
+                    milestonePlan.map((milestone, index) => (
+                      <PointStatus
+                        milestone={milestone}
+                        index={index}
+                        key={index}
+                        numMilestones={milestonePlan.length}
+                        parentWidth={parentWidth}
+                        checkpoints={checkpoints}
+                      />
+                    ))}
+                </View>
+              </View>
+            </View>
+          )}
+          {expenditurePlan && (
+            <View style={previewPlanStyle.barConatiner}>
+                <Text style={previewPlanStyle.text}>{plan.points}</Text>
+                <View style={previewPlanStyle.bar}>
+                    <View style={[previewPlanStyle.darker, {width:`${Math.round((plan.points/expenditurePlan.expenditure) * 100)}%`}]}/>
+                </View>
+                <Text style={previewPlanStyle.text}>{expenditurePlan.expenditure}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
   filterBar: {
     position: 'relative',
@@ -130,6 +304,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+    backgroundColor:color_pallete[10]
   },
   filterText: {
     fontFamily: 'Avenir Next',
@@ -162,23 +337,22 @@ const styles = StyleSheet.create({
   },
   previewContainer:{
     display:'flex',
+    height:'100%',
     flex:1,
-    width:'100%',
-    justifyContent:'flex-start',
-    alignItems:'center',
-    margin:10,
-    marginVertical:40,
-    gap:30
+    paddingVertical:'10%',
+    gap:14
   },
   discoverButton:{
     borderRadius:10,
-    borderWidth:1.5, 
-    borderColor:color_pallete[5],
+    backgroundColor:color_pallete[5],
+    alignSelf:'center',
     width:'80%',
-    padding:10
+    padding:10,
+    marginVertical:50,
+    marginBottom:80
   },
   btnText:{
-    color:color_pallete[5],
+    color:'white',
     fontFamily:'Avenir Next',
     fontSize:18,
     alignSelf:'center',
@@ -204,5 +378,162 @@ const styles = StyleSheet.create({
     textAlign:'center',
     width:'70%',
     marginBottom: '8%'
+  },
+  card:{
+    alignSelf:'center',
+    backgroundColor:'transparent',
+    width:'94%',
+    borderRadius:10,
+  },
+  cardContainer:{
+    backgroundColor:color_pallete[10],
+    justifyContent:'center',
+    gap:15,
+    padding:8,
+    paddingBottom:20,
+    paddingTop:25,
+    borderBottomLeftRadius:10,
+    borderBottomRightRadius:10,
+    borderLeftWidth:1,
+    borderBottomWidth:1, 
+    borderRightWidth:1,
+    borderColor:color_pallete[3],
   }
+});
+
+const previewPlanStyle = StyleSheet.create({
+  roadmap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width:'80%',
+  },
+  roadmapContainer:{
+    width:'100%',
+    alignItems:'center'
+  },
+  stepContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  circle: {
+    width: 22,
+    height: 22,
+    borderRadius: 15,
+    backgroundColor: 'white',
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal:-2,
+  },
+  circleText: {
+    color: color_pallete[2],
+    fontWeight: '500',
+    fontSize: 12,
+  },
+  line: {
+    height: 4,
+    backgroundColor: color_pallete[11],
+  },
+  completion: {
+    height: 4,
+    backgroundColor: color_pallete[2],
+  },
+  bar:{
+    flex:1,
+    backgroundColor:color_pallete[4],
+    height:14,
+    alignSelf:'center',
+    borderRadius:3,
+    overflow:'hidden'
+  },
+  barConatiner:{
+    flexDirection:'row',
+    justifyContent:'center',
+    gap:10,
+    marginHorizontal:'6%',
+  },
+  darker:{
+    backgroundColor:color_pallete[3],
+    height:'100%',
+    position:'absolute',
+    left:0
+  },
+  text:{
+    fontFamily:'Avenir Next',
+    fontWeight:'500',
+    color:color_pallete[3],
+    fontSize:12
+  },
+  visitContainer:{
+    position:'absolute', 
+    right:-10, 
+    bottom:-7,
+    width:18,
+    height:18,
+    backgroundColor:color_pallete[2],
+    borderRadius:10,
+    justifyContent:'center'
+  },
+  visitText:{
+    fontSize:12, 
+    fontWeight:'500',
+    alignSelf:'center',
+    textAlign:'center',
+    color:'white',
+  },
+  header:{
+    fontSize:18,
+    fontWeight:'600',
+    fontFamily: 'Avenir Next',
+    color:'white',
+    shadowOpacity:0
+  },
+  imageContainer: {
+    justifyContent: 'flex-start',
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    borderTopRightRadius:10,
+    borderTopLeftRadius:10,
+    overflow:'hidden'
+  },
+  logoContainer:{
+    height:0,
+    width: '100%',
+    overflow:'visible',
+    marginLeft:20,
+    zIndex:100
+  },
+  logoPosition:{
+    position:'absolute',
+    height:60,
+    top:-40,
+    borderRadius:100,
+    borderWidth:2,
+    borderColor:color_pallete[2],
+    overflow:'hidden'
+  },
+  image: {
+    width: '100%',
+    height: undefined,
+    aspectRatio: 2,
+    backgroundColor:'gray',
+  },
+  logo:{
+    height: '100%',
+    aspectRatio: 1,
+    backgroundColor:'gray',
+  },
+  orgContainer:{
+    marginHorizontal:20,
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+  },
+  orgText:{
+    fontFamily: 'Avenir Next',
+    color:color_pallete[2],
+    fontWeight:'700',
+    fontSize:20,
+  },
 });

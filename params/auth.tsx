@@ -1,19 +1,25 @@
 export class userSignUp {
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
+    fullName:{
+      firstName: string;
+      lastName: string;
+    };
+    birthdate: string;
   
     constructor(
       email: string,
       password: string,
-      firstName: string,
-      lastName: string,
+      fullName:{
+        firstName: string;
+        lastName: string;
+      },
+      birthdate: string
     ) {
       this.email = email;
       this.password = password;
-      this.firstName = firstName;
-      this.lastName = lastName;
+      this.fullName = fullName
+      this.birthdate = birthdate;
     }
 }
 

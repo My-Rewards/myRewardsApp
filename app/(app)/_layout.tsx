@@ -27,6 +27,7 @@ export default function AppLayout() {
       }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="shopPage" options={{ headerShown: false }} />
+        <Stack.Screen name="planPage" options={{ headerShown: false }} />
       </Stack>
     </AppData>
   );

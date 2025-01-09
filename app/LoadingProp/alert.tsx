@@ -57,7 +57,7 @@ export const useAlert = () => {
   );
 
   const onHandlerStateChange = ({ nativeEvent }: any) => {
-    if (nativeEvent.translationY < hiddenPos/2) {
+    if (nativeEvent.translationY < hiddenPos/4) {
         hideAlert(); 
       } else {
         Animated.timing(slideAnim, {

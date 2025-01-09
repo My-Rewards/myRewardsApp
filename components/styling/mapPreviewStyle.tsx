@@ -30,13 +30,15 @@ export const styles = StyleSheet.create({
       backgroundColor:'white',
       flex:1,
       margin:10,
+      borderWidth:1,
+      borderColor:color_pallete[0],
       borderRadius:10,
       width:'100%',
       alignSelf:'center',
       shadowColor:'black',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.4,
-      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
     },
     expandedContainer:{
       backgroundColor:'white', 
@@ -110,7 +112,7 @@ export const styles = StyleSheet.create({
     },
     heartButton:{
       padding:4,
-      borderRadius:20
+      borderRadius:20,
     },
     miniHeader:{
       flexDirection:'row',
@@ -147,6 +149,22 @@ export const styles = StyleSheet.create({
       borderRadius:10, 
       borderColor:'white', 
       overflow:'hidden'
+    },
+    startPlanBttn:{
+      borderWidth:3, 
+      borderColor:color_pallete[5], 
+      width:'70%',
+      textAlign:'center',
+      alignItems:'center',
+      alignSelf:'center',
+      padding:10,
+      borderRadius:10
+    },
+    startPlanBttnText:{
+      fontFamily:'Avenir Next',
+      fontSize:16,
+      fontWeight:'600',
+      color:color_pallete[5]
     }
 });
   
@@ -286,20 +304,28 @@ export const modalStyle = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#FFF',
+    backgroundColor: 'white',
     borderWidth: 2,
     borderColor: color_pallete[2],
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf:'center',
+    marginHorizontal:-2,
   },
   circleText: {
     color: '#835C3B',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 14
   },
   line: {
-    height: 2,
+    height: 10,
+    backgroundColor: color_pallete[11],
+  },
+  completion: {
     backgroundColor: color_pallete[2],
+    height:'100%',
+    top:0,
+    left:0
   },
   visitsText:{
     color:color_pallete[3],
@@ -405,9 +431,11 @@ export const dropDown = StyleSheet.create({
     rewardContainer:{
       paddingVertical:15,
       paddingHorizontal:10,
+      paddingRight:15,
       justifyContent:'space-between',
       flexDirection:'row',
-      alignItems:"center"
+      alignItems:"center",
+      backgroundColor:color_pallete[7]
     },
     rewardText:{
       fontFamily:'Avenir Next',
@@ -424,7 +452,7 @@ export const dropDown = StyleSheet.create({
       fontSize:12,
       fontWeight:'500',
       fontFamily:'Avenir Next',
-    }
+    },
 })
 
 export const milestoneStyle = StyleSheet.create({

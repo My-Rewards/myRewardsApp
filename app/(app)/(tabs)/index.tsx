@@ -8,12 +8,13 @@ import {
   Dimensions, 
   ActivityIndicator, 
   TouchableOpacity, 
-  ScrollView 
+  ScrollView, 
+  FlatList
 } from 'react-native';
 import { color_pallete } from '@/constants/Colors';
 import { localData } from '@/app-data/appData';
 import { ShopPreview } from '@/components/shopPreview';
-import { shopPreview } from '@/app-data/data-types';
+import { ShopPreviewProps, shop } from '@/app-data/data-types';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -60,27 +61,29 @@ export default function index() {
     }
   };
 
-  const loadMoreData = async () => {
-    if (!loadingMore) {
-      console.log('fetching more data...');
-      try {
-        setLoadingMore(true);
-        await fetchDiscoverShops(savedFilterSelection, 1);
-      } catch (error) {
-        console.error("Error fetching more shops:", error);
-      } finally {
-        setLoadingMore(false);
-      }
-    }
-  };
+  // TBD on wheter/when this will be implemented
+
+  // const loadMoreData = async () => {
+  //   if (!loadingMore) {
+  //     try {
+  //       setLoadingMore(true);
+  //       await fetchDiscoverShops(savedFilterSelection, 1);
+  //     } catch (error) {
+  //       console.error("Error fetching more shops:", error);
+  //     } finally {
+  //       setLoadingMore(false);
+  //     }
+  //   }
+  // };
 
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
       {!loadingNewFilter? 
         <ShopPreviews 
-          discoverShops={sendShopOption()} 
-          loadMoreData={loadMoreData}
+          discoverShops={sendShopOption()}
+          filterSelection={savedFilterSelection} 
+          // loadMoreData={loadMoreData}
         />:
         <View style={{flex:1}}>
           <ActivityIndicator />
@@ -118,50 +121,54 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
   </View>
 ));
 
-const ShopPreviews = React.memo((
-  { discoverShops, loadMoreData }: 
-  {discoverShops:shopPreview[]| null | undefined, loadMoreData:() => Promise<void>}) => {
+const ShopPreviews = React.memo(({discoverShops, filterSelection}:{discoverShops:ShopPreviewProps[]| null | undefined, filterSelection:number}) => {
+  // loadMoreData:() => Promise<void>
 
-  const { setShopPreviewCache, isPage1Loading } = localData();
+  const { isPage1Loading, fetchDiscoverShops} = localData();
 
-  const handleScroll = async (event: any) => {
-    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
-      loadMoreData(); 
-    }
-  };
+  // const handleScroll = async (event: any) => {
+  //   const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+  //   if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
+  //     loadMoreData(); 
+  //   }
+  // };
 
-  const openShopPage = (shop:shopPreview) =>{
-    setShopPreviewCache(shop);
-    router.push({ pathname: "/shopPage", params:{ parentPage:'Discover' }});
+  const openShopPage = (shop_id:string) =>{
+    router.push({ pathname: "/shopPage", params:{ parentPage:'Discover', shop_id }});
   }
 
   if(discoverShops){
     return (
       <View style={{flex:1, width:'100%', height:'100%', zIndex:100}}>
-        <ScrollView
-          overScrollMode="always"
-          bounces={true}
-          style={{ flex: 1, width: '100%', height:'100%' }}
-          onScrollEndDrag={handleScroll}
-          scrollEventThrottle={20}
-          showsVerticalScrollIndicator={false}
-        >
-          {discoverShops.map((shop: any, index: number) => (
-            <View key={index} style={{ marginHorizontal: 15 }}>
-              <TouchableOpacity onPress={()=>openShopPage(shop)}>
-                <ShopPreview 
-                selectedPin={shop} 
-                type={1} />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
+        <FlatList
+        data={discoverShops}
+        horizontal={false}
+        renderItem={({item})=>(
+          <View key={item.id} style={{ marginHorizontal: 15 }}>
+            <TouchableOpacity onPress={()=>openShopPage(item.shop_id)}>
+              <ShopPreview 
+              selectedPin={item} 
+              type={1} />
+            </TouchableOpacity>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, width: '100%', height:'100%' }}
+        scrollEventThrottle={20}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        keyExtractor={item => item.id}
+        removeClippedSubviews={false}
+        refreshing={isPage1Loading}
+        onRefresh={()=>{fetchDiscoverShops(filterSelection,0)}}
+        windowSize={2}
+        // onScrollEndDrag={handleScroll}
+        />
       </View>
     );
   }else{
     return(
-    <View style={{flex:1}}>
+    <View style={styles.loading}>
       <ActivityIndicator />
     </View>
     )
@@ -169,6 +176,12 @@ const ShopPreviews = React.memo((
 });
 
 const styles = StyleSheet.create({
+  loading:{
+    flex:1,
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+  },
   filterBar: {
     position: 'relative',
     display: 'flex',
@@ -200,11 +213,6 @@ const styles = StyleSheet.create({
     width: width / 3 + 30,
     backgroundColor: color_pallete[0],
     borderRadius: 20,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loadingMore: {
     paddingVertical: 20,

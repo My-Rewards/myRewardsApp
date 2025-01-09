@@ -1,5 +1,5 @@
 import { Plan, Reward, Tier, RewardMapProps } from "@/app-data/data-types";
-import { View, Text, Dimensions, TouchableOpacity, Animated, SafeAreaView } from "react-native"
+import { View, Text, Dimensions, TouchableOpacity, Animated } from "react-native"
 import Collapsible from 'react-native-collapsible';
 import {dropDown, milestoneStyle, modalStyle} from '@/components/styling/mapPreviewStyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -81,15 +81,17 @@ const categorizeRewards = ({road_map, visits, redeemableRewards}:CategorizeProps
     .map(key => Number(key))
     .filter(milestone => !isNaN(milestone));
 
+
     return milestones.map((milestone) => {
         const tier_id = road_map[milestone].id
+        const redeemable = redeemableRewards.includes(tier_id);
       
-        if (milestone <= visits && !redeemableRewards.includes(tier_id)) {
-          return { milestone, status: "passed", rewards: road_map[milestone] };
-        } else if (redeemableRewards.includes(tier_id) || milestone <= visits ) {
-          return { milestone, status: "current", rewards: road_map[milestone] };
+        if (milestone <= visits && !redeemable) {
+          return { milestone, status: "passed", rewards: road_map[milestone], redeemable};
+        } else if (redeemable || milestone <= visits ) {
+          return { milestone, status: "current", rewards: road_map[milestone], redeemable };
         } else {
-          return { milestone, status: "upcoming", rewards: road_map[milestone] };
+          return { milestone, status: "upcoming", rewards: road_map[milestone], redeemable };
         }
       });
 };
@@ -107,11 +109,12 @@ const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:bool
                         <View key={index} 
                         style={option==0?[dropDown.rewardContainer, {backgroundColor:color_pallete[7]}]:[dropDown.rewardContainer]}>
                             <Text style={dropDown.rewardText}> {rewardOption}</Text>
-                            {redeemable &&
+                            {redeemable ?
                                 <TouchableOpacity style={dropDown.redeemBtn}>
                                     <Text style={dropDown.redeemText}>Redeem</Text>
-                                </TouchableOpacity>
-                            }
+                                </TouchableOpacity>:
+                                <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
+                                }
                         </View>
                         {index < rewardList.length - 1 && (
                             <View style={dropDown.seperaterLine} />
@@ -135,13 +138,28 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     const tillNextRew = getNextRewardVisits(plan);
 
     const taggedRewards = categorizeRewards({road_map:plan.reward_plan.road_map, visits:plan.visits, redeemableRewards:plan.redeemableRewards});
+    const checkpoints = milestones.map(([checkpoint]) => parseInt(checkpoint, 10));
 
     const PointStatus: React.FC<{milestone:[string, Tier], index:number}> = ({ milestone, index }) => {   
         const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
         const checkpoint = parseInt(milestone[0],10);
+        const prevCheckpoint = checkpoints
+        .filter((findCheckpoint:number) => findCheckpoint < checkpoint)
+        .pop(); 
+    
+        const completion = prevCheckpoint ? plan.visits < prevCheckpoint ? 0 : plan.visits >= checkpoint ? 1 : (plan.visits%checkpoint)/checkpoint : 0
+    
 
         return(
             <View key={index} style={modalStyle.stepContainer}>
+                {index > 0 && (
+                    <View style={[modalStyle.line, { width: lineWidth+2 }]}>
+                        <View style={[
+                            modalStyle.completion, 
+                            { width: lineWidth*(completion), position:'absolute', height:'100%'},
+                            completion != 1 ? {borderTopRightRadius:4, borderBottomRightRadius:4}:null ]} />
+                    </View>
+                )}
                 {plan.visits >= checkpoint && !rewardRedeemable ? (
                 <View style={[modalStyle.circle, { backgroundColor: color_pallete[2] }]}>
                     <Ionicons name="checkmark" color="white" />
@@ -155,36 +173,47 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                     <Text style={modalStyle.circleText}>{checkpoint}</Text>
                 </View>
                 )}
-                {index < milestones.length - 1 && (
-                    <View style={[modalStyle.line, { width: lineWidth }]} />
-                )}
             </View>
+        )
+    }
+
+    const StatusText = () =>{
+
+        if(!plan.activePlan && plan.firstPlan){
+            return(
+                <Text style={modalStyle.visitsText}>
+                    Start Your Plan now!
+                </Text>
+            )
+        }
+        return(
+            <Text style={modalStyle.visitsText}>
+                {tillNextRew && tillNextRew>0 ?
+                `${tillNextRew} ${tillNextRew === 1 ? 'Visit' : 'Visits'} until your next reward!`
+                :
+                `Redeem a reward on your next visit!`
+                }
+            </Text>
         )
     }
 
     return (
         <View style={{gap:30, marginBottom:height/10}}>
             <View style={{ alignItems: 'center', marginTop:10}}>
-                <Text style={modalStyle.visitsText}>
-                    {tillNextRew && tillNextRew>0 ?
-                    `${tillNextRew} ${tillNextRew === 1 ? 'Visit' : 'Visits'} until your next reward!`
-                    :
-                    `Redeem a reward on your next visit!`
-                    }
-                </Text>
+                <StatusText />
             </View>
-            {/* Completion Bar */}
+            {/* roadMap Bar */}
             <View style={modalStyle.roadmapContainer}>
                 <View style={modalStyle.roadmap}>
                     {milestones.map((milestone, index) => 
-                    <PointStatus milestone={milestone} index={index} key={index}/>
+                    <PointStatus milestone={milestone} index={index} key={index} />
                     )}
                 </View>
             </View>
             {/* Drop Down */}
             <View style={[modalStyle.roadmapContainer, {marginTop:10}]}>
                 <Animated.View style={dropDown.container}>
-                    {taggedRewards.map(({ status, rewards }, index) => (
+                    {taggedRewards.map(({ status, rewards, redeemable }, index) => (
                         <React.Fragment key={index}>
                         {status === 'passed' && (
                             <TouchableOpacity activeOpacity={1} style={[dropDown.tierTitleContainer, {backgroundColor:color_pallete[6]}]}>
@@ -210,7 +239,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <ListRewards 
                                         rewardList={rewards.rewards} 
                                         option={0} 
-                                        redeemable={tillNextRew === 0}
+                                        redeemable={redeemable}
                                     />
                                 </Collapsible>
                             </View>
@@ -228,7 +257,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
                                     <Ionicons name={'lock-closed-outline'} size={width/20} color={color_pallete[5]}/>
                                 </TouchableOpacity>
                                 <Collapsible collapsed={selectedIndex !== index}>
-                                    <ListRewards rewardList={rewards.rewards} option={1} redeemable={false}/>
+                                    <ListRewards rewardList={rewards.rewards} option={1} redeemable={redeemable}/>
                                 </Collapsible>
                             </View>
                         )}
@@ -267,9 +296,14 @@ export const ExpendatureMap:React.FC<RoadMapProps> = ({plan}) => {
                         Get 50 points on us with your first plan!
                     </Text>
                 }
+                {pointsTill>0 ? 
                 <Text style={plan.firstPlan ? milestoneStyle.visitsText2 : modalStyle.visitsText}>
                     {pointsTill} points until you unlock Rewards!
+                </Text>:
+                <Text style={plan.firstPlan ? milestoneStyle.visitsText2 : modalStyle.visitsText}>
+                    Unlock a Reward Now!
                 </Text>
+                }
             </View>
             {/* Completion Bar */}
             <View style={milestoneStyle.barConatiner}>
