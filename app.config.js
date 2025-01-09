@@ -1,3 +1,5 @@
+require('dotenv').config(); 
+
 export default () => {
   const isProd = process.env.APP_ENV === 'prod';
   const RUNTIMEVERSION = '1.0.0'
