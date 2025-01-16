@@ -1,32 +1,40 @@
 import { router } from 'expo-router';
 import { Text, View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useSession } from '../auth/ctx';
-import { userSignIn } from '@/params/auth';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
-import { signInWithRedirect } from 'aws-amplify/auth';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
   const { signIn, isLoading, googleSignIn } = useSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState<string>('test@gmail.com');
+  const [password, setPassword] = useState<string>('Test1234');
   const { triggerLoadingScreen, alert } = useProps();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   useEffect(() => {
     triggerLoadingScreen({ isLoading });
   }, [isLoading]);
 
   const signInFunc = async () => {
-    signIn({ email, password }).then((status) => {
-      if (status === 'success') {
-        router.replace('/');
-      } else if (status === 'unverified') {
-        router.replace('/verificationScreen');
-      } else {
-        alert('', 'Invalid email or password', 'error');
-      }
-    });
+    if(emailRegex.test(email) && password){
+      signIn({ email, password }).then((status) => {
+        if (status === 'success') {
+          router.replace('/');
+        } else if (status === 'unverified') {
+          router.replace({
+            pathname: "/verificationScreen",
+            params: {
+              email: email,
+            },
+          });
+        } else {
+          alert('', 'Invalid email or password', 'error');
+        }
+      });
+    }else{
+      alert('', 'Please fill out all Inputs', 'error');
+    }
   };
 
   const gsFunction = () =>{

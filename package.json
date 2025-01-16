@@ -9,7 +9,7 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "production": "eas build --auto-submit",
-    "run": "npx expo run:ios --device",
+    "ios": "npx expo run:ios --device",
     "cc": "rimraf node_modules/.cache/babel-loader/*,",
     "sync": "./sync.sh beta",
     "internal-build-beta": "APP_ENV=beta && ./sync.sh beta && npx expo run:ios --device --configuration Release",

@@ -32,7 +32,12 @@ export default function SignUp() {
 
     signUp(userSignUpData).then((success) => {
       if (success) {
-        router.replace('/verificationScreen');
+        router.replace({
+          pathname: '/verificationScreen',
+          params: {
+            email: userSignUpData.email,
+          },
+        });
       } else {
         alert('Error', 'Email is already in use', 'error');
       }

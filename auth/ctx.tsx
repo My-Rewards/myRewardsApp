@@ -1,4 +1,4 @@
-import { useContext, createContext, type PropsWithChildren, useState, useEffect } from 'react';
+import { useContext, createContext, type PropsWithChildren, useState } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
@@ -79,7 +79,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
               setFetching(false); 
               checkUserSession();
 
-              resolve('success'); // Return true after the delay
+              resolve('unverified'); // Return true after the delay
             }, 1000);
           });
           // 
