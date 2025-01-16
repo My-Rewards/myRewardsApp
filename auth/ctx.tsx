@@ -1,4 +1,5 @@
 import { useContext, createContext, type PropsWithChildren, useState } from 'react';
+import { useContext, createContext, type PropsWithChildren, useState } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
@@ -73,16 +74,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (profile:userSignIn) => {
           setFetching(true); 
 
-          // // REMOVE THIS AFTER TESTING
-          // return new Promise((resolve) => {
-          //   setTimeout(() => {
-          //     setFetching(false); 
-          //     checkUserSession();
+          // REMOVE THIS AFTER TESTING
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              setFetching(false); 
+              checkUserSession();
 
-          //     resolve('success');
-          //   }, 1000);
-          // });
-          // // 
+              resolve('unverified'); // Return true after the delay
+            }, 1000);
+          });
+          // 
           
           try{
             // is Authenticated
