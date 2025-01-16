@@ -34,7 +34,6 @@ export default function SignUp() {
           pathname: '/verificationScreen',
           params: {
             email: userSignUpData.email,
-            password: userSignUpData.password,
           },
         });
       } else {
