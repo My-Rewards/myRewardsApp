@@ -73,16 +73,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (profile:userSignIn) => {
           setFetching(true); 
 
-          // REMOVE THIS AFTER TESTING
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              setFetching(false); 
-              checkUserSession();
+          // // REMOVE THIS AFTER TESTING
+          // return new Promise((resolve) => {
+          //   setTimeout(() => {
+          //     setFetching(false); 
+          //     checkUserSession();
 
-              resolve('unverified'); // Return true after the delay
-            }, 1000);
-          });
-          // 
+          //     resolve('success');
+          //   }, 1000);
+          // });
+          // // 
           
           try{
             // is Authenticated
