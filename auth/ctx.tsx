@@ -2,6 +2,7 @@ import { useContext, createContext, type PropsWithChildren, useState, useEffect 
 import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
+
 /* 
   Serves to check authentication inclosing the app, each time a new screen is triggered this code is referenced and checks
   to see if the user is still autenticated.
