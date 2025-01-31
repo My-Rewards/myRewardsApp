@@ -1,5 +1,4 @@
 import { useContext, createContext, type PropsWithChildren, useState } from 'react';
-import { useContext, createContext, type PropsWithChildren, useState } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
