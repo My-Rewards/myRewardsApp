@@ -79,7 +79,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
               setFetching(false); 
               checkUserSession();
 
-              resolve('unverified'); // Return true after the delay
+              resolve('verified'); // Return true after the delay
             }, 1000);
           });
           // 

@@ -1,102 +1,100 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image } from "react-native";
-import { getMockUserProfile, UserProfile } from "@/api/mockApi";
+import { localData } from "@/app-data/appData";
+import { useProps } from "../LoadingProp/propsProvider";
 
 export default function EditProfilePage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const { profile, fetchProfile } = localData();
+  const { triggerLoadingScreen } = useProps();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  useEffect(() => {
-    getMockUserProfile().then((data) => {
-      setProfile(data);
-      setFirstName(data.first_name);
-      setLastName(data.last_name);
-    });
-  }, []);
 
-  if (!profile) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  useEffect(()=>{
+    triggerLoadingScreen({isLoading:!profile})
+  },[profile])
 
   const handleSaveChanges = () => {
     // Mock saving logic
     console.log("Saving changes...", { firstName, lastName });
+    fetchProfile();
   };
 
-  return (
-    <View style={[styles.container, { height: Dimensions.get("window").height - 90 }]}>
-      <View style={styles.content}>
-        <View style={styles.topSection}>
-          {/* User Icon */}
-          <Image
-            source={{ uri: "https://via.placeholder.com/70" }}
-            style={styles.userIcon}
-          />
-
-          {/* User Info */}
-          <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
-          <View style={styles.emailWrapper}>
-            <View style={styles.emailContainer}>
-              <View style={styles.emailLine} />
-              <Text style={styles.emailText}>{profile.email}</Text>
-              <View style={styles.emailLine} />
+  if(profile){
+    return (
+      <View style={[styles.container, { height: Dimensions.get("window").height - 90 }]}>
+        <View style={styles.content}>
+          <View style={styles.topSection}>
+            {/* User Icon */}
+            <Image
+              source={{ uri: "https://via.placeholder.com/70" }}
+              style={styles.userIcon}
+            />
+  
+            {/* User Info */}
+            <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
+            <View style={styles.emailWrapper}>
+              <View style={styles.emailContainer}>
+                <View style={styles.emailLine} />
+                <Text style={styles.emailText}>{profile.username}</Text>
+                <View style={styles.emailLine} />
+              </View>
+            </View>
+  
+            {/* Membership Info */}
+            <View style={styles.membershipContainer}>
+              <View style={styles.membershipRow}>
+                <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
+                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
+              </View>
+              <View style={styles.membershipRow}>
+                <Text style={styles.membershipText}>Birthday:</Text>
+                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
+              </View>
             </View>
           </View>
-
-          {/* Membership Info */}
-          <View style={styles.membershipContainer}>
-            <View style={styles.membershipRow}>
-              <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
-              <Text style={styles.membershipText}>XX.XX.XXXX</Text>
-            </View>
-            <View style={styles.membershipRow}>
-              <Text style={styles.membershipText}>Birthday:</Text>
-              <Text style={styles.membershipText}>XX.XX.XXXX</Text>
-            </View>
+  
+          {/* Editable Fields */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Edit first name</Text>
+            <TextInput
+              value={firstName}
+              onChangeText={setFirstName}
+              style={styles.inputField}
+              placeholder="Firstname"
+            />
+  
+            <Text style={styles.inputLabel}>Edit last name</Text>
+            <TextInput
+              value={lastName}
+              onChangeText={setLastName}
+              style={styles.inputField}
+              placeholder="Lastname"
+            />
           </View>
-        </View>
-
-        {/* Editable Fields */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Edit first name</Text>
-          <TextInput
-            value={firstName}
-            onChangeText={setFirstName}
-            style={styles.inputField}
-            placeholder="Firstname"
-          />
-
-          <Text style={styles.inputLabel}>Edit last name</Text>
-          <TextInput
-            value={lastName}
-            onChangeText={setLastName}
-            style={styles.inputField}
-            placeholder="Lastname"
-          />
-        </View>
-
-        {/* Reset Password Button */}
-        <Pressable style={styles.resetPasswordButton}>
-          <Text style={styles.resetPasswordText}>reset password</Text>
-        </Pressable>
-
-        {/* Action Buttons */}
-        <View style={styles.actionButtonsContainer}>
-          <Pressable style={styles.cancelButton}>
-            <Text style={styles.cancelButtonText}>cancel</Text>
+  
+          {/* Reset Password Button */}
+          <Pressable style={styles.resetPasswordButton}>
+            <Text style={styles.resetPasswordText}>reset password</Text>
           </Pressable>
-          <Pressable style={styles.saveChangesButton} onPress={handleSaveChanges}>
-            <Text style={styles.saveChangesText}>save changes</Text>
-          </Pressable>
+  
+          {/* Action Buttons */}
+          <View style={styles.actionButtonsContainer}>
+            <Pressable style={styles.cancelButton}>
+              <Text style={styles.cancelButtonText}>cancel</Text>
+            </Pressable>
+            <Pressable style={styles.saveChangesButton} onPress={handleSaveChanges}>
+              <Text style={styles.saveChangesText}>save changes</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    );
+  }
+  else{
+    return null
+  }
 }
 
 const styles = StyleSheet.create({

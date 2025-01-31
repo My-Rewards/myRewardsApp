@@ -780,3 +780,5 @@ export const mockfetchNearestShop = (org_id:string, region: { latitude: number; 
     }, 500);
   });
 };
+
+export { Profile };
