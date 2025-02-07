@@ -1,0 +1,20 @@
+import {useState, useEffect} from 'react'
+import {fetchAppConfig} from '../services/fetchConfig'
+
+const useAppConfig = () => {
+    const [config, setConfig] = useState(null);
+
+    
+    useEffect(() => {
+        const getConfig = async () => {
+          const data = await fetchAppConfig();
+          setConfig(data);
+        };
+        getConfig();
+      }, 
+      []);
+
+      return config;
+}
+
+export default useAppConfig;
