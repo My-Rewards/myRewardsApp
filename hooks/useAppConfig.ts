@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react'
-import {fetchAppConfig} from '../services/fetchConfig'
+import {fetchAppConfig} from '@/services/fetchConfig';
 
-const useAppConfig = () => {
+export const useAppConfig = () => {
     const [config, setConfig] = useState(null);
 
     
@@ -11,10 +11,7 @@ const useAppConfig = () => {
           setConfig(data);
         };
         getConfig();
-      }, 
-      []);
+      }, []);
 
       return config;
 }
-
-export default useAppConfig;

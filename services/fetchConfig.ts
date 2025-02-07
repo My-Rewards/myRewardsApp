@@ -8,7 +8,7 @@ const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
 const CONFIG_PROFILE_ID = process.env.CONFIG_PROFILE_ID;
 const client = new AppConfigDataClient({region: REGION});
 
-const fetchAppConfig = async() => {
+export const fetchAppConfig = async() => {
     try {
         const createSession = await client.send(
             new StartConfigurationSessionCommand({
@@ -36,5 +36,3 @@ const fetchAppConfig = async() => {
         return null;
     }
 }
-
-export default fetchAppConfig;
