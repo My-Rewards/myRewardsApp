@@ -12,7 +12,7 @@ export default function SignIn() {
   const [password, setPassword] = useState<string>('Test1234');
   const { triggerLoadingScreen, alert } = useProps();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //const config = useAppConfig();
+  const config = useAppConfig();
 
   useEffect(() => {
     triggerLoadingScreen({ isLoading });
@@ -52,7 +52,7 @@ export default function SignIn() {
 
   return (
     <View style={styles.container}>
-      {/* <Text>Recieved config: {JSON.stringify(config, null)}</Text> */}
+      <Text>Recieved config: {JSON.stringify(config, null)}</Text>
       <Image
         source={{ uri: "/path/to/MyRewardsLogo.png" }}
         style={styles.logo}

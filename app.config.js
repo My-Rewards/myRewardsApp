@@ -61,6 +61,9 @@ export default () => {
       identityPoolId: process.env.IDENTITY_POOL_ID,
       awsRegion: process.env.AWS_REGION,
       appEnv: process.env.APP_ENV,
+      applicationId: process.env.APPLICATION_ID,
+      environmentId: process.env.ENVIRONMENT_ID,
+      configProfileId: process.env.CONFIG_PROFILE_ID
     },
     owner: "myrewards",
     updates: {

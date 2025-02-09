@@ -1,20 +1,15 @@
-import dotenv from 'dotenv'
 import {AppConfigDataClient, StartConfigurationSessionCommand, GetLatestConfigurationCommand} from "@aws-sdk/client-appconfigdata"
-dotenv.config();
-
-const REGION = process.env.AWS_REGION;
-const APPLICATION_ID = process.env.APPLICATION_ID;
-const ENVIRONMENT_ID = process.env.ENVIRONMENT_ID;
-const CONFIG_PROFILE_ID = process.env.CONFIG_PROFILE_ID;
-const client = new AppConfigDataClient({region: REGION});
+import Constants  from "expo-constants";
+const { applicationId, environmentId, configProfileId } = Constants.expoConfig?.extra || {};
+const client = new AppConfigDataClient({region: 'us-east-1'});
 
 export const fetchAppConfig = async() => {
     try {
         const createSession = await client.send(
             new StartConfigurationSessionCommand({
-                ApplicationIdentifier: APPLICATION_ID,
-                EnvironmentIdentifier: ENVIRONMENT_ID,
-                ConfigurationProfileIdentifier: CONFIG_PROFILE_ID
+                ApplicationIdentifier: applicationId,
+                EnvironmentIdentifier: environmentId,
+                ConfigurationProfileIdentifier: configProfileId
             })
         );
 
