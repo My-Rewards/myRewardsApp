@@ -1,9 +1,18 @@
 import {AppConfigDataClient, StartConfigurationSessionCommand, GetLatestConfigurationCommand} from "@aws-sdk/client-appconfigdata"
 import Constants  from "expo-constants";
-const { appConfig } = Constants.expoConfig?.extra || {};
-const client = new AppConfigDataClient({region: 'us-east-1', credentials: {accessKeyId: "", secretAccessKey:""}});
+const { appConfig, identityPoolId, userPoolId } = Constants.expoConfig?.extra || {};
+import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
+import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
+import * as auth from "aws-amplify/auth"
+
 
 export const fetchAppConfig = async() => {
+    const client = new AppConfigDataClient({region: 'us-east-1', 
+        credentials: fromCognitoIdentityPool({
+        client: new CognitoIdentityClient({ region: 'us-east-1' }),
+        identityPoolId: identityPoolId
+    })});    
+    
     try {
         const createSession = await client.send(
             new StartConfigurationSessionCommand({
