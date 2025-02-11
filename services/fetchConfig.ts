@@ -1,15 +1,15 @@
 import {AppConfigDataClient, StartConfigurationSessionCommand, GetLatestConfigurationCommand} from "@aws-sdk/client-appconfigdata"
 import Constants  from "expo-constants";
-const { applicationId, environmentId, configProfileId } = Constants.expoConfig?.extra || {};
-const client = new AppConfigDataClient({region: 'us-east-1'});
+const { appConfig } = Constants.expoConfig?.extra || {};
+const client = new AppConfigDataClient({region: 'us-east-1', credentials: {accessKeyId: "", secretAccessKey:""}});
 
 export const fetchAppConfig = async() => {
     try {
         const createSession = await client.send(
             new StartConfigurationSessionCommand({
-                ApplicationIdentifier: applicationId,
-                EnvironmentIdentifier: environmentId,
-                ConfigurationProfileIdentifier: configProfileId
+                ApplicationIdentifier: appConfig.applicationId,
+                EnvironmentIdentifier: appConfig.environmentId,
+                ConfigurationProfileIdentifier: appConfig.configProfileId
             })
         );
 
