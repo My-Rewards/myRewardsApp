@@ -1,4 +1,4 @@
-import { useContext, createContext, type PropsWithChildren, useState } from 'react';
+import { useContext, useEffect, createContext, type PropsWithChildren, useState } from 'react';
 import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
@@ -44,28 +44,31 @@ export function SessionProvider({ children }: PropsWithChildren) {
     setFetching(true);
 
     // REMOVE THIS WHEN DONE TESTING
-    setUserSub('mockSub');
-    setFetching(false);
+    // setUserSub('mockSub');
+    // setFetching(false);
     // 
 
   //   // UNCOMMENT THIS AFTER TESTING
-  //   try {
-  //     const currentSession = await fetchAuthSession();
-  //     if(currentSession.tokens?.idToken && currentSession.userSub){
-  //       setUserSub(currentSession.userSub);
-  //     }else{
-  //       setUserSub(null);
-  //     }
-  //   } catch (error) {
-  //     setUserSub(null);
-  //   } finally {
-  //     setFetching(false);
-  //   }
+    try {
+      const currentSession = await fetchAuthSession();
+      console.log("Session: ", currentSession);
+      console.log("Credentials: ", currentSession.credentials)
+      if(currentSession.tokens?.idToken && currentSession.userSub){
+        setUserSub(currentSession.userSub);
+      }else{
+        setUserSub(null);
+      }
+    } catch (error) {
+      console.log("Error getting session: ", error);
+      setUserSub(null);
+    } finally {
+      setFetching(false);
+    }
   };
 
-  // useEffect(() => {
-  //   checkUserSession(); 
-  // }, []);
+  useEffect(() => {
+    checkUserSession(); 
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -74,14 +77,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
           setFetching(true); 
 
           // REMOVE THIS AFTER TESTING
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              setFetching(false); 
-              checkUserSession();
+          // return new Promise((resolve) => {
+          //   setTimeout(() => {
+          //     setFetching(false); 
+          //     checkUserSession();
 
-              resolve('verified'); // Return true after the delay
-            }, 1000);
-          });
+          //     resolve('verified'); // Return true after the delay
+          //   }, 1000);
+          // });
           // 
           
           try{

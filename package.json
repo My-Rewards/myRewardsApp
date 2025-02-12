@@ -22,7 +22,11 @@
   "dependencies": {
     "@aws-amplify/react-native": "^1.1.5",
     "@aws-amplify/rtn-web-browser": "^1.1.1",
+    "@aws-sdk/client-appconfig": "^3.743.0",
+    "@aws-sdk/client-appconfigdata": "^3.743.0",
+    "@aws-sdk/client-cognito-identity": "^3.744.0",
     "@aws-sdk/client-dynamodb": "^3.670.0",
+    "@aws-sdk/credential-provider-cognito-identity": "^3.744.0",
     "@aws-sdk/credential-provider-node": "^3.670.0",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -72,6 +76,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-transform-class-static-block": "^7.26.0",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-native": "^0.72.8",
