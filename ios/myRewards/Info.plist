@@ -61,10 +61,6 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>MyRewards needs access to you location when using the app.</string>
     <key>UIBackgroundModes</key>

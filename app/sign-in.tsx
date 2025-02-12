@@ -4,7 +4,6 @@ import { useSession } from '../auth/ctx';
 import { useEffect, useState } from 'react';
 import { useProps } from './LoadingProp/propsProvider';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
-import {useAppConfig} from '@/hooks/useAppConfig';
 
 export default function SignIn() {
   const { signIn, isLoading, googleSignIn } = useSession();
@@ -12,7 +11,6 @@ export default function SignIn() {
   const [password, setPassword] = useState<string>('Test1234');
   const { triggerLoadingScreen, alert } = useProps();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const config = useAppConfig();
 
   useEffect(() => {
     triggerLoadingScreen({ isLoading });
@@ -52,7 +50,6 @@ export default function SignIn() {
 
   return (
     <View style={styles.container}>
-      <Text>Recieved config: {JSON.stringify(config, null)}</Text>
       <Image
         source={{ uri: "/path/to/MyRewardsLogo.png" }}
         style={styles.logo}

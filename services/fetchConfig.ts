@@ -1,17 +1,25 @@
 import {AppConfigDataClient, StartConfigurationSessionCommand, GetLatestConfigurationCommand} from "@aws-sdk/client-appconfigdata"
 import Constants  from "expo-constants";
-const { appConfig, identityPoolId, userPoolId } = Constants.expoConfig?.extra || {};
+const { appConfig, identityPoolId, userPoolId, webClientId } = Constants.expoConfig?.extra || {};
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { CognitoIdentityClient } from "@aws-sdk/client-cognito-identity";
-import * as auth from "aws-amplify/auth"
-
+import { Amplify } from 'aws-amplify';
+import { fetchAuthSession } from "aws-amplify/auth";
 
 export const fetchAppConfig = async() => {
-    const client = new AppConfigDataClient({region: 'us-east-1', 
-        credentials: fromCognitoIdentityPool({
-        client: new CognitoIdentityClient({ region: 'us-east-1' }),
-        identityPoolId: identityPoolId
-    })});    
+
+    const session = await fetchAuthSession();
+    console.log(session)
+    const credentials = session.credentials   
+    const client = new AppConfigDataClient({
+        region: 'us-east-1',
+        credentials: credentials
+    })
+    // const client = new AppConfigDataClient({region: 'us-east-1', 
+    //     credentials: fromCognitoIdentityPool({
+    //     client: new CognitoIdentityClient({ region: 'us-east-1' }),
+    //     identityPoolId: identityPoolId
+    // })});    
     
     try {
         const createSession = await client.send(

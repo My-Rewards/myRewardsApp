@@ -3,7 +3,7 @@ import { useSession } from "../../../auth/ctx"
 import { localData } from "@/app-data/appData"
 import { SvgXml } from "react-native-svg";
 import { router } from 'expo-router';
-
+import { useAppConfig } from "@/hooks/useAppConfig";
 
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,7 +54,7 @@ export default function ProfilePage() {
   const { signOut } = useSession()
   const { profile } = localData()
   const windowHeight = Dimensions.get("window").height
-
+  const config = useAppConfig();
   if (!profile) {
     return (
       <View style={styles.container}>
@@ -104,6 +104,10 @@ export default function ProfilePage() {
             <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>{formatDate(profile.dob)}</Text>
+            </View>
+            <View style={styles.membershipRow}>
+              {config ? (<Text style={styles.membershipText}>{"Config Received: " + config.isBeta}</Text>
+              ) : (<Text style={styles.membershipText}>Loading config...</Text>)}
             </View>
           </View>
 
