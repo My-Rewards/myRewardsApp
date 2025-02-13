@@ -57,7 +57,6 @@ export default () => {
       },
       userPoolId: process.env.USERPOOL_ID,
       webClientId: process.env.WEB_CLIENT_ID,
-      cognitoDomain: process.env.COGNITO_DOMAIN,
       identityPoolId: process.env.IDENTITY_POOL_ID,
       awsRegion: process.env.AWS_REGION,
       appEnv: process.env.APP_ENV,
