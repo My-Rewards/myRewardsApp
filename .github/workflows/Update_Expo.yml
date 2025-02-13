@@ -29,7 +29,7 @@ jobs:
         id: fetch_ssm_parameters
         run: |
           # Fetch parameters from SSM
-            PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/identityPoolId" "/myRewardsApp/beta/appConfig" --with-decryption --region us-east-1)
+            PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/$APP_ENV/customerUserPoolId" "/myRewardsApp/$APP_ENV/customerWebClientId" "/myRewardsApp/$APP_ENV/identityPoolIdCustomer" "/myRewardsApp/$APP_ENV/appConfig" --with-decryption --region us-east-1)
     
             # Extract and set environment variables
             echo "USER_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/userPoolId").Value')" >> $GITHUB_ENV
