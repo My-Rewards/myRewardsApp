@@ -1,10 +1,11 @@
-import { Text, View, StyleSheet, Pressable, Image, Dimensions } from "react-native"
-import { useSession } from "../../../auth/ctx"
+import { Text, View, StyleSheet, Pressable, Image, Dimensions, Modal } from "react-native"
+import { useSession } from "../../../../auth/ctx"
 import { localData } from "@/app-data/appData"
 import { SvgXml } from "react-native-svg";
 import { router } from 'expo-router';
 import { useAppConfig } from "@/hooks/useAppConfig";
-
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M15.8932 20.9996H3.00682C1.34877 20.9996 0 19.6508 0 17.9928V5.10643C0 3.44838 1.34877 2.09961 3.00682 2.09961H11.9994C12.474 2.09961 12.8584 2.48405 12.8584 2.9587C12.8584 3.43335 12.474 3.81779 11.9994 3.81779H3.00682C2.29646 3.81779 1.71818 4.39607 1.71818 5.10643V17.9928C1.71818 18.7032 2.29646 19.2814 3.00682 19.2814H15.8932C16.6035 19.2814 17.1818 18.7032 17.1818 17.9928V8.11325C17.1818 7.6386 17.5663 7.25416 18.0409 7.25416C18.5156 7.25416 18.9 7.6386 18.9 8.11325V17.9928C18.9 19.6508 17.5512 20.9996 15.8932 20.9996Z" fill="#F35E43"/>
@@ -61,6 +62,11 @@ export default function ProfilePage() {
         <Text>Loading...</Text>
       </View>
     )
+  }
+
+  const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   }
 
   const formatDate = (date: Date) => {
@@ -122,7 +128,7 @@ export default function ProfilePage() {
           <View style={styles.card}>
           <Pressable
               style={styles.menuItem}
-              onPress={() => router.push('/editProfilePage')}  // Navigate to edit profile page
+              onPress={() => router.push('profilePage/editProfilePage')}
             >
               <Text style={styles.menuText}>Edit profile</Text>
               <SvgXml
@@ -144,7 +150,7 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable style={styles.menuItem} onPress={toggleModal}>
               <Text style={styles.deleteText}>Delete account</Text>
               <SvgXml
                 xml={trashSvg}
@@ -306,5 +312,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#8B4513",
     width: "92%", // Adjusted to align with new card size
     alignSelf: "center",
+  },
+  modalContent: {
+    height: 1/2,
+  },
+  modalTitle: {
+    
+  },
+  modalButtonText: {
+    
+  },
+  modalMessage: {
+    
+  },
+  modalButton: {
+    
+  },
+  modalButtons: {
+
   },
 })

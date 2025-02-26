@@ -1,37 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image } from "react-native";
 import { localData } from "@/app-data/appData";
-import { useProps } from "../LoadingProp/propsProvider";
+import { useProps } from "../../../LoadingProp/propsProvider";
+import { useRouter } from "expo-router";
+import { color_pallete } from "@/constants/Colors";
+import { SafeAreaView } from "react-native";
 
 export default function EditProfilePage() {
+  const router = useRouter();
   const { profile, fetchProfile } = localData();
   const { triggerLoadingScreen } = useProps();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
-
+  const [buttonColor, setButtonColor] = useState("#FBC19F");
   useEffect(()=>{
     triggerLoadingScreen({isLoading:!profile})
   },[profile])
 
+  useEffect(() => {
+    if (firstName !== "" || lastName !== "") {
+      setButtonColor("#F98B4E");
+    } else {
+      setButtonColor("#FBC19F");
+    }
+  }, [firstName, lastName]);
+
   const handleSaveChanges = () => {
-    // Mock saving logic
-    console.log("Saving changes...", { firstName, lastName });
-    fetchProfile();
+    if (firstName !== "" || lastName !== "") {
+      console.log("Saving changes...", { firstName, lastName });
+      fetchProfile();
+      router.back();
+    }
   };
 
   if(profile){
     return (
       <View style={[styles.container, { height: Dimensions.get("window").height - 90 }]}>
+         {/* <SafeAreaView>
+          <View style={[styles.header, {paddingBottom:5}]}>
+            <Text style={styles.headerText}>Edit Profile</Text>
+          </View>
+         </SafeAreaView> */}
         <View style={styles.content}>
           <View style={styles.topSection}>
             {/* User Icon */}
-            <Image
-              source={{ uri: "https://via.placeholder.com/70" }}
-              style={styles.userIcon}
-            />
-  
+             <Image
+                source={{
+                  uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LdlKUMY8VdtdQfwRogRVi4MU4LuzvX.png",
+                  }}
+                style={styles.userIcon}
+               />
             {/* User Info */}
             <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
             <View style={styles.emailWrapper}>
@@ -81,10 +100,10 @@ export default function EditProfilePage() {
   
           {/* Action Buttons */}
           <View style={styles.actionButtonsContainer}>
-            <Pressable style={styles.cancelButton}>
+            <Pressable onPress={() => router.back()} style={styles.cancelButton}>
               <Text style={styles.cancelButtonText}>cancel</Text>
             </Pressable>
-            <Pressable style={styles.saveChangesButton} onPress={handleSaveChanges}>
+            <Pressable style={[styles.saveChangesButton, { backgroundColor: buttonColor }]} onPress={handleSaveChanges}>
               <Text style={styles.saveChangesText}>save changes</Text>
             </Pressable>
           </View>
@@ -98,6 +117,26 @@ export default function EditProfilePage() {
 }
 
 const styles = StyleSheet.create({
+   header:{
+      backgroundColor:color_pallete[10],
+      elevation: 0,
+      shadowOpacity: 0.1,
+      borderBottomWidth:2,
+      shadowColor:'black',
+      shadowRadius:3,
+      shadowOffset:{
+        height:5,
+        width:0
+      },
+      borderBottomColor:color_pallete[2],
+    },
+    headerText:{
+      fontSize: 30,
+      fontWeight: 'bold',
+      fontFamily:'Avenir Next',
+      color:color_pallete[2],
+      marginLeft:'5%'
+    },
   container: {
     flex: 1,
     backgroundColor: "#fffbf7",
@@ -126,6 +165,7 @@ const styles = StyleSheet.create({
   emailWrapper: {
     width: "100%",
     marginBottom: 8,
+    marginTop: 20,
   },
   emailContainer: {
     flexDirection: "row",
@@ -142,7 +182,7 @@ const styles = StyleSheet.create({
   emailText: {
     fontFamily: "AvenirNext-Regular",
     fontSize: 13,
-    color: "#8B4513",
+    color: "#7F513A",
     textAlign: "center",
   },
   membershipContainer: {
@@ -164,11 +204,14 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 320,
     marginBottom: 24,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignSelf: "center"
   },
   inputLabel: {
     fontFamily: "AvenirNext-Regular",
     fontSize: 14,
-    color: "#8B4513",
+    color: "#F98B4E",
     marginBottom: 8,
   },
   inputField: {
@@ -190,6 +233,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 24,
+    alignSelf:  "center"
   },
   resetPasswordText: {
     fontFamily: "AvenirNext-Bold",
@@ -200,16 +244,20 @@ const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignSelf: "center",
+    marginTop: 20,
     maxWidth: 320,
     width: "100%",
   },
   cancelButton: {
+    flex: 1,
     backgroundColor: "transparent",
     borderColor: "#F98B4E",
     borderWidth: 1,
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    marginRight: 10,
     borderRadius: 12,
+    alignItems: "center"
   },
   cancelButtonText: {
     fontFamily: "AvenirNext-Medium",
@@ -218,10 +266,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   saveChangesButton: {
-    backgroundColor: "#F98B4E",
+    flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    marginLeft: 10,
     borderRadius: 12,
+    alignItems: "center"
   },
   saveChangesText: {
     fontFamily: "AvenirNext-Bold",
