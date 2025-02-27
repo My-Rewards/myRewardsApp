@@ -183,12 +183,13 @@ export default function TabLayout(){
             Profile
           </Text>
         ),
-        header: () => (
-          <View style={[styles.header, {paddingBottom:5}]}>
-            <SafeAreaView />
-            <Text style={styles.headerText}>Profile</Text>
-          </View>
-        )
+        // header: () => (
+        //   <View style={[styles.header, {paddingBottom:5}]}>
+        //     <SafeAreaView />
+        //     <Text style={styles.headerText}>Profile</Text>
+        //   </View>
+        // )
+        headerShown: false,
       }}
     />
   </Tabs>
