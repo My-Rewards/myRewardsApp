@@ -21,7 +21,7 @@ export default function Root() {
           <Stack.Screen name={'sign-in'} 
             options={{
               headerShown:false,
-              animation:'none'
+               animation:'none'
               }} />
             <Stack.Screen name={'sign-up'} 
             options={{
@@ -33,6 +33,11 @@ export default function Root() {
               animation:'fade'
               }} />
             <Stack.Screen name={'verificationScreen'} 
+            options={{
+              headerShown:false,
+              animation:'slide_from_right'
+              }} />
+            <Stack.Screen name={'forgot-password'}
             options={{
               headerShown:false,
               animation:'slide_from_right'
