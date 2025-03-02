@@ -42,6 +42,11 @@ export default function Root() {
               headerShown:false,
               animation:'slide_from_right'
               }} />
+            <Stack.Screen name={'password-reset-success'}
+            options={{
+              headerShown:false,
+              animation:'slide_from_right'
+              }} />
           </Stack>
       </SessionProvider>
     </PropsProvider>

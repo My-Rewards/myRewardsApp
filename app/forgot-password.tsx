@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { useEffect, useState } from 'react';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 function ForgotPassword() {
   const [code, setCode] = useState("");
@@ -13,26 +14,29 @@ function ForgotPassword() {
   }, [code, password, confirmPassword]);
 
   const handleResetPassword = () => {
-    console.log("Reset password with code:", code, "password:", password, "confirmPassword:", confirmPassword);
+    // if(password == confirmPassword){
+    //     console.log("Passwords match");
+    // }
+    router.push('/password-reset-success');
   };
 
   return (
     <View style={styles.container}>
     <SafeAreaView/>
       <Text style={styles.title}>Reset password</Text>
-      <View style={styles.screenContainer}>
+      <View style={styles.formContainer}>
       <Text style={styles.text}>{textNotificationBox}</Text>
-      <View style={styles.inputContainer}>
+      <View style={styles.inputBoxContainer}>
         <Text style={styles.text}>Code</Text>
         <TextInput
-            style={styles.input}
+            style={styles.inputBox}
             value={code}
             onChangeText={setCode}
             placeholder="Enter code"
         />
         <Text style={styles.text}>New Password</Text>
         <TextInput
-            style={styles.input}
+            style={styles.inputBox}
             value={password}
             onChangeText={setPassword}
             placeholder="Enter new password"
@@ -40,7 +44,7 @@ function ForgotPassword() {
         />
         <Text style={styles.text}>Confirm Password</Text>
         <TextInput
-            style={styles.input}
+            style={styles.inputBox}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             placeholder="Confirm new password"
@@ -61,10 +65,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#F8F6F1', 
         height: '100%',
     },
-    screenContainer: {
+    formContainer: {
         padding: 30,
     },
-    inputContainer: {
+    inputBoxContainer: {
         marginTop: 20,
     },
     title: {
@@ -81,7 +85,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginBottom: 5,
     },
-    input: {
+    inputBox: {
         borderWidth: 1,
         borderColor: '#7F513A',
         padding: 10,
