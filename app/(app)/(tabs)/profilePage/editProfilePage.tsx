@@ -9,7 +9,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const { profile, fetchProfile } = localData();
   const { triggerLoadingScreen } = useProps();
-
+  const {alert} = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
@@ -27,7 +27,7 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = () => {
     if (firstName !== "" || lastName !== "") {
-      console.log("Saving changes...", { firstName, lastName });
+      alert("Profile Updated", "Your profile has been updated successfully", "success");  
       fetchProfile();
       router.back();
     }

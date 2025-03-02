@@ -27,6 +27,20 @@ export default function ProfileStack() {
                     <Text style={styles.headerText}>Forgot Password</Text>
                   </View>
                 )}} />
+                 <Stack.Screen name="privacy-policy" options={{ headerShown: true,    
+        header: () => (
+                  <View style={[styles.header, {paddingBottom:5}]}>
+                    <SafeAreaView />
+                    <Text style={styles.headerText}>Privacy Policy</Text>
+                  </View>
+                )}} />
+                 <Stack.Screen name="legal" options={{ headerShown: true,    
+        header: () => (
+                  <View style={[styles.header, {paddingBottom:5}]}>
+                    <SafeAreaView />
+                    <Text style={styles.headerText}>Legal</Text>
+                  </View>
+                )}} />
     </Stack>
   );
 }

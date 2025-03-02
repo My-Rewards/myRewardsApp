@@ -118,7 +118,7 @@ export default function ProfilePage() {
           </View>
 
           {/* View Plans Button */}
-          <Pressable style={styles.viewPlansButton}>
+          <Pressable style={styles.viewPlansButton} onPress={() => router.push('../../(tabs)/plansPage')}>
             <Text style={styles.viewPlansText}>view your plans</Text>
           </Pressable>
         </View>
@@ -162,7 +162,7 @@ export default function ProfilePage() {
 
           {/* Second Card Group */}
           <View style={styles.card}>
-            <Pressable style={styles.menuItem}>
+            <Pressable style={styles.menuItem} onPress={() => router.push('profilePage/privacy-policy')}>
               <Text style={styles.menuText}>Privacy</Text>
               <SvgXml
                 xml={privacySvg}
@@ -172,7 +172,7 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable style={styles.menuItem} onPress={() => router.push('profilePage/legal')}>  
               <Text style={styles.menuText}>Legal</Text>
               <SvgXml
                 xml={legalSvg}

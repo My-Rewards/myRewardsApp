@@ -6,7 +6,7 @@ function forgotPassword() {
   return (
     <View>
       <SafeAreaView />
-      <Text>Forgot Password</Text>
+      <Text>Privacy Policy</Text>
       <Pressable onPress={() => router.back()}>
         <Text>Go Back</Text>
       </Pressable>
