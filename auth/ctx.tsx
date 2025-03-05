@@ -1,5 +1,5 @@
 import { useContext, useEffect, createContext, type PropsWithChildren, useState } from 'react';
-import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser } from 'aws-amplify/auth'
+import { signIn, signUp, fetchAuthSession, signOut, signInWithRedirect, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth'
 import { userSignIn, userSignUp,} from '@/params/auth';
 import 'aws-amplify/auth/enable-oauth-listener';
 /* 
@@ -8,21 +8,32 @@ import 'aws-amplify/auth/enable-oauth-listener';
   if not authenticated -> redirect to landing screen
   if authenticated -> return sub to retrieve user info
 */
+type UserAttributes = {
+  given_name?: string;
+  family_name?: string;
+  email?: string;
+  sub?: string;
+  [key: string]: string | undefined;
+};
 
-const AuthContext = createContext<{
-  signIn: (profile: userSignIn) => Promise<string>; 
-  signUp: (profile: userSignUp) => Promise<boolean>; 
-  googleSignIn: ()=> Promise<string>,
+type AuthContextType = {
+  signIn: (profile: userSignIn) => Promise<string>;
+  signUp: (profile: userSignUp) => Promise<boolean>;
+  googleSignIn: () => Promise<string>;
   signOut: () => void;
-  userSub: string|null;
+  userSub: string | null;
   isLoading: boolean;
-}>({
+  userAttributes: UserAttributes | null;
+};
+
+const AuthContext = createContext<AuthContextType>({
   signIn: async () => 'error',
   signUp: async () => false,
   googleSignIn: async () => 'error',
   signOut: async () => null,
   userSub: null,
   isLoading: false,
+  userAttributes: null,
 });
 
 export function useSession() {
@@ -36,31 +47,43 @@ export function useSession() {
   return value;
 }
 
+
+const safelyFetchUserAttributes = async (): Promise<UserAttributes | null> => {
+  try {
+    const attributes = await fetchUserAttributes();
+    console.log("Successfully fetched user attributes:", attributes);
+    return attributes as UserAttributes;
+  } catch (error) {
+    console.error("Error fetching user attributes:", error);
+    return null;
+  }
+};
+
 export function SessionProvider({ children }: PropsWithChildren) {
   const [userSub, setUserSub] = useState<string|null>(null);
   const [fetching, setFetching] = useState(false);
+  const [userAttributes, setUserAttributes] = useState<UserAttributes | null>(null);
+
 
   const checkUserSession = async () => {
     setFetching(true);
 
-    // REMOVE THIS WHEN DONE TESTING
-    // setUserSub('mockSub');
-    // setFetching(false);
-    // 
-
-  //   // UNCOMMENT THIS AFTER TESTING
     try {
       const currentSession = await fetchAuthSession();
       console.log("Session: ", currentSession);
       console.log("Credentials: ", currentSession.credentials)
       if(currentSession.tokens?.idToken && currentSession.userSub){
         setUserSub(currentSession.userSub);
+        // const attributes = await safelyFetchUserAttributes();
+        // setUserAttributes(attributes);
       }else{
         setUserSub(null);
+        setUserAttributes(null);
       }
     } catch (error) {
       console.log("Error getting session: ", error);
       setUserSub(null);
+      setUserAttributes(null);
     } finally {
       setFetching(false);
     }
@@ -76,17 +99,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (profile:userSignIn) => {
           setFetching(true); 
 
-          // REMOVE THIS AFTER TESTING
-          // return new Promise((resolve) => {
-          //   setTimeout(() => {
-          //     setFetching(false); 
-          //     checkUserSession();
-
-          //     resolve('verified'); // Return true after the delay
-          //   }, 1000);
-          // });
-          // 
-          
           try{
             // is Authenticated
             const userSession = await fetchAuthSession();
@@ -126,15 +138,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signUp: async (profile:userSignUp) => {
           setFetching(true); 
-
-          // // REMOVE WHEN DONE TESTING
-          // return new Promise((resolve) => {
-          //   setTimeout(() => {
-          //     setFetching(false); 
-          //     resolve(true); // Return true after the delay
-          //   }, 1000);
-          // });
-          // // 
           
             try {
             const data = await signUp({
@@ -178,7 +181,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
           setUserSub(null);
         },
         userSub,
-        isLoading: fetching
+        isLoading: fetching,
+        userAttributes,
       }}>
       {children}
     </AuthContext.Provider>

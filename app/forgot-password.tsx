@@ -82,7 +82,7 @@ function ForgotPassword() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handleResetPassword}
+          onPress={handleResetPassword} disabled={buttonColor === "#FBC19F"}
         >
           <Text style={styles.buttonText}>Reset Password</Text>
         </TouchableOpacity>

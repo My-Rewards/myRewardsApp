@@ -29,6 +29,7 @@
     "@aws-sdk/credential-provider-cognito-identity": "^3.744.0",
     "@aws-sdk/credential-provider-node": "^3.670.0",
     "@expo/vector-icons": "^14.0.2",
+    "@gorhom/bottom-sheet": "^5.1.1",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/netinfo": "11.4.1",
