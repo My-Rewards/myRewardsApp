@@ -69,11 +69,12 @@ export interface Profile {
 }
 
 export type Reward = {
-  type: 'cost'|'percentage'|'item'; 
-  value?: number; 
-  item?: string;
-  rule: string|number;
-  bonusReward?: string
+  // type: 'cost'|'percentage'|'item'; 
+  // value?: number; 
+  // item?: string;
+  // rule: string|number;
+  // bonusReward?: string;
+ reward: string;
 };
 
 export interface Tier {

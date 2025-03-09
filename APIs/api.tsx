@@ -37,110 +37,110 @@ const organizationIds=[
 const rewardTemplates:RewardSystem[]=[
   {
     road_map: {
-      1: {
-        id: "tier-1",
-        rewards: [
-          { type: "cost", value: 5, rule: "menu Item" },
-          { type: "percentage", value: 10, rule: 0 },
-          { type: "percentage", value: 20, rule: "meal" },
-        ],
-      },
-      4: {
-        id: "tier-2",
-        rewards: [
-          { type: "cost", value: 5, rule: 0 },
-          { type: "percentage", value: 20, rule: "entree" },
-          { type: "item", item: "appetizer", rule: "meal" },
-        ],
-      },
-      8: {
-        id: "tier-3",
-        rewards: [
-          { type: "cost", value: 15, rule: "menu Item" },
-          { type: "percentage", value: 25, rule: "menu Item" },
-          { type: "item", item: "entree", rule: 0 },
-        ],
-      },
-    },
-    exp_rewards: {
-      expenditure: 100,
-      rewardsOptions: [
-        { type: "cost", value: 20, rule:'menu Item' },
-        { type: "percentage", value: 50, rule:'menu Item' },
-        { type: "item", item: 'entree', rule:0},
-      ]
-    }
-  },
-  {
-    road_map: {
       3: {
         id: "tier-1",
         rewards: [
-          { type: "cost", value: 5, rule: "menu Item" },
-          { type: "percentage", value: 10, rule: 0 },
-          { type: "percentage", value: 20, rule: "meal" },
+          { reward: "$5 off any menu item" },
+          { reward: "10% off next meal" },
+          { reward: "$5 dollars off" },
         ],
       },
       6: {
         id: "tier-2",
         rewards: [
-          { type: "cost", value: 5, rule: 0 },
-          { type: "percentage", value: 20, rule: "entree" },
-          { type: "item", item: "appetizer", rule: "meal" },
+          { reward: "$10 off any menu item" },
+          { reward: "15% off next meal" },
+          { reward: "$15 dollars off" },
         ],
       },
       9: {
         id: "tier-3",
         rewards: [
-          { type: "cost", value: 15, rule: "menu Item" },
-          { type: "percentage", value: 25, rule: "menu Item" },
-          { type: "item", item: "entree", rule: 0 },
-        ],
-      },
-    },
-    exp_rewards: {
-      expenditure: 150,
-      rewardsOptions: [
-        { type: "cost", value: 20, rule:'menu Item' },
-        { type: "percentage", value: 50, rule:'menu Item' },
-        { type: "item", item: 'entree', rule:0},
-      ]
-    }
-  },
-  {
-    road_map: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          { type: "cost", value: 5, rule: "menu Item" },
-          { type: "percentage", value: 10, rule: 0 },
-          { type: "percentage", value: 20, rule: "meal" },
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          { type: "cost", value: 5, rule: 0 },
-          { type: "percentage", value: 20, rule: "entree" },
-          { type: "item", item: "appetizer", rule: "meal" },
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          { type: "cost", value: 15, rule: "menu Item" },
-          { type: "percentage", value: 25, rule: "menu Item" },
-          { type: "item", item: "entree", rule: 0 },
+          { reward: "$15 off any menu item" },
+          { reward: "20% off next meal" },
+          { reward: "$25 dollars off" },
         ],
       },
     },
       exp_rewards: {
         expenditure: 150,
         rewardsOptions: [
-          { type: "cost", value: 20, rule:'menu Item' },
-          { type: "percentage", value: 50, rule:'menu Item' },
-          { type: "item", item: 'entree', rule:0},
-        ]
+          { reward: "$5 off menu item" },
+          { reward: "5% off next meal" },
+          { reward: "$5 dollars off" },
+        ],
+      }
+},
+ {
+  road_map: {
+    3: {
+      id: "tier-1",
+      rewards: [
+        { reward: "$5 off any menu item" },
+        { reward: "10% off next meal" },
+        { reward: "$5 dollars off" },
+      ],
+    },
+    6: {
+      id: "tier-2",
+      rewards: [
+        { reward: "$10 off any menu item" },
+        { reward: "15% off next meal" },
+        { reward: "$15 dollars off" },
+      ],
+    },
+    9: {
+      id: "tier-3",
+      rewards: [
+        { reward: "$15 off any menu item" },
+        { reward: "20% off next meal" },
+        { reward: "$25 dollars off" },
+      ],
+    },
+  },
+    exp_rewards: {
+      expenditure: 150,
+      rewardsOptions: [
+        { reward: "$5 off menu item" },
+        { reward: "5% off next meal" },
+        { reward: "$5 dollars off" },
+      ],
+    }
+},
+  {
+    road_map: {
+      3: {
+        id: "tier-1",
+        rewards: [
+          { reward: "$5 off any menu item" },
+          { reward: "10% off next meal" },
+          { reward: "$5 dollars off" },
+        ],
+      },
+      6: {
+        id: "tier-2",
+        rewards: [
+          { reward: "$10 off any menu item" },
+          { reward: "15% off next meal" },
+          { reward: "$15 dollars off" },
+        ],
+      },
+      9: {
+        id: "tier-3",
+        rewards: [
+          { reward: "$15 off any menu item" },
+          { reward: "20% off next meal" },
+          { reward: "$25 dollars off" },
+        ],
+      },
+    },
+      exp_rewards: {
+        expenditure: 150,
+        rewardsOptions: [
+          { reward: "$5 off menu item" },
+          { reward: "5% off next meal" },
+          { reward: "$5 dollars off" },
+        ],
       }
   },
   {
@@ -148,35 +148,35 @@ const rewardTemplates:RewardSystem[]=[
       3: {
         id: "tier-1",
         rewards: [
-          { type: "cost", value: 5, rule: "menu Item" },
-          { type: "percentage", value: 10, rule: 0 },
-          { type: "percentage", value: 20, rule: "meal" },
+          { reward: "$5 off any menu item" },
+          { reward: "10% off next meal" },
+          { reward: "$5 dollars off" },
         ],
       },
       6: {
         id: "tier-2",
         rewards: [
-          { type: "cost", value: 5, rule: 0 },
-          { type: "percentage", value: 20, rule: "entree" },
-          { type: "item", item: "appetizer", rule: "meal" },
+          { reward: "$10 off any menu item" },
+          { reward: "15% off next meal" },
+          { reward: "$15 dollars off" },
         ],
       },
       9: {
         id: "tier-3",
         rewards: [
-          { type: "cost", value: 15, rule: "menu Item" },
-          { type: "percentage", value: 25, rule: "menu Item" },
-          { type: "item", item: "entree", rule: 0 },
+          { reward: "$15 off any menu item" },
+          { reward: "20% off next meal" },
+          { reward: "$25 dollars off" },
         ],
       },
     },
       exp_rewards: {
         expenditure: 150,
         rewardsOptions: [
-          { type: "cost", value: 20, rule:'menu Item' },
-          { type: "percentage", value: 50, rule:'menu Item' },
-          { type: "item", item: 'entree', rule:0},
-        ]
+          { reward: "$5 off menu item" },
+          { reward: "5% off next meal" },
+          { reward: "$5 dollars off" },
+        ],
       }
   },
 ]
@@ -452,8 +452,8 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             firstPlan:true,
             activePlan:false,
             bonusRewards:[
-              { type: "cost", value: 10, rule:'menu Item', bonusReward:'birthday'},
-              { type: "percentage", value: 20, rule:'menu Item', bonusReward:'firstPlanr'},
+              { reward: "10 dollars off birthday deal"},
+              { reward: "20% off any menu item birthday deal"},
             ]
           },
           {
@@ -490,8 +490,8 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             firstPlan:true,
             activePlan:false,
             bonusRewards:[
-              { type: "cost", value: 10, rule:'menu Item', bonusReward:'birthday'},
-              { type: "percentage", value: 20, rule:'menu Item', bonusReward:'firstPlanr'},
+              { reward: "10 dollars off birthday deal"},
+              { reward: "20% off any menu item birthday deal"},
             ]
           }
         ];

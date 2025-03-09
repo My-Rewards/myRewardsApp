@@ -13,13 +13,8 @@ export default function ProfileStack() {
                   </View>
                 )}} />
         <Stack.Screen name="editProfilePage" options={{ 
-        headerShown: true,   
-        header: () => (
-                  <View style={[styles.header, {paddingBottom:5}]}>
-                    <SafeAreaView />
-                    <Text style={styles.headerText}>Edit Profile</Text>
-                  </View>
-                )}} />
+          headerShown: false,  
+        }} />
         <Stack.Screen name="reset-password" options={{ headerShown: true,    
         header: () => (
                   <View style={[styles.header, {paddingBottom:5}]}>

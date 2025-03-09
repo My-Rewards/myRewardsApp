@@ -7,12 +7,10 @@ import {
   Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useProps } from "./LoadingProp/propsProvider";
-import { SvgXml } from "react-native-svg";
+import { useProps } from "@/app/LoadingProp/propsProvider";
 import { BackButton } from "@/assets/images/MR-logos";
+import { SvgXml } from "react-native-svg";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -41,18 +39,17 @@ function ForgotPassword() {
     /*
     API logic here to update password for user
     */
-    router.push("/password-reset-success");
+    router.push("profilePage/editProfilePage/password-reset-success");
   };
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView />
+    <View style={styles.container} >
+      <View style={styles.backButtonContainer}>
+      <Pressable onPress={() => router.back()}>
+        <SvgXml xml={BackButton} fill={styles.backButton.color}/>
+      </Pressable>
+      </View>
       <View style={styles.topTextContainer}>
-          <View style={styles.backButtonContainer}>
-              <Pressable onPress={() => router.back()}>
-                <SvgXml xml={BackButton} fill={styles.backButton.color}/>
-              </Pressable>
-              </View>
         <Text style={styles.title}>Reset password</Text>
         <Text style={styles.text}>{textNotificationBox}</Text>
       </View>
@@ -90,13 +87,11 @@ function ForgotPassword() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handleResetPassword} disabled={buttonColor === "#FBC19F"}
+          onPress={handleResetPassword}
+          disabled={buttonColor === "#FBC19F"}
         >
           <Text style={styles.buttonText}>Reset Password</Text>
         </TouchableOpacity>
-        <Link href="/sign-in" style={styles.link}>
-          Return to sign in
-        </Link>
       </View>
     </View>
   );
@@ -158,7 +153,7 @@ const styles = StyleSheet.create({
     marginBottom: 36,
   },
   button: {
-    marginTop: 50,
+    marginTop: 100,
     padding: 15,
     borderRadius: 15,
     alignItems: "center",

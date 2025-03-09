@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image, TouchableOpacity } from "react-native";
 import { localData } from "@/app-data/appData";
-import { useProps } from "../../../LoadingProp/propsProvider";
+import { useProps } from "@/app/LoadingProp/propsProvider";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
 
@@ -93,7 +93,7 @@ export default function EditProfilePage() {
           </View>
   
           {/* Reset Password Button */}
-          <TouchableOpacity style={styles.resetPasswordButton} onPress={() => router.push('profilePage/reset-password')}>
+          <TouchableOpacity style={styles.resetPasswordButton} onPress={() => router.push('profilePage/editProfilePage/verify-email')}>
             <Text style={styles.resetPasswordText}>reset password</Text>
           </TouchableOpacity>
   
