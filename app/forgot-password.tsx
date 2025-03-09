@@ -47,12 +47,12 @@ function ForgotPassword() {
   return (
     <View style={styles.container}>
       <SafeAreaView />
+      <View style={styles.backButtonContainer}>
+          <Pressable onPress={() => router.back()}>
+            <SvgXml xml={BackButton} fill={styles.backButton.color} />
+          </Pressable>
+        </View>
       <View style={styles.topTextContainer}>
-          <View style={styles.backButtonContainer}>
-              <Pressable onPress={() => router.back()}>
-                <SvgXml xml={BackButton} fill={styles.backButton.color}/>
-              </Pressable>
-              </View>
         <Text style={styles.title}>Reset password</Text>
         <Text style={styles.text}>{textNotificationBox}</Text>
       </View>
@@ -90,7 +90,8 @@ function ForgotPassword() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handleResetPassword} disabled={buttonColor === "#FBC19F"}
+          onPress={handleResetPassword}
+          disabled={buttonColor === "#FBC19F"}
         >
           <Text style={styles.buttonText}>Reset Password</Text>
         </TouchableOpacity>
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   backButtonContainer: {
     position: "absolute",
-    top: 20,
+    top: 75,
     left: 20,
   },
   backButton: {

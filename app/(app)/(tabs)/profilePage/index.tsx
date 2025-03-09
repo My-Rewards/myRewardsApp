@@ -6,6 +6,7 @@ import {
   Image,
   Dimensions,
   Modal,
+  TouchableOpacity,
 } from "react-native";
 import { useSession } from "../../../../auth/ctx";
 import { localData } from "@/app-data/appData";
@@ -67,8 +68,7 @@ export default function ProfilePage() {
     setShowBottomPopUp(!showBottomPopUp);
   };
   const handleSignOut = () => {
-    signOut();
-    toggleBottomPopUp();
+      signOut();
   };
   const { profile } = localData();
   const windowHeight = Dimensions.get("window").height;
@@ -165,7 +165,7 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem} onPress={signOut}>
+            <Pressable style={styles.menuItem} onPress={handleSignOut}>
               <Text style={styles.menuText}>Sign out</Text>
               <SvgXml
                 xml={signOutSvg}
@@ -184,10 +184,12 @@ export default function ProfilePage() {
                 width={18} // Adjust size as needed
               />
             </Pressable>
-            {/* <BottomPopUp visible={showBottomPopUp} onClose={toggleBottomPopUp}>
-              <Pressable onPress={handleSignOut}>
-                <SvgXml xml={signOutSvg} width={25} height={25} />
+            {/* <BottomPopUp visible={showBottomPopUp}>
+              <TouchableOpacity onPress={handleSignOut}>
                 <Text>Sign Out</Text>
+              </TouchableOpacity>
+              <Pressable onPress={toggleBottomPopUp}>
+                <Text>Cancel</Text>
               </Pressable>
             </BottomPopUp> */}
             

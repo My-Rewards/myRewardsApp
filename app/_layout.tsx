@@ -47,6 +47,11 @@ export default function Root() {
               headerShown:false,
               animation:'slide_from_right'
               }} />
+              <Stack.Screen name={'verify-email'}
+            options={{
+              headerShown:false,
+              animation:'slide_from_right'
+              }} />
           </Stack>
       </SessionProvider>
     </PropsProvider>
