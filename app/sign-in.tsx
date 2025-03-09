@@ -71,7 +71,7 @@ export default function SignIn() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity onPress={() => router.push('/forgot-password')}>
+      <TouchableOpacity onPress={() => router.push('/verify-email')}>
         <Text style={styles.forgotPassword}>Forgot password? Click here</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.signInButton} onPress={signInFunc}>

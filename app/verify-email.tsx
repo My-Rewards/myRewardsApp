@@ -19,7 +19,7 @@ export default function verifyEmail() {
 
   const verifyEmail = () => {
     //Do some verification here
-    router.push("profilePage/editProfilePage/forgot-password");
+    router.push("/forgot-password");
   };
 
   return (

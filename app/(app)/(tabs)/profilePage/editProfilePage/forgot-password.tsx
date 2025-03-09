@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { BackButton } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -44,6 +45,7 @@ function ForgotPassword() {
 
   return (
     <View style={styles.container} >
+      <SafeAreaView/>
       <View style={styles.backButtonContainer}>
       <Pressable onPress={() => router.back()}>
         <SvgXml xml={BackButton} fill={styles.backButton.color}/>
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
   },
   backButtonContainer: {
     position: "absolute",
-    top: 20,
+    top: 75,
     left: 20,
   },
   backButton: {

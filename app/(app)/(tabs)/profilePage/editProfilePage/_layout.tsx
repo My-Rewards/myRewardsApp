@@ -33,13 +33,7 @@ export default function EditProfileStack() {
       <Stack.Screen
         name="forgot-password"
         options={{
-          headerShown: true,
-          header: () => (
-            <View style={[styles.header, { paddingBottom: 5 }]}>
-              <SafeAreaView />
-              <Text style={styles.headerText}>Forgot Password</Text>
-            </View>
-          ),
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -51,13 +45,7 @@ export default function EditProfileStack() {
        <Stack.Screen
         name="verify-email"
         options={{
-          headerShown: true,
-          header: () => (
-            <View style={[styles.header, { paddingBottom: 5 }]}>
-              <SafeAreaView />
-              <Text style={styles.headerText}>Verify Email</Text>
-            </View>
-          ),
+          headerShown: false,
         }}
       />
     </Stack>
