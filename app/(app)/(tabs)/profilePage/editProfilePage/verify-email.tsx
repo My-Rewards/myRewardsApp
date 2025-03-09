@@ -16,12 +16,19 @@ const reset_message =
 
 export default function verifyEmail() {
   const [email, setEmail] = useState("");
-
+  const [buttonColor, setButtonColor] = useState("#FBC19F");
   const verifyEmail = () => {
     //Do some verification here
     router.push("profilePage/editProfilePage/forgot-password");
   };
 
+  useEffect(() => {
+    if (email !== "") {
+        setButtonColor("#F98B4E");
+      } else {
+        setButtonColor("#FBC19F");
+      }
+  }, [email]);
   return (
     <View style={styles.container}>
     <SafeAreaView/>
@@ -39,7 +46,8 @@ export default function verifyEmail() {
           onChangeText={setEmail}
         ></TextInput>
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: buttonColor }]}
+          disabled={buttonColor === "#FBC19F"}
           onPress={verifyEmail} >
           <Text style={styles.buttonText}>Verify email</Text>
         </TouchableOpacity>
@@ -95,7 +103,6 @@ const styles = StyleSheet.create({
     color: "#7F513A",
   },
   button: {
-    backgroundColor: "#F35E43",
     marginTop: 50,
     padding: 15,
     borderRadius: 15,

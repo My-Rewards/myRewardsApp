@@ -12,8 +12,7 @@ import { localData } from "@/app-data/appData";
 import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { useAppConfig } from "@/hooks/useAppConfig";
-import { useEffect, useRef, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRef, useState } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -148,7 +147,7 @@ export default function ProfilePage() {
           {/* View Plans Button */}
           <Pressable
             style={styles.viewPlansButton}
-            onPress={() => router.push("../../(tabs)/plansPage")}
+            onPress={() => router.navigate("../../(tabs)/plansPage")}
           >
             <Text style={styles.viewPlansText}>view your plans</Text>
           </Pressable>
@@ -159,7 +158,7 @@ export default function ProfilePage() {
           <View style={styles.card}>
             <Pressable
               style={styles.menuItem}
-              onPress={() => router.push("profilePage/editProfilePage")}
+              onPress={() => router.navigate("profilePage/editProfilePage")}
             >
               <Text style={styles.menuText}>Edit profile</Text>
               <SvgXml xml={editProfileSvg} height={18} width={18} />
@@ -177,7 +176,7 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem} onPress={() => bottomSheetRef.current?.expand()}>
+            <Pressable style={styles.menuItem}>
               <Text style={styles.deleteText}>Delete account</Text>
               <SvgXml
                 xml={trashSvg}
@@ -185,12 +184,12 @@ export default function ProfilePage() {
                 width={18} // Adjust size as needed
               />
             </Pressable>
-            <BottomPopUp visible={showBottomPopUp} onClose={toggleBottomPopUp}>
+            {/* <BottomPopUp visible={showBottomPopUp} onClose={toggleBottomPopUp}>
               <Pressable onPress={handleSignOut}>
                 <SvgXml xml={signOutSvg} width={25} height={25} />
                 <Text>Sign Out</Text>
               </Pressable>
-            </BottomPopUp>
+            </BottomPopUp> */}
             
           </View>
 
@@ -198,7 +197,7 @@ export default function ProfilePage() {
           <View style={styles.card}>
             <Pressable
               style={styles.menuItem}
-              onPress={() => router.push("profilePage/privacy-policy")}
+              onPress={() => router.navigate("profilePage/privacy-policy")}
             >
               <Text style={styles.menuText}>Privacy</Text>
               <SvgXml

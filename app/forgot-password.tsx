@@ -41,7 +41,7 @@ function ForgotPassword() {
     /*
     API logic here to update password for user
     */
-    router.push("/password-reset-success");
+    router.navigate("/password-reset-success");
   };
 
   return (

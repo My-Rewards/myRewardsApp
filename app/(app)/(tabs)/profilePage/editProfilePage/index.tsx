@@ -93,7 +93,7 @@ export default function EditProfilePage() {
           </View>
   
           {/* Reset Password Button */}
-          <TouchableOpacity style={styles.resetPasswordButton} onPress={() => router.push('profilePage/editProfilePage/verify-email')}>
+          <TouchableOpacity style={styles.resetPasswordButton} onPress={() => router.navigate('profilePage/editProfilePage/verify-email')}>
             <Text style={styles.resetPasswordText}>reset password</Text>
           </TouchableOpacity>
   

@@ -138,7 +138,7 @@ const PlansPreview = React.memo(({ plansData, isLoading, openShop, fetchPlans }:
               color={color_pallete[1]}
             />
             <Text style={styles.txt1}> Start earning rewards today by creating your first custom plan! </Text>
-            <TouchableOpacity style={styles.discoverButton2}>
+            <TouchableOpacity style={styles.discoverButton2} onPress={() => router.navigate('/')}>
               <Text style={styles.btnText2}>discover more</Text>
             </TouchableOpacity>
           </View>
