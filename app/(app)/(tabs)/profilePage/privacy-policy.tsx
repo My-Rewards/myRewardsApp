@@ -1,17 +1,29 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-function forgotPassword() {
+import { SvgXml } from "react-native-svg";
+import { BackButton } from "@/assets/images/MR-logos";
+export default function legal() {
   return (
     <View>
       <SafeAreaView />
-      <Text>Privacy Policy</Text>
-      <Pressable onPress={() => router.back()}>
-        <Text>Go Back</Text>
-      </Pressable>
+      <View style={styles.backButtonContainer}>
+        <Pressable onPress={() => router.back()}>
+          <SvgXml xml={BackButton} fill={styles.backButton.color} />
+        </Pressable>
+      </View>
     </View>
   );
 }
 
-export default forgotPassword;
+const styles = StyleSheet.create({
+  backButtonContainer: {
+    position: "absolute",
+    top: 30,
+    left: 20,
+  },
+  backButton: {
+    color: "#F98B4E",
+  },
+});

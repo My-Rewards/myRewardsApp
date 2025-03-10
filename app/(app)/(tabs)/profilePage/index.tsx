@@ -5,16 +5,15 @@ import {
   Pressable,
   Image,
   Dimensions,
-  Modal,
-  TouchableOpacity,
 } from "react-native";
 import { useSession } from "../../../../auth/ctx";
 import { localData } from "@/app-data/appData";
 import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
-import { useAppConfig } from "@/hooks/useAppConfig";
-import { useRef, useState } from "react";
+//import { useAppConfig } from "@/hooks/useAppConfig";
+import { useEffect, useRef, useState } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
+import BottomSheet from "@gorhom/bottom-sheet";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M15.8932 20.9996H3.00682C1.34877 20.9996 0 19.6508 0 17.9928V5.10643C0 3.44838 1.34877 2.09961 3.00682 2.09961H11.9994C12.474 2.09961 12.8584 2.48405 12.8584 2.9587C12.8584 3.43335 12.474 3.81779 11.9994 3.81779H3.00682C2.29646 3.81779 1.71818 4.39607 1.71818 5.10643V17.9928C1.71818 18.7032 2.29646 19.2814 3.00682 19.2814H15.8932C16.6035 19.2814 17.1818 18.7032 17.1818 17.9928V8.11325C17.1818 7.6386 17.5663 7.25416 18.0409 7.25416C18.5156 7.25416 18.9 7.6386 18.9 8.11325V17.9928C18.9 19.6508 17.5512 20.9996 15.8932 20.9996Z" fill="#F35E43"/>
@@ -61,18 +60,28 @@ const privacySvg = `
 `;
 
 export default function ProfilePage() {
-  const bottomSheetRef = useRef(null);
+  const bottomSheetSignOutRef = useRef<BottomSheet>(null);
+  const bottomSheetDeleteRef = useRef<BottomSheet>(null);
+  const [isSignOutOpen, setSignOutOpen] = useState(false);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+
+  const toggleSignOutSheet = () => {
+    setSignOutOpen(!isSignOutOpen);
+    bottomSheetSignOutRef.current?.expand();
+  }
+  const toggleDeleteSheet = () => {
+    setDeleteOpen(!isDeleteOpen);
+    bottomSheetDeleteRef.current?.expand();
+  }
+
   const { signOut, userSub } = useSession();
-  const [showBottomPopUp, setShowBottomPopUp] = useState(false);
-  const toggleBottomPopUp = () => {
-    setShowBottomPopUp(!showBottomPopUp);
-  };
+
   const handleSignOut = () => {
       signOut();
   };
   const { profile } = localData();
   const windowHeight = Dimensions.get("window").height;
-  const config = useAppConfig();
+  //const config = useAppConfig();
   console.log(userSub);
   if (!profile) {
     return (
@@ -133,7 +142,7 @@ export default function ProfilePage() {
                 {formatDate(profile.dob)}
               </Text>
             </View>
-            <View style={styles.membershipRow}>
+            {/* <View style={styles.membershipRow}>
               {config ? (
                 <Text style={styles.membershipText}>
                   {"Config Received: " + config.isBeta}
@@ -141,7 +150,7 @@ export default function ProfilePage() {
               ) : (
                 <Text style={styles.membershipText}>Loading config...</Text>
               )}
-            </View>
+            </View> */}
           </View>
 
           {/* View Plans Button */}
@@ -165,7 +174,7 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem} onPress={handleSignOut}>
+            <Pressable style={styles.menuItem} onPress={toggleSignOutSheet}>
               <Text style={styles.menuText}>Sign out</Text>
               <SvgXml
                 xml={signOutSvg}
@@ -176,23 +185,14 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable style={styles.menuItem} onPress={toggleDeleteSheet}>
               <Text style={styles.deleteText}>Delete account</Text>
               <SvgXml
                 xml={trashSvg}
                 height={18} // Adjust size as needed
                 width={18} // Adjust size as needed
               />
-            </Pressable>
-            {/* <BottomPopUp visible={showBottomPopUp}>
-              <TouchableOpacity onPress={handleSignOut}>
-                <Text>Sign Out</Text>
-              </TouchableOpacity>
-              <Pressable onPress={toggleBottomPopUp}>
-                <Text>Cancel</Text>
-              </Pressable>
-            </BottomPopUp> */}
-            
+            </Pressable>            
           </View>
 
           {/* Second Card Group */}
@@ -224,6 +224,8 @@ export default function ProfilePage() {
           </View>
         </View>
       </View>
+      {isSignOutOpen && (<BottomPopUp ref={bottomSheetSignOutRef} buttonTitle="sign out" description="Stay signed in to log your next visit faster" backgroundColor="#F98B4E" onClose={toggleSignOutSheet}/>)}
+      {isDeleteOpen && (<BottomPopUp ref={bottomSheetDeleteRef} buttonTitle="delete" description="Delete account? This action cannot be undone." backgroundColor="#F35E43" onClose={toggleDeleteSheet}/>)}
     </View>
   );
 }
