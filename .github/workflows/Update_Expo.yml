@@ -29,13 +29,13 @@ jobs:
         id: fetch_ssm_parameters
         run: |
           # Fetch parameters from SSM
-            PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/$APP_ENV/customerUserPoolId" "/myRewardsApp/$APP_ENV/customerWebClientId" "/myRewardsApp/$APP_ENV/identityPoolIdCustomer" "/myRewardsApp/$APP_ENV/appConfig" --with-decryption --region us-east-1)
-    
-            # Extract and set environment variables
-            echo "USER_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/userPoolId").Value')" >> $GITHUB_ENV
-            echo "WEB_CLIENT_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/webClientId").Value')" >> $GITHUB_ENV
-            echo "IDENTITY_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/identityPoolId").Value')" >> $GITHUB_ENV
-            echo "APP_CONFIG_VALUES=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/appConfig").Value')" >> $GITHUB_ENV
+          PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/beta/userPoolId" "/myRewardsApp/beta/webClientId" "/myRewardsApp/beta/cognitoDomain" "/myRewardsApp/beta/identityPoolId" --with-decryption --region us-east-1)
+  
+          # Extract and set environment variables
+          echo "EXPO_PUBLIC_USER_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/userPoolId").Value')" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_WEB_CLIENT_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/webClientId").Value')" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_COGNITO_DOMAIN=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/cognitoDomain").Value')" >> $GITHUB_ENV
+          echo "EXPO_PUBLIC_IDENTITY_POOL_ID=$(echo $PARAMS | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/beta/identityPoolId").Value')" >> $GITHUB_ENV
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8

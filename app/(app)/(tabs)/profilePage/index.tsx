@@ -1,10 +1,19 @@
-import { Text, View, StyleSheet, Pressable, Image, Dimensions } from "react-native"
-import { useSession } from "../../../auth/ctx"
-import { localData } from "@/app-data/appData"
+import {
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+  Image,
+  Dimensions,
+} from "react-native";
+import { useSession } from "../../../../auth/ctx";
+import { localData } from "@/app-data/appData";
 import { SvgXml } from "react-native-svg";
-import { router } from 'expo-router';
-import { useAppConfig } from "@/hooks/useAppConfig";
-
+import { router } from "expo-router";
+//import { useAppConfig } from "@/hooks/useAppConfig";
+import { useEffect, useRef, useState } from "react";
+import BottomPopUp from "@/components/bottomPopUp";
+import BottomSheet from "@gorhom/bottom-sheet";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M15.8932 20.9996H3.00682C1.34877 20.9996 0 19.6508 0 17.9928V5.10643C0 3.44838 1.34877 2.09961 3.00682 2.09961H11.9994C12.474 2.09961 12.8584 2.48405 12.8584 2.9587C12.8584 3.43335 12.474 3.81779 11.9994 3.81779H3.00682C2.29646 3.81779 1.71818 4.39607 1.71818 5.10643V17.9928C1.71818 18.7032 2.29646 19.2814 3.00682 19.2814H15.8932C16.6035 19.2814 17.1818 18.7032 17.1818 17.9928V8.11325C17.1818 7.6386 17.5663 7.25416 18.0409 7.25416C18.5156 7.25416 18.9 7.6386 18.9 8.11325V17.9928C18.9 19.6508 17.5512 20.9996 15.8932 20.9996Z" fill="#F35E43"/>
@@ -38,7 +47,7 @@ const legalSvg = `
     </clipPath>
     </defs>
   </svg>
-`
+`;
 
 const privacySvg = `
   <svg width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,20 +57,40 @@ const privacySvg = `
     <path d="M17.4495 20.3146H2.86483C2.43771 20.3146 2.08352 19.9604 2.08352 19.5333C2.08352 19.1062 2.43771 18.752 2.86483 18.752H17.4495C17.8766 18.752 18.2308 19.1062 18.2308 19.5333C18.2308 19.9604 17.8766 20.3146 17.4495 20.3146Z" fill="#F35E43"/>
     <path d="M2.86484 20.3146C1.28136 20.3146 0 19.0333 0 17.4498C0 15.8663 1.28136 14.585 2.86484 14.585C3.29196 14.585 3.64615 14.9392 3.64615 15.3663C3.64615 15.7934 3.29196 16.1476 2.86484 16.1476C2.14602 16.1476 1.56264 16.731 1.56264 17.4498C1.56264 18.1686 2.14602 18.752 2.86484 18.752C3.29196 18.752 3.64615 19.1062 3.64615 19.5333C3.64615 19.9604 3.29196 20.3146 2.86484 20.3146Z" fill="#F35E43"/>
   </svg>
-`
+`;
 
 export default function ProfilePage() {
-  const { signOut } = useSession()
-  const { profile } = localData()
-  const windowHeight = Dimensions.get("window").height
-  const config = useAppConfig();
+  const bottomSheetSignOutRef = useRef<BottomSheet>(null);
+  const bottomSheetDeleteRef = useRef<BottomSheet>(null);
+  const [isSignOutOpen, setSignOutOpen] = useState(false);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+
+  const toggleSignOutSheet = () => {
+    setSignOutOpen(!isSignOutOpen);
+    bottomSheetSignOutRef.current?.expand();
+  }
+  const toggleDeleteSheet = () => {
+    setDeleteOpen(!isDeleteOpen);
+    bottomSheetDeleteRef.current?.expand();
+  }
+
+  const { signOut, userSub } = useSession();
+
+  const handleSignOut = () => {
+      signOut();
+  };
+  const { profile } = localData();
+  const windowHeight = Dimensions.get("window").height;
+  //const config = useAppConfig();
+  console.log(userSub);
   if (!profile) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
       </View>
-    )
+    );
   }
+
 
   const formatDate = (date: Date) => {
     return date
@@ -70,8 +99,8 @@ export default function ProfilePage() {
         month: "2-digit",
         year: "numeric",
       })
-      .replace(/\//g, ".")
-  }
+      .replace(/\//g, ".");
+  };
 
   return (
     <View style={[styles.container, { height: windowHeight - 90 }]}>
@@ -86,7 +115,9 @@ export default function ProfilePage() {
           />
 
           {/* User Info */}
-          <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
+          <Text
+            style={styles.userName}
+          >{`${profile.first_name} ${profile.last_name}`}</Text>
           <View style={styles.emailWrapper}>
             <View style={styles.emailContainer}>
               <View style={styles.emailLine} />
@@ -98,21 +129,35 @@ export default function ProfilePage() {
           {/* Membership Info */}
           <View style={styles.membershipContainer}>
             <View style={styles.membershipRow}>
-              <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
-              <Text style={styles.membershipText}>{formatDate(profile.dob)}</Text>
+              <Text style={styles.membershipText}>
+                Valued MyRewards member since:
+              </Text>
+              <Text style={styles.membershipText}>
+                {formatDate(profile.dob)}
+              </Text>
             </View>
             <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
-              <Text style={styles.membershipText}>{formatDate(profile.dob)}</Text>
+              <Text style={styles.membershipText}>
+                {formatDate(profile.dob)}
+              </Text>
             </View>
-            <View style={styles.membershipRow}>
-              {config ? (<Text style={styles.membershipText}>{"Config Received: " + config.isBeta}</Text>
-              ) : (<Text style={styles.membershipText}>Loading config...</Text>)}
-            </View>
+            {/* <View style={styles.membershipRow}>
+              {config ? (
+                <Text style={styles.membershipText}>
+                  {"Config Received: " + config.isBeta}
+                </Text>
+              ) : (
+                <Text style={styles.membershipText}>Loading config...</Text>
+              )}
+            </View> */}
           </View>
 
           {/* View Plans Button */}
-          <Pressable style={styles.viewPlansButton}>
+          <Pressable
+            style={styles.viewPlansButton}
+            onPress={() => router.navigate("../../(tabs)/plansPage")}
+          >
             <Text style={styles.viewPlansText}>view your plans</Text>
           </Pressable>
         </View>
@@ -120,20 +165,16 @@ export default function ProfilePage() {
         <View style={styles.actionButtonContainer}>
           {/* First Card Group */}
           <View style={styles.card}>
-          <Pressable
+            <Pressable
               style={styles.menuItem}
-              onPress={() => router.push('/editProfilePage')}  // Navigate to edit profile page
+              onPress={() => router.navigate("profilePage/editProfilePage")}
             >
               <Text style={styles.menuText}>Edit profile</Text>
-              <SvgXml
-                xml={editProfileSvg}
-                height={18}
-                width={18}
-              />
+              <SvgXml xml={editProfileSvg} height={18} width={18} />
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem} onPress={signOut}>
+            <Pressable style={styles.menuItem} onPress={toggleSignOutSheet}>
               <Text style={styles.menuText}>Sign out</Text>
               <SvgXml
                 xml={signOutSvg}
@@ -144,19 +185,22 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable style={styles.menuItem} onPress={toggleDeleteSheet}>
               <Text style={styles.deleteText}>Delete account</Text>
               <SvgXml
                 xml={trashSvg}
                 height={18} // Adjust size as needed
                 width={18} // Adjust size as needed
               />
-            </Pressable>
+            </Pressable>            
           </View>
 
           {/* Second Card Group */}
           <View style={styles.card}>
-            <Pressable style={styles.menuItem}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => router.navigate("profilePage/privacy-policy")}
+            >
               <Text style={styles.menuText}>Privacy</Text>
               <SvgXml
                 xml={privacySvg}
@@ -166,7 +210,10 @@ export default function ProfilePage() {
             </Pressable>
             <View style={styles.menuDivider} />
 
-            <Pressable style={styles.menuItem}>
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => router.push("profilePage/legal")}
+            >
               <Text style={styles.menuText}>Legal</Text>
               <SvgXml
                 xml={legalSvg}
@@ -177,8 +224,10 @@ export default function ProfilePage() {
           </View>
         </View>
       </View>
+      {isSignOutOpen && (<BottomPopUp ref={bottomSheetSignOutRef} buttonTitle="sign out" description="Stay signed in to log your next visit faster" backgroundColor="#F98B4E" onClose={toggleSignOutSheet} onSubmit={handleSignOut}/>)}
+      {isDeleteOpen && (<BottomPopUp ref={bottomSheetDeleteRef} buttonTitle="delete" description="Delete account? This action cannot be undone." backgroundColor="#F35E43" onClose={toggleDeleteSheet} onSubmit={handleSignOut}/>)}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -210,8 +259,8 @@ const styles = StyleSheet.create({
   },
   emailWrapper: {
     width: "100%",
-    marginBottom: 8,  // Increase space below the email section
-    marginTop: 20,  // Add some top spacing to push it down
+    marginBottom: 8, // Increase space below the email section
+    marginTop: 20, // Add some top spacing to push it down
   },
   emailContainer: {
     flexDirection: "row",
@@ -234,8 +283,8 @@ const styles = StyleSheet.create({
   membershipContainer: {
     width: "100%",
     maxWidth: 300,
-    marginBottom: 20,  // Push the membership lines further down
-    marginTop: 5,  // Adjust the top margin if needed
+    marginBottom: 20, // Push the membership lines further down
+    marginTop: 5, // Adjust the top margin if needed
   },
   membershipRow: {
     flexDirection: "row",
@@ -253,7 +302,7 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     padding: 12,
     borderRadius: 12,
-    marginBottom: 26,  // Keep the "View Your Plans" button in its current place
+    marginBottom: 26, // Keep the "View Your Plans" button in its current place
     marginTop: 2,
   },
   viewPlansText: {
@@ -307,4 +356,12 @@ const styles = StyleSheet.create({
     width: "92%", // Adjusted to align with new card size
     alignSelf: "center",
   },
-})
+  modalContent: {
+    height: 1 / 2,
+  },
+  modalTitle: {},
+  modalButtonText: {},
+  modalMessage: {},
+  modalButton: {},
+  modalButtons: {},
+});

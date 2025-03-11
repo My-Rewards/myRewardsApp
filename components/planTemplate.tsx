@@ -39,42 +39,42 @@ function getNextRewardVisits(plan:Plan) {
     return 0;
 }
 
-function anlyzeInput(reward:Reward){
-    if (!reward || !reward.type) {
-        return "Invalid reward";
-      }
+// function anlyzeInput(reward:Reward){
+//     if (!reward || !reward.type) {
+//         return "Invalid reward";
+//       }
     
-      switch (reward.type) {
-        case "item":
-          if (typeof reward.rule === "number" && reward.rule > 0) {
-            return `Free ${reward.item} with any purchase of +$${reward.rule}`;
-          } else if (typeof reward.rule === "string") {
-            return `Free ${reward.item} with any ${reward.rule}`;
-          }
-          return `Free ${reward.item}`;
+//       switch (reward.type) {
+//         case "item":
+//           if (typeof reward.rule === "number" && reward.rule > 0) {
+//             return `Free ${reward.item} with any purchase of +$${reward.rule}`;
+//           } else if (typeof reward.rule === "string") {
+//             return `Free ${reward.item} with any ${reward.rule}`;
+//           }
+//           return `Free ${reward.item}`;
     
-        case "percentage":
-          if (typeof reward.rule === "number" && reward.rule >0) {
-            return `${reward.value}% off any order +$${reward.rule}+`;
-          }
-          else if (typeof reward.rule === "string" && reward.rule !== ''){
-            return `$${reward.value} off any ${reward.rule}`;
-          }
-          return `${reward.value}% off`;
+//         case "percentage":
+//           if (typeof reward.rule === "number" && reward.rule >0) {
+//             return `${reward.value}% off any order +$${reward.rule}+`;
+//           }
+//           else if (typeof reward.rule === "string" && reward.rule !== ''){
+//             return `$${reward.value} off any ${reward.rule}`;
+//           }
+//           return `${reward.value}% off`;
     
-        case "cost":
-          if (typeof reward.rule === "string") {
-            return `$${reward.value} off any ${reward.rule}`;
-          }
-          else if (typeof reward.rule === "number" && reward.rule >0){
-            return `$${reward.value} with any purchase of +$${reward.rule}`;
-          }
-          return `$${reward.value} off`;
+//         case "cost":
+//           if (typeof reward.rule === "string") {
+//             return `$${reward.value} off any ${reward.rule}`;
+//           }
+//           else if (typeof reward.rule === "number" && reward.rule >0){
+//             return `$${reward.value} with any purchase of +$${reward.rule}`;
+//           }
+//           return `$${reward.value} off`;
     
-        default:
-          return "Unknown reward type";
-      }
-}
+//         default:
+//           return "Unknown reward type";
+//       }
+// }
 
 const categorizeRewards = ({road_map, visits, redeemableRewards}:CategorizeProps) => {
     const milestones = Object.keys(road_map)
@@ -100,7 +100,7 @@ const ListRewards: React.FC<{rewardList:Reward[], option:number, redeemable:bool
     return(
         <View>
             {rewardList.map((rewards, index) => {
-                const rewardOption = anlyzeInput(rewards);
+                const rewardOption = rewards.reward;
                 return(
                     <View key={index}>
                         {index == 0 && (
