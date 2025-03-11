@@ -9,15 +9,20 @@ type BottomPopUpProps = {
   description: string;
   buttonTitle: string;
   onClose: () => void;
+  onSubmit: () => void;
 };
 
-const BottomPopUp = forwardRef<BottomSheet, BottomPopUpProps>(({ backgroundColor, description, buttonTitle, onClose }, ref) => {
+const BottomPopUp = forwardRef<BottomSheet, BottomPopUpProps>(({ backgroundColor, description, buttonTitle, onClose, onSubmit }, ref) => {
   const snap_points = ["50%"];
 
   const handleClose = () => {
     (ref as React.RefObject<BottomSheet>).current?.close();
     onClose();
   };
+
+  const handleSubmit = () => {
+    onSubmit();
+  }
 
   return (
     <BottomSheet
@@ -32,7 +37,7 @@ const BottomPopUp = forwardRef<BottomSheet, BottomPopUpProps>(({ backgroundColor
       <BottomSheetView style={[styles.contentContainer, { backgroundColor: backgroundColor }]}>
         <Text style={styles.description}>{description}</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.mainButton]}>
+          <TouchableOpacity style={[styles.mainButton]} onPress={handleSubmit}>
             <Text style={[styles.mainButtonText, { color: backgroundColor }]}>{buttonTitle}</Text>
           </TouchableOpacity>
           <Pressable onPress={handleClose} style={[styles.cancelButton, { backgroundColor: backgroundColor }]}>

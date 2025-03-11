@@ -224,8 +224,8 @@ export default function ProfilePage() {
           </View>
         </View>
       </View>
-      {isSignOutOpen && (<BottomPopUp ref={bottomSheetSignOutRef} buttonTitle="sign out" description="Stay signed in to log your next visit faster" backgroundColor="#F98B4E" onClose={toggleSignOutSheet}/>)}
-      {isDeleteOpen && (<BottomPopUp ref={bottomSheetDeleteRef} buttonTitle="delete" description="Delete account? This action cannot be undone." backgroundColor="#F35E43" onClose={toggleDeleteSheet}/>)}
+      {isSignOutOpen && (<BottomPopUp ref={bottomSheetSignOutRef} buttonTitle="sign out" description="Stay signed in to log your next visit faster" backgroundColor="#F98B4E" onClose={toggleSignOutSheet} onSubmit={handleSignOut}/>)}
+      {isDeleteOpen && (<BottomPopUp ref={bottomSheetDeleteRef} buttonTitle="delete" description="Delete account? This action cannot be undone." backgroundColor="#F35E43" onClose={toggleDeleteSheet} onSubmit={handleSignOut}/>)}
     </View>
   );
 }
