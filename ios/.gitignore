@@ -32,3 +32,6 @@ Podfile.lock
 
 # Ignore project.pbxproj0
 ios/myRewards.xcodeproj/project.pbxproj0
+
+# Ignore project.pbxproj
+ios/myRewards.xcodeproj/project.pbxproj
