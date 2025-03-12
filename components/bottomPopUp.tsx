@@ -35,6 +35,7 @@ const BottomPopUp = forwardRef<BottomSheet, BottomPopUpProps>(({ backgroundColor
       style={{ backgroundColor: 'transparent' }}
     >
       <BottomSheetView style={[styles.contentContainer, { backgroundColor: backgroundColor }]}>
+        <SvgXml xml={mediumLogo} style={styles.svg}/>
         <Text style={styles.description}>{description}</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.mainButton]} onPress={handleSubmit}>
@@ -106,6 +107,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
+  svg: {
+    width: 200,
+    height: 50,
+    color: "#FFFBF6"
+  }
 });
 
 export default BottomPopUp;
