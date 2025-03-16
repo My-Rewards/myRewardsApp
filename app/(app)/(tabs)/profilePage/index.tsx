@@ -10,8 +10,7 @@ import { useSession } from "../../../../auth/ctx";
 import { localData } from "@/app-data/appData";
 import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
-//import { useAppConfig } from "@/hooks/useAppConfig";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
 import BottomSheet from "@gorhom/bottom-sheet";
 const editProfileSvg = `
@@ -60,6 +59,7 @@ const privacySvg = `
 `;
 
 export default function ProfilePage() {
+  const user = useSession();
   const bottomSheetSignOutRef = useRef<BottomSheet>(null);
   const bottomSheetDeleteRef = useRef<BottomSheet>(null);
   const [isSignOutOpen, setSignOutOpen] = useState(false);
@@ -81,8 +81,6 @@ export default function ProfilePage() {
   };
   const { profile } = localData();
   const windowHeight = Dimensions.get("window").height;
-  //const config = useAppConfig();
-  console.log(userSub);
   if (!profile) {
     return (
       <View style={styles.container}>
@@ -117,11 +115,11 @@ export default function ProfilePage() {
           {/* User Info */}
           <Text
             style={styles.userName}
-          >{`${profile.first_name} ${profile.last_name}`}</Text>
+          >{`${user.userAttributes?.fullname?.firstName || "first name"} ${user.userAttributes?.fullname?.lastName || "last name"}`}</Text>
           <View style={styles.emailWrapper}>
             <View style={styles.emailContainer}>
               <View style={styles.emailLine} />
-              <Text style={styles.emailText}>{profile.username}</Text>
+              <Text style={styles.emailText}>{user.userAttributes?.email || "email@email.com"}</Text>
               <View style={styles.emailLine} />
             </View>
           </View>
@@ -133,24 +131,15 @@ export default function ProfilePage() {
                 Valued MyRewards member since:
               </Text>
               <Text style={styles.membershipText}>
-                {formatDate(profile.dob)}
+                {formatDate(user.userAttributes?.date_created ? new Date(user.userAttributes.date_created) : new Date())}
               </Text>
             </View>
             <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>
-                {formatDate(profile.dob)}
+                {formatDate(user.userAttributes?.birthdate ? new Date(user.userAttributes.birthdate) : new Date())}
               </Text>
             </View>
-            {/* <View style={styles.membershipRow}>
-              {config ? (
-                <Text style={styles.membershipText}>
-                  {"Config Received: " + config.isBeta}
-                </Text>
-              ) : (
-                <Text style={styles.membershipText}>Loading config...</Text>
-              )}
-            </View> */}
           </View>
 
           {/* View Plans Button */}
