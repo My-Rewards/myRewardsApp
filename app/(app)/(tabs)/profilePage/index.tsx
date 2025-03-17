@@ -5,14 +5,15 @@ import {
   Pressable,
   Image,
   Dimensions,
+  Alert,
 } from "react-native";
-import { useSession } from "../../../../auth/ctx";
-import { localData } from "@/app-data/appData";
+import { useSession } from "@/auth/ctx";
 import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
 import BottomSheet from "@gorhom/bottom-sheet";
+import formatDate from "@/services/formatDate";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M15.8932 20.9996H3.00682C1.34877 20.9996 0 19.6508 0 17.9928V5.10643C0 3.44838 1.34877 2.09961 3.00682 2.09961H11.9994C12.474 2.09961 12.8584 2.48405 12.8584 2.9587C12.8584 3.43335 12.474 3.81779 11.9994 3.81779H3.00682C2.29646 3.81779 1.71818 4.39607 1.71818 5.10643V17.9928C1.71818 18.7032 2.29646 19.2814 3.00682 19.2814H15.8932C16.6035 19.2814 17.1818 18.7032 17.1818 17.9928V8.11325C17.1818 7.6386 17.5663 7.25416 18.0409 7.25416C18.5156 7.25416 18.9 7.6386 18.9 8.11325V17.9928C18.9 19.6508 17.5512 20.9996 15.8932 20.9996Z" fill="#F35E43"/>
@@ -68,37 +69,26 @@ export default function ProfilePage() {
   const toggleSignOutSheet = () => {
     setSignOutOpen(!isSignOutOpen);
     bottomSheetSignOutRef.current?.expand();
-  }
+  };
   const toggleDeleteSheet = () => {
     setDeleteOpen(!isDeleteOpen);
     bottomSheetDeleteRef.current?.expand();
-  }
+  };
 
-  const { signOut, userSub } = useSession();
+  const { signOut } = useSession();
 
   const handleSignOut = () => {
-      signOut();
+    signOut();
   };
-  const { profile } = localData();
+
+  const handleDelete = () => {
+    Alert.alert("Delete Account?", "This action cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: () => signOut() },
+    ]);
+  };
+
   const windowHeight = Dimensions.get("window").height;
-  if (!profile) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-
-  const formatDate = (date: Date) => {
-    return date
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-      .replace(/\//g, ".");
-  };
 
   return (
     <View style={[styles.container, { height: windowHeight - 90 }]}>
@@ -113,13 +103,15 @@ export default function ProfilePage() {
           />
 
           {/* User Info */}
-          <Text
-            style={styles.userName}
-          >{`${user.userAttributes?.fullname?.firstName || "first name"} ${user.userAttributes?.fullname?.lastName || "last name"}`}</Text>
+          <Text style={styles.userName}>{`${
+            user.userAttributes?.fullname?.firstName || "first name"
+          } ${user.userAttributes?.fullname?.lastName || "last name"}`}</Text>
           <View style={styles.emailWrapper}>
             <View style={styles.emailContainer}>
               <View style={styles.emailLine} />
-              <Text style={styles.emailText}>{user.userAttributes?.email || "email@email.com"}</Text>
+              <Text style={styles.emailText}>
+                {user.userAttributes?.email || "email@email.com"}
+              </Text>
               <View style={styles.emailLine} />
             </View>
           </View>
@@ -131,13 +123,21 @@ export default function ProfilePage() {
                 Valued MyRewards member since:
               </Text>
               <Text style={styles.membershipText}>
-                {formatDate(user.userAttributes?.date_created ? new Date(user.userAttributes.date_created) : new Date())}
+                {formatDate(
+                  user.userAttributes?.date_created
+                    ? new Date(user.userAttributes.date_created)
+                    : new Date()
+                )}
               </Text>
             </View>
             <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>
-                {formatDate(user.userAttributes?.birthdate ? new Date(user.userAttributes.birthdate) : new Date())}
+                {formatDate(
+                  user.userAttributes?.birthdate
+                    ? new Date(user.userAttributes.birthdate)
+                    : new Date()
+                )}
               </Text>
             </View>
           </View>
@@ -181,7 +181,7 @@ export default function ProfilePage() {
                 height={18} // Adjust size as needed
                 width={18} // Adjust size as needed
               />
-            </Pressable>            
+            </Pressable>
           </View>
 
           {/* Second Card Group */}
@@ -213,8 +213,26 @@ export default function ProfilePage() {
           </View>
         </View>
       </View>
-      {isSignOutOpen && (<BottomPopUp ref={bottomSheetSignOutRef} buttonTitle="sign out" description="Stay signed in to log your next visit faster" backgroundColor="#F98B4E" onClose={toggleSignOutSheet} onSubmit={handleSignOut}/>)}
-      {isDeleteOpen && (<BottomPopUp ref={bottomSheetDeleteRef} buttonTitle="delete" description="Delete account? This action cannot be undone." backgroundColor="#F35E43" onClose={toggleDeleteSheet} onSubmit={handleSignOut}/>)}
+      {isSignOutOpen && (
+        <BottomPopUp
+          ref={bottomSheetSignOutRef}
+          buttonTitle="sign out"
+          description="Stay signed in to log your next visit faster"
+          backgroundColor="#F98B4E"
+          onClose={toggleSignOutSheet}
+          onSubmit={handleSignOut}
+        />
+      )}
+      {isDeleteOpen && (
+        <BottomPopUp
+          ref={bottomSheetDeleteRef}
+          buttonTitle="delete"
+          description="Delete account? This action cannot be undone."
+          backgroundColor="#F35E43"
+          onClose={toggleDeleteSheet}
+          onSubmit={handleDelete}
+        />
+      )}
     </View>
   );
 }

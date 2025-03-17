@@ -106,7 +106,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         const userData = await fetchUser(currentSession.userSub);
         if (userData?.user) {
           setUserAttributes(userData.user);
-          console.log("Fetched User Data:", JSON.stringify(userData.user, null, 2));
+          // console.log("Fetched User Data:", JSON.stringify(userData.user, null, 2));
         }  else {
           console.error("Error: No user data returned from fetchUser.");
           setUserAttributes(null);

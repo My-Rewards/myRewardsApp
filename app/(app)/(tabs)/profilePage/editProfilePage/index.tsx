@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image, TouchableOpacity } from "react-native";
-import { localData } from "@/app-data/appData";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
-
+import { useSession } from "@/auth/ctx";
+import formatDate from "@/services/formatDate";
 export default function EditProfilePage() {
   const router = useRouter();
-  const { profile, fetchProfile } = localData();
-  const { triggerLoadingScreen } = useProps();
-  const {alert} = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  useEffect(()=>{
-    triggerLoadingScreen({isLoading:!profile})
-  },[profile])
+  const user = useSession();
 
   useEffect(() => {
     if (firstName !== "" || lastName !== "") {
@@ -27,20 +22,14 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = () => {
     if (firstName !== "" || lastName !== "") {
-      alert("Profile Updated", "Your profile has been updated successfully", "success");  
-      fetchProfile();
+      //api logic here
+
       router.back();
     }
   };
 
-  if(profile){
     return (
       <View style={[styles.container, { height: Dimensions.get("window").height - 90 }]}>
-         {/* <SafeAreaView>
-          <View style={[styles.header, {paddingBottom:5}]}>
-            <Text style={styles.headerText}>Edit Profile</Text>
-          </View>
-         </SafeAreaView> */}
         <View style={styles.content}>
           <View style={styles.topSection}>
             {/* User Icon */}
@@ -51,11 +40,11 @@ export default function EditProfilePage() {
                 style={styles.userIcon}
                />
             {/* User Info */}
-            <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
+            <Text style={styles.userName}>{`${user?.userAttributes?.fullname?.firstName} ${user?.userAttributes?.fullname?.lastName}`}</Text>
             <View style={styles.emailWrapper}>
               <View style={styles.emailContainer}>
                 <View style={styles.emailLine} />
-                <Text style={styles.emailText}>{profile.username}</Text>
+                <Text style={styles.emailText}>{user?.userAttributes?.email}</Text>
                 <View style={styles.emailLine} />
               </View>
             </View>
@@ -64,11 +53,13 @@ export default function EditProfilePage() {
             <View style={styles.membershipContainer}>
               <View style={styles.membershipRow}>
                 <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
-                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
+                <Text style={styles.membershipText}>
+                {formatDate(user.userAttributes?.date_created ? new Date(user.userAttributes.date_created) : new Date())}
+                </Text>
               </View>
               <View style={styles.membershipRow}>
                 <Text style={styles.membershipText}>Birthday:</Text>
-                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
+                <Text style={styles.membershipText}>{formatDate(user.userAttributes?.birthdate ? new Date(user.userAttributes.birthdate) : new Date())}</Text>
               </View>
             </View>
           </View>
@@ -109,10 +100,6 @@ export default function EditProfilePage() {
         </View>
       </View>
     );
-  }
-  else{
-    return null
-  }
 }
 
 const styles = StyleSheet.create({
