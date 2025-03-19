@@ -24,7 +24,7 @@ import { useProps } from "@/app/LoadingProp/propsProvider";
   if not authenticated -> redirect to landing screen
   if authenticated -> return sub to retrieve user info
 */
-type UserAttributes = {
+export type UserAttributes = {
   credentials?: {
     modifyPlans: boolean;
     modifyPayments: boolean;
@@ -103,7 +103,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       if (currentSession.tokens?.idToken && currentSession.userSub) {
         setUserSub(currentSession.userSub);
   
-        const userData = await fetchUser(currentSession.userSub);
+        const userData = await fetchUser();
         if (userData?.user) {
           setUserAttributes(userData.user);
           // console.log("Fetched User Data:", JSON.stringify(userData.user, null, 2));

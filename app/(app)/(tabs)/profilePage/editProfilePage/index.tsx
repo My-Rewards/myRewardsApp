@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
 import { useSession } from "@/auth/ctx";
 import formatDate from "@/services/formatDate";
+import updateUser from "@/APIs/updateUser";
 export default function EditProfilePage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
@@ -13,7 +14,7 @@ export default function EditProfilePage() {
   const user = useSession();
 
   useEffect(() => {
-    if (firstName !== "" || lastName !== "") {
+    if (firstName !== "" && lastName !== "" || firstName !== ""){
       setButtonColor("#F98B4E");
     } else {
       setButtonColor("#FBC19F");
@@ -21,8 +22,13 @@ export default function EditProfilePage() {
   }, [firstName, lastName]);
 
   const handleSaveChanges = () => {
-    if (firstName !== "" || lastName !== "") {
-      //api logic here
+    if (firstName !== "" && lastName !== "" || firstName !== "") {
+       updateUser({
+        fullname: {
+          firstName,
+          lastName, 
+        },
+      });
 
       router.back();
     }
