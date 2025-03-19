@@ -3,7 +3,7 @@ import {
   mockFavoriteShops, 
   mockPlans, 
   mockPopularShops, 
-  mockProfile, 
+  // mockProfile, 
   mockShopRadius 
 }   from '@/APIs/api';
 import { 
@@ -17,6 +17,7 @@ import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
 import { Plan, PreviewPlanProp, Profile, regionProp, ShopPreviewProps } from './data-types';
 import Map from 'react-native-maps';
+import fetchUser from '@/APIs/fetchUser';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
@@ -111,16 +112,9 @@ const DataContext = createContext<{
           }
     
           if (!profile) {
-            setFetchingPage4(true);
-            try {
-              // Replace mock API with actual API
-              const fetchedProfile = await mockProfile(userSub);
+              const fetchedProfile = await fetchUser();
               setProfile(fetchedProfile);
-            } catch (error) {
-              console.error('Error fetching profile:', error);
-            } finally {
               setFetchingPage4(false);
-            }
           }
     
           if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3)) {
@@ -280,7 +274,8 @@ const DataContext = createContext<{
 
             },
             fetchProfile: async () => {
-              
+              const profile = await fetchUser();
+              setProfile(profile);
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
             locateMe: async (map:React.RefObject<Map>)=>{rebaseUserLocation(map)},

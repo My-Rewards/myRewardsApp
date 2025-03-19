@@ -15,6 +15,7 @@ import BottomPopUp from "@/components/bottomPopUp";
 import BottomSheet from "@gorhom/bottom-sheet";
 import formatDate from "@/services/formatDate";
 import deleteUser from "@/APIs/deleteUser";
+import { localData } from "@/app-data/appData";
 const editProfileSvg = `
   <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M15.8932 20.9996H3.00682C1.34877 20.9996 0 19.6508 0 17.9928V5.10643C0 3.44838 1.34877 2.09961 3.00682 2.09961H11.9994C12.474 2.09961 12.8584 2.48405 12.8584 2.9587C12.8584 3.43335 12.474 3.81779 11.9994 3.81779H3.00682C2.29646 3.81779 1.71818 4.39607 1.71818 5.10643V17.9928C1.71818 18.7032 2.29646 19.2814 3.00682 19.2814H15.8932C16.6035 19.2814 17.1818 18.7032 17.1818 17.9928V8.11325C17.1818 7.6386 17.5663 7.25416 18.0409 7.25416C18.5156 7.25416 18.9 7.6386 18.9 8.11325V17.9928C18.9 19.6508 17.5512 20.9996 15.8932 20.9996Z" fill="#F35E43"/>
@@ -66,6 +67,7 @@ export default function ProfilePage() {
   const bottomSheetDeleteRef = useRef<BottomSheet>(null);
   const [isSignOutOpen, setSignOutOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const {profile} = localData();
 
   const toggleSignOutSheet = () => {
     setSignOutOpen(!isSignOutOpen);
@@ -106,13 +108,12 @@ export default function ProfilePage() {
 
           {/* User Info */}
           <Text style={styles.userName}>{`${
-            user.userAttributes?.fullname?.firstName || "first name"
-          } ${user.userAttributes?.fullname?.lastName || "last name"}`}</Text>
+            profile?.fullname?.firstName} ${profile?.fullname?.lastName}`}</Text>
           <View style={styles.emailWrapper}>
             <View style={styles.emailContainer}>
               <View style={styles.emailLine} />
               <Text style={styles.emailText}>
-                {user.userAttributes?.email || "email@email.com"}
+                {profile?.email || "email@email.com"}
               </Text>
               <View style={styles.emailLine} />
             </View>
@@ -126,8 +127,8 @@ export default function ProfilePage() {
               </Text>
               <Text style={styles.membershipText}>
                 {formatDate(
-                  user.userAttributes?.date_created
-                    ? new Date(user.userAttributes.date_created)
+                  profile?.date_created
+                    ? new Date(profile.date_created)
                     : new Date()
                 )}
               </Text>
@@ -136,8 +137,8 @@ export default function ProfilePage() {
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>
                 {formatDate(
-                  user.userAttributes?.birthdate
-                    ? new Date(user.userAttributes.birthdate)
+                  profile?.birthdate
+                    ? new Date(profile.birthdate)
                     : new Date()
                 )}
               </Text>

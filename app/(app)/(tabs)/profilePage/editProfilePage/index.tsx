@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image, TouchableOpacity } from "react-native";
-import { useProps } from "@/app/LoadingProp/propsProvider";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
-import { useSession } from "@/auth/ctx";
 import formatDate from "@/services/formatDate";
 import updateUser from "@/APIs/updateUser";
+import { localData } from "@/app-data/appData";
 export default function EditProfilePage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const user = useSession();
+  const {profile, fetchProfile} = localData();
 
   useEffect(() => {
-    if (firstName !== "" && lastName !== "" || firstName !== ""){
+    if (firstName !== "" || lastName !== ""){
       setButtonColor("#F98B4E");
     } else {
       setButtonColor("#FBC19F");
@@ -22,13 +21,14 @@ export default function EditProfilePage() {
   }, [firstName, lastName]);
 
   const handleSaveChanges = () => {
-    if (firstName !== "" && lastName !== "" || firstName !== "") {
+    if (firstName !== "" || lastName !== "") {
        updateUser({
         fullname: {
           firstName,
           lastName, 
         },
       });
+      fetchProfile();
 
       router.back();
     }
@@ -46,11 +46,11 @@ export default function EditProfilePage() {
                 style={styles.userIcon}
                />
             {/* User Info */}
-            <Text style={styles.userName}>{`${user?.userAttributes?.fullname?.firstName} ${user?.userAttributes?.fullname?.lastName}`}</Text>
+            <Text style={styles.userName}>{`${profile?.fullname?.firstName} ${profile?.fullname?.lastName}`}</Text>
             <View style={styles.emailWrapper}>
               <View style={styles.emailContainer}>
                 <View style={styles.emailLine} />
-                <Text style={styles.emailText}>{user?.userAttributes?.email}</Text>
+                <Text style={styles.emailText}>{profile?.email}</Text>
                 <View style={styles.emailLine} />
               </View>
             </View>
@@ -60,12 +60,12 @@ export default function EditProfilePage() {
               <View style={styles.membershipRow}>
                 <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
                 <Text style={styles.membershipText}>
-                {formatDate(user.userAttributes?.date_created ? new Date(user.userAttributes.date_created) : new Date())}
+                {formatDate(profile?.date_created ? new Date(profile?.date_created) : new Date())}
                 </Text>
               </View>
               <View style={styles.membershipRow}>
                 <Text style={styles.membershipText}>Birthday:</Text>
-                <Text style={styles.membershipText}>{formatDate(user.userAttributes?.birthdate ? new Date(user.userAttributes.birthdate) : new Date())}</Text>
+                <Text style={styles.membershipText}>{formatDate(profile?.birthdate ? new Date(profile.birthdate) : new Date())}</Text>
               </View>
             </View>
           </View>

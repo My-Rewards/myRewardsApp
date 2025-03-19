@@ -12,7 +12,6 @@ import {
   signOut,
   signInWithRedirect,
   getCurrentUser,
-  fetchUserAttributes,
 } from "aws-amplify/auth";
 import { userSignIn, userSignUp } from "@/params/auth";
 import "aws-amplify/auth/enable-oauth-listener";
@@ -24,25 +23,7 @@ import { useProps } from "@/app/LoadingProp/propsProvider";
   if not authenticated -> redirect to landing screen
   if authenticated -> return sub to retrieve user info
 */
-export type UserAttributes = {
-  credentials?: {
-    modifyPlans: boolean;
-    modifyPayments: boolean;
-  };
-  birthdate?: Date | null;
-  role?: string;
-  newAccount?: boolean;
-  preferences?: {
-    lightMode: boolean;
-  };
-  date_created?: Date | null;
-  id?: string;
-  email?: string;
-  fullname?: {
-    firstName?: string;
-    lastName?: string;
-  };
-};
+
 
 
 type AuthContextType = {
@@ -52,7 +33,6 @@ type AuthContextType = {
   signOut: () => void;
   userSub: string | null;
   isLoading: boolean;
-  userAttributes: UserAttributes | null;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -62,7 +42,6 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => null,
   userSub: null,
   isLoading: false,
-  userAttributes: null,
 });
 
 export function useSession() {
@@ -76,24 +55,10 @@ export function useSession() {
   return value;
 }
 
-const safelyFetchUserAttributes = async (): Promise<UserAttributes | null> => {
-  try {
-    const attributes = await fetchUserAttributes();
-    console.log("Successfully fetched user attributes:", attributes);
-    return attributes as UserAttributes;
-  } catch (error) {
-    console.error("Error fetching user attributes:", error);
-    return null;
-  }
-};
-
 export function SessionProvider({ children }: PropsWithChildren) {
   const { alert } = useProps();
   const [userSub, setUserSub] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
-  const [userAttributes, setUserAttributes] = useState<UserAttributes | null>(
-    null
-  );
 
   const checkUserSession = async () => {
     setFetching(true);
@@ -102,23 +67,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
   
       if (currentSession.tokens?.idToken && currentSession.userSub) {
         setUserSub(currentSession.userSub);
-  
-        const userData = await fetchUser();
-        if (userData?.user) {
-          setUserAttributes(userData.user);
-          // console.log("Fetched User Data:", JSON.stringify(userData.user, null, 2));
-        }  else {
-          console.error("Error: No user data returned from fetchUser.");
-          setUserAttributes(null);
-        }
       } else {
         setUserSub(null);
-        setUserAttributes(null);
       }
     } catch (error) {
       console.error("Error getting session: ", error);
       setUserSub(null);
-      setUserAttributes(null);
     } finally {
       setFetching(false);
     }
@@ -219,7 +173,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         userSub,
         isLoading: fetching,
-        userAttributes,
       }}
     >
       {children}

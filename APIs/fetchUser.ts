@@ -18,7 +18,7 @@ const fetchUser = async () => {
                 "Authorization": `Bearer ${accessToken}`,
             },
         });
-        return data;
+        return data.user;
     } catch (error: any) {
         console.error("Error fetching user:", error.response?.data || error.message);
         console.error("Status code:", error.response?.status);
