@@ -411,25 +411,25 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
   });
 };
 
-export const mockProfile = (user_id:string): Promise<Profile> => {
-  return new Promise((resolve) => {
-      setTimeout(() => {
-        const sampleProfile: Profile = {
-          id: "A34ghjw",
-          username: "email@example.com",
-          role: "customer",
-          first_name: "John",
-          last_name: "Howil",
-          dob: new Date('2002-05-12'),
-          preferences: {
-            theme: "dark",
-          },
-          date_registered: "2024-01-01",
-        };
-        resolve(sampleProfile);
-      }, 500);
-    });
-}
+// export const mockProfile = (user_id:string): Promise<Profile> => {
+//   return new Promise((resolve) => {
+//       setTimeout(() => {
+//         const sampleProfile: Profile = {
+//           id: "A34ghjw",
+//           username: "email@example.com",
+//           role: "customer",
+//           first_name: "John",
+//           last_name: "Howil",
+//           dob: new Date('2002-05-12'),
+//           preferences: {
+//             theme: "dark",
+//           },
+//           date_registered: "2024-01-01",
+//         };
+//         resolve(sampleProfile);
+//       }, 500);
+//     });
+// }
 
 export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
   return new Promise((resolve) => {

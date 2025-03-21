@@ -55,18 +55,25 @@ export interface shop {
   longitude: number;
 }
 
-export interface Profile {
-  id: string;
-  username: string;
-  role: "customer" | "admin" | "owner";
-  first_name: string;
-  last_name: string;
-  dob: Date;
-  preferences: {
-    theme: "dark" | "light";
+export type Profile = {
+  credentials?: {
+    modifyPlans: boolean;
+    modifyPayments: boolean;
   };
-  date_registered: string;
-}
+  birthdate?: Date | null;
+  role?: string;
+  newAccount?: boolean;
+  preferences?: {
+    lightMode: boolean;
+  };
+  date_created?: Date | null;
+  id?: string;
+  email?: string;
+  fullname?: {
+    firstName?: string;
+    lastName?: string;
+  };
+};
 
 export type Reward = {
   // type: 'cost'|'percentage'|'item'; 

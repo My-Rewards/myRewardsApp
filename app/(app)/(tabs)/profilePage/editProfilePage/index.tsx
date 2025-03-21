@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Pressable, TextInput, Dimensions, Image, TouchableOpacity } from "react-native";
-import { localData } from "@/app-data/appData";
-import { useProps } from "@/app/LoadingProp/propsProvider";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
-
+import formatDate from "@/services/formatDate";
+import updateUser from "@/APIs/updateUser";
+import { localData } from "@/app-data/appData";
 export default function EditProfilePage() {
   const router = useRouter();
-  const { profile, fetchProfile } = localData();
-  const { triggerLoadingScreen } = useProps();
-  const {alert} = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  useEffect(()=>{
-    triggerLoadingScreen({isLoading:!profile})
-  },[profile])
+  const { profile, fetchProfile } = localData();
 
   useEffect(() => {
     if (firstName !== "" || lastName !== "") {
@@ -25,117 +29,139 @@ export default function EditProfilePage() {
     }
   }, [firstName, lastName]);
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (firstName !== "" || lastName !== "") {
-      alert("Profile Updated", "Your profile has been updated successfully", "success");  
+      await updateUser({
+        fullname: {
+          firstName,
+          lastName,
+        },
+      });
       fetchProfile();
       router.back();
     }
   };
 
-  if(profile){
-    return (
-      <View style={[styles.container, { height: Dimensions.get("window").height - 90 }]}>
-         {/* <SafeAreaView>
-          <View style={[styles.header, {paddingBottom:5}]}>
-            <Text style={styles.headerText}>Edit Profile</Text>
-          </View>
-         </SafeAreaView> */}
-        <View style={styles.content}>
-          <View style={styles.topSection}>
-            {/* User Icon */}
-             <Image
-                source={{
-                  uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LdlKUMY8VdtdQfwRogRVi4MU4LuzvX.png",
-                  }}
-                style={styles.userIcon}
-               />
-            {/* User Info */}
-            <Text style={styles.userName}>{`${profile.first_name} ${profile.last_name}`}</Text>
-            <View style={styles.emailWrapper}>
-              <View style={styles.emailContainer}>
-                <View style={styles.emailLine} />
-                <Text style={styles.emailText}>{profile.username}</Text>
-                <View style={styles.emailLine} />
-              </View>
-            </View>
-  
-            {/* Membership Info */}
-            <View style={styles.membershipContainer}>
-              <View style={styles.membershipRow}>
-                <Text style={styles.membershipText}>Valued MyRewards member since:</Text>
-                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
-              </View>
-              <View style={styles.membershipRow}>
-                <Text style={styles.membershipText}>Birthday:</Text>
-                <Text style={styles.membershipText}>XX.XX.XXXX</Text>
-              </View>
+  return (
+    <View
+      style={[
+        styles.container,
+        { height: Dimensions.get("window").height - 90 },
+      ]}
+    >
+      <View style={styles.content}>
+        <View style={styles.topSection}>
+          {/* User Icon */}
+          <Image
+            source={{
+              uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LdlKUMY8VdtdQfwRogRVi4MU4LuzvX.png",
+            }}
+            style={styles.userIcon}
+          />
+          {/* User Info */}
+          <Text
+            style={styles.userName}
+          >{`${profile?.fullname?.firstName} ${profile?.fullname?.lastName}`}</Text>
+          <View style={styles.emailWrapper}>
+            <View style={styles.emailContainer}>
+              <View style={styles.emailLine} />
+              <Text style={styles.emailText}>{profile?.email}</Text>
+              <View style={styles.emailLine} />
             </View>
           </View>
-  
-          {/* Editable Fields */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Edit first name</Text>
-            <TextInput
-              value={firstName}
-              onChangeText={setFirstName}
-              style={styles.inputField}
-              placeholder="Firstname"
-            />
-  
-            <Text style={styles.inputLabel}>Edit last name</Text>
-            <TextInput
-              value={lastName}
-              onChangeText={setLastName}
-              style={styles.inputField}
-              placeholder="Lastname"
-            />
-          </View>
-  
-          {/* Reset Password Button */}
-          <TouchableOpacity style={styles.resetPasswordButton} onPress={() => router.navigate('profilePage/editProfilePage/verify-email')}>
-            <Text style={styles.resetPasswordText}>reset password</Text>
-          </TouchableOpacity>
-  
-          {/* Action Buttons */}
-          <View style={styles.actionButtonsContainer}>
-            <Pressable onPress={() => router.back()} style={styles.cancelButton}>
-              <Text style={styles.cancelButtonText}>cancel</Text>
-            </Pressable>
-            <Pressable style={[styles.saveChangesButton, { backgroundColor: buttonColor }]} onPress={handleSaveChanges}>
-              <Text style={styles.saveChangesText}>save changes</Text>
-            </Pressable>
+
+          {/* Membership Info */}
+          <View style={styles.membershipContainer}>
+            <View style={styles.membershipRow}>
+              <Text style={styles.membershipText}>
+                Valued MyRewards member since:
+              </Text>
+              <Text style={styles.membershipText}>
+                {formatDate(
+                  profile?.date_created
+                    ? new Date(profile?.date_created)
+                    : new Date()
+                )}
+              </Text>
+            </View>
+            <View style={styles.membershipRow}>
+              <Text style={styles.membershipText}>Birthday:</Text>
+              <Text style={styles.membershipText}>
+                {formatDate(
+                  profile?.birthdate ? new Date(profile.birthdate) : new Date()
+                )}
+              </Text>
+            </View>
           </View>
         </View>
+
+        {/* Editable Fields */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Edit first name</Text>
+          <TextInput
+            value={firstName}
+            onChangeText={setFirstName}
+            style={styles.inputField}
+            placeholder="Firstname"
+          />
+
+          <Text style={styles.inputLabel}>Edit last name</Text>
+          <TextInput
+            value={lastName}
+            onChangeText={setLastName}
+            style={styles.inputField}
+            placeholder="Lastname"
+          />
+        </View>
+
+        {/* Reset Password Button */}
+        <TouchableOpacity
+          style={styles.resetPasswordButton}
+          onPress={() =>
+            router.navigate("profilePage/editProfilePage/verify-email")
+          }
+        >
+          <Text style={styles.resetPasswordText}>reset password</Text>
+        </TouchableOpacity>
+
+        {/* Action Buttons */}
+        <View style={styles.actionButtonsContainer}>
+          <Pressable onPress={() => router.back()} style={styles.cancelButton}>
+            <Text style={styles.cancelButtonText}>cancel</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.saveChangesButton, { backgroundColor: buttonColor }]}
+            onPress={handleSaveChanges}
+          >
+            <Text style={styles.saveChangesText}>save changes</Text>
+          </Pressable>
+        </View>
       </View>
-    );
-  }
-  else{
-    return null
-  }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-   header:{
-      backgroundColor:color_pallete[10],
-      elevation: 0,
-      shadowOpacity: 0.1,
-      borderBottomWidth:2,
-      shadowColor:'black',
-      shadowRadius:3,
-      shadowOffset:{
-        height:5,
-        width:0
-      },
-      borderBottomColor:color_pallete[2],
+  header: {
+    backgroundColor: color_pallete[10],
+    elevation: 0,
+    shadowOpacity: 0.1,
+    borderBottomWidth: 2,
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: {
+      height: 5,
+      width: 0,
     },
-    headerText:{
-      fontSize: 30,
-      fontWeight: 'bold',
-      fontFamily:'Avenir Next',
-      color:color_pallete[2],
-      marginLeft:'5%'
-    },
+    borderBottomColor: color_pallete[2],
+  },
+  headerText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    fontFamily: "Avenir Next",
+    color: color_pallete[2],
+    marginLeft: "5%",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fffbf7",
@@ -205,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     flexDirection: "column",
     justifyContent: "center",
-    alignSelf: "center"
+    alignSelf: "center",
   },
   inputLabel: {
     fontFamily: "AvenirNext-Regular",
@@ -232,7 +258,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 24,
-    alignSelf:  "center"
+    alignSelf: "center",
   },
   resetPasswordText: {
     fontFamily: "AvenirNext-Bold",
@@ -256,7 +282,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginRight: 10,
     borderRadius: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   cancelButtonText: {
     fontFamily: "AvenirNext-Medium",
@@ -269,7 +295,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginLeft: 10,
     borderRadius: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   saveChangesText: {
     fontFamily: "AvenirNext-Bold",
