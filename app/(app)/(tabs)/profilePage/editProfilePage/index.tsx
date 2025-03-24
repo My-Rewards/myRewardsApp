@@ -8,18 +8,21 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
 import formatDate from "@/services/formatDate";
 import updateUser from "@/APIs/updateUser";
 import { localData } from "@/app-data/appData";
+
 export default function EditProfilePage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const { profile, fetchProfile } = localData();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (firstName !== "" || lastName !== "") {
@@ -31,6 +34,7 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = async () => {
     if (firstName !== "" || lastName !== "") {
+      setIsLoading(true);
       await updateUser({
         fullname: {
           firstName,
@@ -38,9 +42,23 @@ export default function EditProfilePage() {
         },
       });
       fetchProfile();
+      setIsLoading(false);
       router.back();
     }
   };
+
+  if (isLoading || !profile) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator size="small" color="#F98B4E" />
+      </View>
+    );
+  }
 
   return (
     <View

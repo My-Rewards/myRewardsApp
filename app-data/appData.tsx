@@ -276,6 +276,7 @@ const DataContext = createContext<{
             fetchProfile: async () => {
               const profile = await fetchUser();
               setProfile(profile);
+              return profile;
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
             locateMe: async (map:React.RefObject<Map>)=>{rebaseUserLocation(map)},
