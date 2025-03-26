@@ -15,9 +15,10 @@ import { color_pallete } from "@/constants/Colors";
 import formatDate from "@/constants/formatDate";
 import updateUser from "@/APIs/updateUser";
 import { localData } from "@/app-data/appData";
-
+import { useProps } from "@/app/LoadingProp/propsProvider";
 export default function EditProfilePage() {
   const router = useRouter();
+  const { alert } = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
@@ -35,12 +36,17 @@ export default function EditProfilePage() {
   const handleSaveChanges = async () => {
     if (firstName !== "" || lastName !== "") {
       setIsLoading(true);
-      await updateUser({
+      const result = await updateUser({
         fullname: {
           firstName,
           lastName,
         },
       });
+      if(result === null){
+        setIsLoading(false);
+        alert("Invalid input", "Name is invalid or too long", "error");
+        return;
+      }
       fetchProfile();
       setIsLoading(false);
       router.back();

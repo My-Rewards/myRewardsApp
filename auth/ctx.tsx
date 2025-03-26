@@ -15,7 +15,6 @@ import {
 } from "aws-amplify/auth";
 import { userSignIn, userSignUp } from "@/params/auth";
 import "aws-amplify/auth/enable-oauth-listener";
-import fetchUser from "@/APIs/fetchUser";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 /* 
   Serves to check authentication inclosing the app, each time a new screen is triggered this code is referenced and checks

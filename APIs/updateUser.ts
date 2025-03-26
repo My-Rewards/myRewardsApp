@@ -1,12 +1,9 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import { Profile } from "@/app-data/data-types";
-const INVOKE_URL = process.env.INVOKE_URL;
-const url = `${INVOKE_URL}/customer/user/update`;
+import { updateUserSchema } from "@/constants/validationTypes";
+const url = "";
 
-/*
-TODO: Add input validation to validate the first name and last name
-*/
 const updateUser = async (updates: Partial<Profile>) => {
     try {
         const { tokens } = await fetchAuthSession();
@@ -14,7 +11,12 @@ const updateUser = async (updates: Partial<Profile>) => {
         if (!accessToken) {
             throw new Error("No access token available");
         }
-        
+
+        const result = updateUserSchema.safeParse({updates});
+        if(result.success === false) {
+            return null;
+        }
+
         const { data } = await axios.put(url, { ...updates }, {
             headers: {
                 "Content-Type": "application/json",

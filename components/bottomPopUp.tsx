@@ -38,9 +38,9 @@ const BottomPopUp = forwardRef<BottomSheet, BottomPopUpProps>(({ backgroundColor
         <SvgXml xml={mediumLogo} style={styles.svg}/>
         <Text style={styles.description}>{description}</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.mainButton]} onPress={handleSubmit}>
+          <Pressable style={[styles.mainButton]} onPress={handleSubmit}>
             <Text style={[styles.mainButtonText, { color: backgroundColor }]}>{buttonTitle}</Text>
-          </TouchableOpacity>
+          </Pressable>
           <Pressable onPress={handleClose} style={[styles.cancelButton, { backgroundColor: backgroundColor }]}>
             <Text style={styles.cancelButtonText}>cancel</Text>
           </Pressable>

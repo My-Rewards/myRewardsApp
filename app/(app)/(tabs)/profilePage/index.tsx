@@ -110,7 +110,7 @@ export default function ProfilePage() {
                   )}
                 </Text>
               </View>
-              <View style={styles.membershipRow}>
+              {/* <View style={styles.membershipRow}>
                 <Text style={styles.membershipText}>Birthday:</Text>
                 <Text style={styles.membershipText}>
                   {formatDate(
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                       : new Date()
                   )}
                 </Text>
-              </View>
+              </View> */}
             </View>
 
             {/* View Plans Button */}
