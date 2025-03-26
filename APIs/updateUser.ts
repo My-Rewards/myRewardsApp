@@ -4,6 +4,9 @@ import { Profile } from "@/app-data/data-types";
 const INVOKE_URL = process.env.INVOKE_URL;
 const url = `${INVOKE_URL}/customer/user/update`;
 
+/*
+TODO: Add input validation to validate the first name and last name
+*/
 const updateUser = async (updates: Partial<Profile>) => {
     try {
         const { tokens } = await fetchAuthSession();

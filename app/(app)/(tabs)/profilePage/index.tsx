@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import { useRef, useState, useEffect } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
 import BottomSheet from "@gorhom/bottom-sheet";
-import formatDate from "@/services/formatDate";
+import formatDate from "@/constants/formatDate";
 import deleteUser from "@/APIs/deleteUser";
 import { localData } from "@/app-data/appData";
 import {
@@ -30,7 +30,7 @@ export default function ProfilePage() {
   const bottomSheetDeleteRef = useRef<BottomSheet>(null);
   const [isSignOutOpen, setSignOutOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
-  let { profile, fetchProfile} = localData();
+  let { profile, fetchProfile } = localData();
 
   useEffect(() => {
     if (!profile) {

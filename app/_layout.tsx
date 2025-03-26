@@ -27,7 +27,7 @@ export default function Root() {
               }}
             />
             <Stack.Screen
-              name={"sign-up"}
+              name={"forgot-password"}
               options={{
                 headerShown: false,
               }}
@@ -37,34 +37,6 @@ export default function Root() {
               options={{
                 headerShown: false,
                 animation: "fade",
-              }}
-            />
-            <Stack.Screen
-              name={"verificationScreen"}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen
-              name={"forgot-password"}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen
-              name={"password-reset-success"}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen
-              name={"verify-email"}
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
               }}
             />
           </Stack>

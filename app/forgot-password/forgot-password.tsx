@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useProps } from "./LoadingProp/propsProvider";
+import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
 function ForgotPassword() {
@@ -41,7 +41,7 @@ function ForgotPassword() {
     /*
     API logic here to update password for user
     */
-    router.navigate("/password-reset-success");
+    router.navigate("forgot-password/password-reset-success");
   };
 
   return (

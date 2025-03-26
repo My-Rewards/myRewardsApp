@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import {fetchAppConfig} from '@/services/fetchConfig';
+import {fetchAppConfig} from '@/APIs/fetchConfig';
 
 type AppConfig = {
   isBeta: boolean;

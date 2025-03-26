@@ -4,7 +4,7 @@ import Svg, { Path, G, ClipPath, Rect } from "react-native-svg";
 import { useLocalSearchParams } from "expo-router";
 import * as auth from 'aws-amplify/auth'
 import { router } from 'expo-router';
-import { useProps } from "./LoadingProp/propsProvider";
+import { useProps } from "../LoadingProp/propsProvider";
 
 export default function VerificationScreen() {
     const { email } = useLocalSearchParams();

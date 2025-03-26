@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
-import formatDate from "@/services/formatDate";
+import formatDate from "@/constants/formatDate";
 import updateUser from "@/APIs/updateUser";
 import { localData } from "@/app-data/appData";
 

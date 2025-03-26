@@ -31,7 +31,7 @@ export default function EditProfileStack() {
         }}
       />
       <Stack.Screen
-        name="forgot-password"
+        name="reset-password"
         options={{
           headerShown: false,
         }}
@@ -42,7 +42,7 @@ export default function EditProfileStack() {
           headerShown: false,
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="verify-email"
         options={{
           headerShown: false,

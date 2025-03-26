@@ -27,7 +27,7 @@ export default function verifyEmail() {
 
   const verifyEmail = () => {
     //Do some verification here
-    router.navigate("/forgot-password");
+    router.navigate("forgot-password/forgot-password");
   };
 
   return (

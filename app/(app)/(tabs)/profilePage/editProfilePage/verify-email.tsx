@@ -19,7 +19,7 @@ export default function verifyEmail() {
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const verifyEmail = () => {
     //Do some verification here
-    router.push("profilePage/editProfilePage/forgot-password");
+    router.push("profilePage/editProfilePage/reset-password");
   };
 
   useEffect(() => {

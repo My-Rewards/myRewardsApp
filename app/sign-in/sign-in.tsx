@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { Text, View, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useSession } from '../auth/ctx';
+import { useSession } from '@/auth/ctx';
 import { useEffect, useState } from 'react';
-import { useProps } from './LoadingProp/propsProvider';
+import { useProps } from '../LoadingProp/propsProvider';
 import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
@@ -71,7 +71,7 @@ export default function SignIn() {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity onPress={() => router.push('/verify-email')}>
+      <TouchableOpacity onPress={() => router.push('../forgot-password/verify-email')}>
         <Text style={styles.forgotPassword}>Forgot password? Click here</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.signInButton} onPress={signInFunc}>
@@ -86,7 +86,7 @@ export default function SignIn() {
       />
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => router.push('/sign-up')}>
+        <TouchableOpacity onPress={() => router.push('sign-in/sign-up')}>
           <Text style={styles.signUpLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
