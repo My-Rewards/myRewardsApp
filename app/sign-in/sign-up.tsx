@@ -38,7 +38,7 @@ export default function SignUp() {
       },
     };
 
-    if(!email || !password || !birthDate){
+    if (!email || !password || !birthDate) {
       alert("Error", "Please fill out all inputs", "error");
       return;
     }
@@ -105,15 +105,15 @@ export default function SignUp() {
           keyboardType="numeric"
         />
       </View>
-      <View
-        style={styles.termsContainer}
-      >
-        <BouncyCheckbox
-          fillColor="#F35E43"
-          onPress={(isChecked: boolean) => {
-            setIsChecked(isChecked);
-          }}
-        />
+      <View style={styles.termsContainer}>
+        <View>
+          <BouncyCheckbox
+            fillColor="#F35E43"
+            onPress={(isChecked: boolean) => {
+              setIsChecked(isChecked);
+            }}
+          />
+        </View>
         <Text style={styles.termsText}>
           Click to agree to <Text style={styles.link}>terms and services</Text>
         </Text>
@@ -189,14 +189,16 @@ const styles = StyleSheet.create({
   termsContainer: {
     flexDirection: "row",
     width: "90%",
+    justifyContent: "flex-start",
+    alignItems: "center",
     marginBottom: 25,
   },
   termsText: {
-    width: "85%",
     fontSize: 14,
     color: "#8B4513",
     fontFamily: "Avenir Next",
     textAlign: "left",
+    alignSelf: "center",
   },
   link: {
     color: "#F35E43",

@@ -1,7 +1,7 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 
-const url = "";
+const url = process.env.CUSTOMER_DELETE_ENDPOINT;
 
 const deleteUser = async () => {
     try {
@@ -10,7 +10,9 @@ const deleteUser = async () => {
         if (!accessToken) {
             throw new Error("No access token available");
         }
-
+        if (!url) {
+            throw new Error("CUSTOMER_DELETE_ENDPOINT is not defined");
+        }
         const { data } = await axios.delete(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -20,10 +22,6 @@ const deleteUser = async () => {
 
         return data;
     } catch (error: any) {
-        console.error("Error deleting user:", error.response?.data || error.message);
-        console.error("Status code:", error.response?.status);
-        console.error("Headers:", error.response?.headers);
-
         return null;
     }
 };

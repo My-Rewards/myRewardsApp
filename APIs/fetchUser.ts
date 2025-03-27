@@ -1,7 +1,6 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
-const url = "";
-
+const url = process.env.CUSTOMER_GET_ENDPOINT;
 const fetchUser = async () => {
     try {
         const { tokens } = await fetchAuthSession();
@@ -9,7 +8,9 @@ const fetchUser = async () => {
         if (!accessToken) {
             throw new Error("No access token available");
         }
-        
+        if (!url) {
+            throw new Error("CUSTOMER_GET_ENDPOINT is not defined");
+        }
         const { data } = await axios.get(url, {
             headers: {
                 "Content-Type": "application/json",

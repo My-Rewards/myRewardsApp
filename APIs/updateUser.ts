@@ -2,7 +2,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import { Profile } from "@/app-data/data-types";
 import { updateUserSchema } from "@/constants/validationTypes";
-const url = "";
+const url = process.env.CUSTOMER_UPDATE_ENDPOINT;
 
 const updateUser = async (updates: Partial<Profile>) => {
     try {
@@ -15,6 +15,9 @@ const updateUser = async (updates: Partial<Profile>) => {
         const result = updateUserSchema.safeParse({updates});
         if(result.success === false) {
             return null;
+        }
+        if (!url) {
+            throw new Error("CUSTOMER_UPDATE_ENDPOINT is not defined");
         }
 
         const { data } = await axios.put(url, { ...updates }, {

@@ -24,6 +24,7 @@ import {
   privacySvg,
 } from "@/constants/profileSvgs";
 import { ProfileLoadingState } from "@/components/navigation/profileLoadingState";
+import { useProps } from "@/app/LoadingProp/propsProvider";
 
 export default function ProfilePage() {
   const bottomSheetSignOutRef = useRef<BottomSheet>(null);
@@ -31,6 +32,8 @@ export default function ProfilePage() {
   const [isSignOutOpen, setSignOutOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   let { profile, fetchProfile } = localData();
+  const { alert } = useProps();
+  const { signOut } = useSession();
 
   useEffect(() => {
     if (!profile) {
@@ -40,8 +43,6 @@ export default function ProfilePage() {
       }
     }
   }, [profile]);
-
-  const { signOut } = useSession();
 
   const toggleSignOutSheet = () => {
     setSignOutOpen(!isSignOutOpen);
@@ -62,10 +63,16 @@ export default function ProfilePage() {
       {
         text: "Delete",
         style: "destructive",
-        onPress: async () => await deleteUser(),
+        onPress: async () => {
+          const result = await deleteUser();
+          if (result === null) {
+            alert("", "Unable to delete account", "error");
+          } else {
+            signOut();
+          }
+        },
       },
     ]);
-    signOut();
   };
 
   const windowHeight = Dimensions.get("window").height;
@@ -149,7 +156,7 @@ export default function ProfilePage() {
                   xml={signOutSvg}
                   style={styles.menuIcon}
                   height={18} // Adjust size as needed
-                  width={20} // Adjust size as needed
+                  width={18} // Adjust size as needed
                 />
               </Pressable>
               <View style={styles.menuDivider} />

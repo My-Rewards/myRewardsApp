@@ -44,12 +44,13 @@ export default function EditProfilePage() {
       });
       if(result === null){
         setIsLoading(false);
-        alert("Invalid input", "Name is invalid or too long", "error");
+        alert("", "Name is invalid or too long", "error");
         return;
       }
       fetchProfile();
       setIsLoading(false);
       router.back();
+      alert("", "Profile updated successfully", "success");
     }
   };
 
