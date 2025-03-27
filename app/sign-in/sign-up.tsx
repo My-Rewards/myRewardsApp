@@ -1,6 +1,3 @@
-// add eye on password field
-// add checkbox
-
 import { router } from "expo-router";
 import {
   Text,
@@ -8,43 +5,49 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
 } from "react-native";
 import { useSession } from "@/auth/ctx";
 import { useEffect, useState } from "react";
 import { useProps } from "../LoadingProp/propsProvider";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { updateUserSchema } from "@/constants/validationTypes";
 export default function SignUp() {
   const { signUp, isLoading, googleSignIn } = useSession();
   const { triggerLoadingScreen, alert } = useProps();
   const [email, setEmail] = useState("");
   const [isChecked, setIsChecked] = useState(false);
   const [password, setPassword] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const userSignUpData = {
+    email,
+    password,
+    birthdate: "",
+    fullName: {
+      firstName: firstName,
+      lastName: lastName,
+    },
+  };
 
   useEffect(() => {
     triggerLoadingScreen({ isLoading });
   }, [isLoading]);
 
   const handleSignUp = async () => {
-    const userSignUpData = {
-      email,
-      password,
-      birthdate: birthDate,
-      fullName: {
-        firstName: "John",
-        lastName: "Doe",
-      },
-    };
+    if (!email || !password || !firstName || !lastName) {
+      alert("", "Please fill out all inputs", "error");
+      return;
+    }
 
-    if (!email || !password || !birthDate) {
-      alert("Error", "Please fill out all inputs", "error");
+    if (!emailRegex.test(email)) {
+      alert("", "Please enter a valid email", "error");
       return;
     }
 
     if (!isChecked) {
-      alert("Error", "Please agree to the terms and services", "error");
+      alert("", "Please agree to the terms and services", "error");
       return;
     }
 
@@ -57,7 +60,7 @@ export default function SignUp() {
           },
         });
       } else {
-        alert("Error", "Email is already in use", "error");
+        alert("", "Email is already in use", "error");
       }
     });
   };
@@ -82,6 +85,18 @@ export default function SignUp() {
       </View>
 
       <View style={styles.inputContainer}>
+      <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+         <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -96,13 +111,6 @@ export default function SignUp() {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="mm/dd/yyyy"
-          value={birthDate}
-          onChangeText={setBirthDate}
-          keyboardType="numeric"
         />
       </View>
       <View style={styles.termsContainer}>
