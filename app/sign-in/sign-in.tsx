@@ -7,8 +7,8 @@ import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
   const { signIn, isLoading, googleSignIn } = useSession();
-  const [email, setEmail] = useState<string>('test@gmail.com');
-  const [password, setPassword] = useState<string>('Test1234');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const { triggerLoadingScreen, alert } = useProps();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,11 +19,12 @@ export default function SignIn() {
   const signInFunc = async () => {
     if(emailRegex.test(email) && password){
       signIn({ email, password }).then((status) => {
+        console.log(status);
         if (status === 'success') {
           router.replace('/');
         } else if (status === 'unverified') {
           router.replace({
-            pathname: "/verificationScreen",
+            pathname: "sign-in/verificationScreen",
             params: {
               email: email,
             },
@@ -37,12 +38,12 @@ export default function SignIn() {
     }
   };
 
-  const gsFunction = () =>{
-    googleSignIn().then((status) => {
+  const gsFunction = async() =>{
+   await googleSignIn().then((status) => {
       if (status === 'success') {
         router.replace('/');
       } else if (status === 'unverified') {
-        router.replace('/verificationScreen');
+        router.replace('sign-in/verificationScreen');
       } else {
         alert('', 'Invalid email or password', 'error');
       }

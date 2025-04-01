@@ -126,17 +126,30 @@ export default function EditProfilePage() {
           <TextInput
             value={firstName}
             onChangeText={setFirstName}
-            style={styles.inputField}
+            style={[
+              styles.inputField,
+              firstName.length > 14 && { marginBottom: 4 },
+            ]}
             placeholder="Firstname"
           />
+         {firstName.length > 14 && (
+           <Text style={styles.nameDescriptionText}>*Max of 14 characters</Text>
+         )}
+          
 
           <Text style={styles.inputLabel}>Edit last name</Text>
           <TextInput
             value={lastName}
             onChangeText={setLastName}
-            style={styles.inputField}
+            style={[
+              styles.inputField,
+              lastName.length > 14 && { marginBottom: 4 },
+            ]}
             placeholder="Lastname"
           />
+           {lastName.length > 14 && (
+           <Text style={styles.nameDescriptionText}>*Max of 14 characters</Text>
+         )}
         </View>
 
         {/* Reset Password Button */}
@@ -327,5 +340,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
+  },
+  nameDescriptionText: {
+    fontFamily: "Avenir Next",
+    fontSize: 11,
+    color: "#8B4513",
+    marginBottom: 6,
   },
 });

@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, UnknownOutputParams } from "expo-router";
 import {
   Text,
   View,
@@ -11,7 +11,8 @@ import { useEffect, useState } from "react";
 import { useProps } from "../LoadingProp/propsProvider";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { updateUserSchema } from "@/constants/validationTypes";
+import { signUpSchema } from "@/constants/validationTypes";
+import { ZodError, ZodErrorMap } from "zod";
 export default function SignUp() {
   const { signUp, isLoading, googleSignIn } = useSession();
   const { triggerLoadingScreen, alert } = useProps();
@@ -20,7 +21,6 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const userSignUpData = {
     email,
     password,
@@ -35,38 +35,52 @@ export default function SignUp() {
     triggerLoadingScreen({ isLoading });
   }, [isLoading]);
 
-  const handleSignUp = async () => {
-    if (!email || !password || !firstName || !lastName) {
-      alert("", "Please fill out all inputs", "error");
-      return;
-    }
+  const validateInputs = () => {
+    try {
+      signUpSchema.parse({
+        email,
+        password,
+        fullname: {
+          firstName,
+          lastName,
+        },
+      });
 
-    if (!emailRegex.test(email)) {
-      alert("", "Please enter a valid email", "error");
-      return;
-    }
-
-    if (!isChecked) {
-      alert("", "Please agree to the terms and services", "error");
-      return;
-    }
-
-    signUp(userSignUpData).then((success) => {
-      if (success) {
-        router.replace({
-          pathname: "/verificationScreen",
-          params: {
-            email: userSignUpData.email,
-          },
-        });
-      } else {
-        alert("", "Email is already in use", "error");
+      if (!isChecked) {
+        alert("", "Please agree to the terms and services", "error");
+        return false;
       }
-    });
+
+      return true;
+    } catch (error: unknown) {
+      if (error instanceof ZodError) {
+        const message = error.errors[0].message;
+        alert("", message, "error");
+        return false;
+      }
+    }
   };
 
-  const gsFunction = () => {
-    googleSignIn().then((status) => {
+  const handleSignUp = async () => {
+    const isValidated = validateInputs();
+    if (isValidated) {
+      signUp(userSignUpData).then((success) => {
+        if (success) {
+          router.replace({
+            pathname: "sign-in/verificationScreen",
+            params: {
+              email: userSignUpData.email,
+            },
+          });
+        } else {
+          alert("", "Email is already in use. Try logging in instead", "error");
+        }
+      });
+    }
+  };
+
+  const gsFunction = async () => {
+    await googleSignIn().then((status) => {
       if (status === "success") {
         router.replace("/");
       } else if (status === "unverified") {
@@ -85,13 +99,13 @@ export default function SignUp() {
       </View>
 
       <View style={styles.inputContainer}>
-      <TextInput
+        <TextInput
           style={styles.input}
           placeholder="First Name"
           value={firstName}
           onChangeText={setFirstName}
         />
-         <TextInput
+        <TextInput
           style={styles.input}
           placeholder="Last Name"
           value={lastName}
@@ -106,12 +120,32 @@ export default function SignUp() {
           keyboardType="email-address"
         />
         <TextInput
-          style={styles.input}
+          style={styles.lastInput}
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
+        {password.length < 8 && (
+          <Text style={styles.passwordText}>
+            *Password must contain at least 8 characters
+          </Text>
+        )}
+        {/* {!/[A-Z]/.test(password) && (
+          <Text style={styles.passwordText}>
+            *Password must contain at least one uppercase letter
+          </Text>
+        )}
+        {!/[0-9]/.test(password) && (
+          <Text style={styles.passwordText}>
+            *Password must contain at least one number
+          </Text>
+        )}
+        {!/[!@#$%^&*(),.?":{}|<>]/.test(password) && (
+          <Text style={styles.passwordText}>
+            *Password must contain at least one special character
+          </Text>
+        )} */}
       </View>
       <View style={styles.termsContainer}>
         <View>
@@ -166,14 +200,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 29,
+    fontSize: 24, // Reduced from 29
     fontWeight: "700",
     color: "#F98B4E",
     fontFamily: "Avenir Next",
     marginBottom: 5,
   },
   subHeaderText: {
-    fontSize: 16,
+    fontSize: 14, // Reduced from 16
     color: "#2A5D9F",
     fontFamily: "Avenir Next",
   },
@@ -202,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   termsText: {
-    fontSize: 14,
+    fontSize: 12, // Reduced from 14
     color: "#8B4513",
     fontFamily: "Avenir Next",
     textAlign: "left",
@@ -223,7 +257,7 @@ const styles = StyleSheet.create({
   },
   signUpButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16, // Reduced from 18
     fontWeight: "700",
     fontFamily: "Avenir Next",
   },
@@ -238,15 +272,35 @@ const styles = StyleSheet.create({
     bottom: 100,
   },
   signInText: {
-    fontSize: 14,
+    fontSize: 12, // Reduced from 14
     color: "#666",
     fontFamily: "Avenir Next",
   },
   signInLink: {
-    fontSize: 14,
+    fontSize: 12, // Reduced from 14
     color: "#F35E43",
     fontWeight: "700",
     fontFamily: "Avenir Next",
     textDecorationLine: "underline",
+  },
+  passwordText: {
+    fontFamily: "Avenir Next",
+    color: "#8B4513",
+    fontSize: 10, // Reduced from 12
+    lineHeight: 12, // Added line height for compactness
+    marginBottom: 8, // Reduced margin
+  },
+  lastInput: {
+    height: 40,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#D8C1A0",
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    marginBottom: 10,
+    fontSize: 16,
+    fontFamily: "Avenir Next",
+    backgroundColor: "#FFF",
   },
 });

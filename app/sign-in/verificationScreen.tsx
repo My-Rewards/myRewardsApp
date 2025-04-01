@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput } from "react-native";
-import Svg, { Path, G, ClipPath, Rect } from "react-native-svg";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, TextInput, Pressable } from "react-native";
+import Svg, { Path, G, ClipPath, Rect, SvgXml } from "react-native-svg";
 import { useLocalSearchParams } from "expo-router";
 import * as auth from 'aws-amplify/auth'
 import { router } from 'expo-router';
 import { useProps } from "../LoadingProp/propsProvider";
+import { BackButton } from "@/assets/images/MR-logos";
 
 export default function VerificationScreen() {
     const { email } = useLocalSearchParams();
@@ -54,7 +55,7 @@ export default function VerificationScreen() {
 
     const sendVerification = async () => {
         setVerifying(true)
-        auth.confirmSignUp({
+        await auth.confirmSignUp({
             username:email.toLocaleString(),
             confirmationCode: verificationCode.toLocaleString()
         }).then(()=>{
@@ -75,6 +76,7 @@ export default function VerificationScreen() {
 
         setVerificationCode(Array(6).fill(null))
         try {      
+          console.log("Resending code to:", email);
           await auth.resendSignUpCode({
             username: Array.isArray(email) ? email[0] : email,
           });
@@ -106,6 +108,9 @@ export default function VerificationScreen() {
   return (
     <View style={styles.page}>
       <SafeAreaView />
+      <Pressable style={styles.backButtonContainer} onPress={() => router.back()}>
+                <SvgXml xml={BackButton} fill={styles.backButton.color} />
+         </Pressable>
       <Svg width="100%" height="10%" viewBox="0 0 109 86" fill="none">
         <G clipPath="url(#clip0_167_224)">
             <Path d="M91.7978 86H13.1566C5.90167 86 0 80.128 0 72.9095V16.8073C0 9.58883 5.90167 3.7168 13.1566 3.7168H67.6625C69.7393 3.7168 71.4215 5.39051 71.4215 7.45694C71.4215 9.52337 69.7393 11.1971 67.6625 11.1971H13.1566C10.0483 11.1971 7.51805 13.7147 7.51805 16.8073V72.9095C7.51805 76.0021 10.0483 78.5197 13.1566 78.5197H91.7978C94.906 78.5197 97.4363 76.0021 97.4363 72.9095V40.8845C97.4363 38.8181 99.1185 37.1444 101.195 37.1444C103.272 37.1444 104.954 38.8181 104.954 40.8845V72.9095C104.954 80.128 99.0527 86 91.7978 86Z" fill="#F35E43" />
@@ -157,6 +162,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFBF6",
     gap: 20,
+  },
+  backButtonContainer: {
+    position: "absolute",
+    top: 75,
+    left: 20,
+  },
+  backButton: {
+    color: "#F98B4E",
   },
   inputContainer: {
     flexDirection: "row",
