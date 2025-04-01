@@ -138,7 +138,7 @@ export default function VerificationScreen() {
       </View>
       <View style={styles.mainContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>A verification Email was sent to </Text>
+          <Text style={styles.text}>A verification email was sent to </Text>
           <Text style={styles.highlight}>{email}.</Text>
           <Text style={styles.text}> You can check your inbox</Text>
         </View>

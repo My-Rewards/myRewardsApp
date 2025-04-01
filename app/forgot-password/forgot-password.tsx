@@ -7,18 +7,22 @@ import {
   Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
+import { resetPassword } from "aws-amplify/auth";
+import { verifyPasswordSchema } from "@/constants/validationTypes";
+import { ZodError } from "zod";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const textNotificationBox = `We sent a password reset code by email to test*****@ufl.com. Enter it below to reset your password.`;
+  const { email } = useLocalSearchParams();
+  const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
   const { alert } = useProps();
   const getCode = 123456;
 
@@ -31,17 +35,22 @@ function ForgotPassword() {
   }, [password, confirmPassword, code]);
 
   const handleResetPassword = () => {
-    if (password !== confirmPassword) {
-      alert("", "Passwords do not match", "error");
-      return;
-    } else if (code !== getCode.toString()) {
-      alert("", "Invalid code", "error");
-      return;
+    try {
+      verifyPasswordSchema.parse({password, confirmPassword});
+      if (password !== confirmPassword) {
+        alert("", "Passwords do not match", "error");
+        return;
+      } 
+      //Call on resetpassword function
+      router.navigate("forgot-password/password-reset-success");
+    } catch(error: unknown) {
+      if (error instanceof ZodError) {
+        const message = error.errors[0].message;
+        alert("", message, "error");
+        return;
+      }
     }
-    /*
-    API logic here to update password for user
-    */
-    router.navigate("forgot-password/password-reset-success");
+
   };
 
   return (

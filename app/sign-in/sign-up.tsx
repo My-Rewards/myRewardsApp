@@ -1,4 +1,4 @@
-import { router, UnknownOutputParams } from "expo-router";
+import { router } from "expo-router";
 import {
   Text,
   View,
@@ -12,7 +12,7 @@ import { useProps } from "../LoadingProp/propsProvider";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { signUpSchema } from "@/constants/validationTypes";
-import { ZodError, ZodErrorMap } from "zod";
+import { ZodError } from "zod";
 export default function SignUp() {
   const { signUp, isLoading, googleSignIn } = useSession();
   const { triggerLoadingScreen, alert } = useProps();
@@ -36,6 +36,10 @@ export default function SignUp() {
   }, [isLoading]);
 
   const validateInputs = () => {
+    if (!email || !password || !firstName || !lastName) {
+      alert("", "Please fill out all inputs", "error");
+      return false;
+    }
     try {
       signUpSchema.parse({
         email,
@@ -64,7 +68,7 @@ export default function SignUp() {
   const handleSignUp = async () => {
     const isValidated = validateInputs();
     if (isValidated) {
-      signUp(userSignUpData).then((success) => {
+      await signUp(userSignUpData).then((success) => {
         if (success) {
           router.replace({
             pathname: "sign-in/verificationScreen",
@@ -168,7 +172,9 @@ export default function SignUp() {
       >
         <Text style={styles.signUpButtonText}>create account</Text>
       </TouchableOpacity>
-
+      <View style={styles.otherOptionContainer}>
+        <Text style={styles.otherOptionText}>Or sign up with</Text>
+      </View>
       <GoogleSigninButton
         size={GoogleSigninButton.Size.Standard}
         color={GoogleSigninButton.Color.Light}
@@ -200,14 +206,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 24, // Reduced from 29
+    fontSize: 29,
     fontWeight: "700",
     color: "#F98B4E",
     fontFamily: "Avenir Next",
     marginBottom: 5,
   },
   subHeaderText: {
-    fontSize: 14, // Reduced from 16
+    fontSize: 16,
     color: "#2A5D9F",
     fontFamily: "Avenir Next",
   },
@@ -236,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   termsText: {
-    fontSize: 12, // Reduced from 14
+    fontSize: 12,
     color: "#8B4513",
     fontFamily: "Avenir Next",
     textAlign: "left",
@@ -257,7 +263,7 @@ const styles = StyleSheet.create({
   },
   signUpButtonText: {
     color: "#fff",
-    fontSize: 16, // Reduced from 18
+    fontSize: 16,
     fontWeight: "700",
     fontFamily: "Avenir Next",
   },
@@ -272,12 +278,12 @@ const styles = StyleSheet.create({
     bottom: 100,
   },
   signInText: {
-    fontSize: 12, // Reduced from 14
+    fontSize: 14,
     color: "#666",
     fontFamily: "Avenir Next",
   },
   signInLink: {
-    fontSize: 12, // Reduced from 14
+    fontSize: 14,
     color: "#F35E43",
     fontWeight: "700",
     fontFamily: "Avenir Next",
@@ -286,9 +292,9 @@ const styles = StyleSheet.create({
   passwordText: {
     fontFamily: "Avenir Next",
     color: "#8B4513",
-    fontSize: 10, // Reduced from 12
-    lineHeight: 12, // Added line height for compactness
-    marginBottom: 8, // Reduced margin
+    fontSize: 10,
+    lineHeight: 12,
+    marginBottom: 8, 
   },
   lastInput: {
     height: 40,
@@ -303,4 +309,12 @@ const styles = StyleSheet.create({
     fontFamily: "Avenir Next",
     backgroundColor: "#FFF",
   },
+  otherOptionContainer: {
+    marginBottom: 10,
+  },
+  otherOptionText: {  
+    fontFamily: "Avenir Next",
+    fontSize: 12,
+    color: "#8B4513",
+  }
 });
