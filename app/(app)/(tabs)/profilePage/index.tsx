@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const [isSignOutOpen, setSignOutOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   let { profile, fetchProfile } = localData();
-  const { alert } = useProps();
+  const { alert, triggerLoadingScreen } = useProps();
   const { signOut } = useSession();
 
   useEffect(() => {
@@ -64,8 +64,10 @@ export default function ProfilePage() {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
+          triggerLoadingScreen({ isLoading: true });
           const result = await deleteUser();
           if (result === null) {
+            triggerLoadingScreen({ isLoading: false });
             alert("", "Unable to delete account", "error");
           } else {
             signOut();

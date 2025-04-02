@@ -18,12 +18,11 @@ import { localData } from "@/app-data/appData";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 export default function EditProfilePage() {
   const router = useRouter();
-  const { alert } = useProps();
+  const { alert, triggerLoadingScreen } = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const { profile, fetchProfile } = localData();
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (firstName !== "" || lastName !== "") {
@@ -35,7 +34,7 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = async () => {
     if (firstName !== "" || lastName !== "") {
-      setIsLoading(true);
+      triggerLoadingScreen({ isLoading: true });
       const result = await updateUser({
         fullname: {
           firstName,
@@ -43,29 +42,16 @@ export default function EditProfilePage() {
         },
       });
       if(result === null){
-        setIsLoading(false);
+        triggerLoadingScreen({ isLoading: false });
         alert("", "Name is invalid or too long", "error");
         return;
       }
       fetchProfile();
-      setIsLoading(false);
+      triggerLoadingScreen({ isLoading: false });
       router.back();
       alert("", "Profile updated successfully", "success");
     }
   };
-
-  if (isLoading || !profile) {
-    return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-      >
-        <ActivityIndicator size="small" color="#F98B4E" />
-      </View>
-    );
-  }
 
   return (
     <View
@@ -109,14 +95,14 @@ export default function EditProfilePage() {
                 )}
               </Text>
             </View>
-            <View style={styles.membershipRow}>
+            {/* <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>
                 {formatDate(
                   profile?.birthdate ? new Date(profile.birthdate) : new Date()
                 )}
               </Text>
-            </View>
+            </View> */}
           </View>
         </View>
 
