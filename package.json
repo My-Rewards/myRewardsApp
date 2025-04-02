@@ -41,7 +41,7 @@
     "axios": "^1.8.3",
     "dotenv": "^16.4.5",
     "eas-cli": "^14.2.0",
-    "expo": "^52.0.0",
+    "expo": "^52.0.42",
     "expo-constants": "~17.0.3",
     "expo-dev-client": "~5.0.10",
     "expo-font": "~13.0.2",

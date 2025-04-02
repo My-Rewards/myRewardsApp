@@ -37,14 +37,23 @@ export function ProfileLoadingState() {
       <View style={styles.content}>
         <View style={styles.topSection}>
           {/* User Icon */}
-          <Animated.View style={[styles.userIcon, { backgroundColor: animatedBackground }]} />
+          <Animated.View
+            style={[styles.userIcon, { backgroundColor: animatedBackground }]}
+          />
 
           {/* User Info */}
-          <Animated.View style={[styles.userName, { backgroundColor: animatedBackground }]} />
+          <Animated.View
+            style={[styles.userName, { backgroundColor: animatedBackground }]}
+          />
           <View style={styles.emailWrapper}>
             <View style={styles.emailContainer}>
               <View style={styles.emailLine} />
-              <Animated.View style={[styles.emailText, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.emailText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
               <View style={styles.emailLine} />
             </View>
           </View>
@@ -52,51 +61,126 @@ export function ProfileLoadingState() {
           {/* Membership Info */}
           <View style={styles.membershipContainer}>
             <View style={styles.membershipRow}>
-              <Animated.View style={[styles.membershipText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.membershipText, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.membershipText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.membershipText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
             <View style={styles.membershipRow}>
-              <Animated.View style={[styles.membershipText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.membershipText, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.membershipText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.membershipText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
           </View>
 
           {/* View Plans Button */}
-          <Animated.View style={[styles.viewPlansButton, { backgroundColor: animatedBackground }]} />
+          <Animated.View
+            style={[
+              styles.viewPlansButton,
+              { backgroundColor: animatedBackground },
+            ]}
+          />
         </View>
 
         <View style={styles.actionButtonContainer}>
           {/* First Card Group */}
           <View style={styles.card}>
             <View style={styles.menuItem}>
-              <Animated.View style={[styles.menuText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.smallIcon, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.menuText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.smallIcon,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
             <View style={styles.menuDivider} />
 
             <View style={styles.menuItem}>
-              <Animated.View style={[styles.menuText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.smallIcon, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.menuText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.smallIcon,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
             <View style={styles.menuDivider} />
 
             <View style={styles.menuItem}>
-              <Animated.View style={[styles.menuText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.smallIcon, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.menuText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.smallIcon,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
           </View>
 
           {/* Second Card Group */}
           <View style={styles.card}>
             <View style={styles.menuItem}>
-              <Animated.View style={[styles.menuText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.smallIcon, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.menuText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.smallIcon,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
             <View style={styles.menuDivider} />
 
             <View style={styles.menuItem}>
-              <Animated.View style={[styles.menuText, { backgroundColor: animatedBackground }]} />
-              <Animated.View style={[styles.smallIcon, { backgroundColor: animatedBackground }]} />
+              <Animated.View
+                style={[
+                  styles.menuText,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.smallIcon,
+                  { backgroundColor: animatedBackground },
+                ]}
+              />
             </View>
           </View>
         </View>
@@ -105,14 +189,16 @@ export function ProfileLoadingState() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fffbf7",
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
   },
   content: {
-    flex: 1,
+    width: "100%", // Ensure content doesn't exceed screen width
+    maxWidth: 320, // Optional: Limit max width for better layout
     paddingHorizontal: 20,
     paddingTop: 16,
   },

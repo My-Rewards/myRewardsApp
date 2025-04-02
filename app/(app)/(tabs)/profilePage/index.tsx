@@ -231,9 +231,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fffbf7",
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
     flex: 1,
+    width: "100%",
+    maxWidth: 320,
     paddingHorizontal: 20,
     paddingTop: 16,
   },
