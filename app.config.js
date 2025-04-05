@@ -57,7 +57,7 @@ export default () => {
       },
       userPoolId: process.env.USERPOOL_ID,
       webClientId: process.env.WEB_CLIENT_ID,
-      cognitoDomain: process.env.COGNITO_DOMAIN,
+      cognitoDomain: process.env.APP_ENV == 'prod' ? 'https://api.myrewards.website':'https://beta.api.myrewards.website',
       identityPoolId: process.env.IDENTITY_POOL_ID,
       awsRegion: process.env.AWS_REGION,
       appEnv: process.env.APP_ENV,
