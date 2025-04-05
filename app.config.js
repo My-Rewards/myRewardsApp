@@ -70,5 +70,7 @@ export default () => {
         : "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8",
     },
     runtimeVersion: "1.0.0",
+    description: 'MyRrewards Mobile App',
+    orientation:'default',
   };
 };
