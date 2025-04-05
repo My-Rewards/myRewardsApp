@@ -1,0 +1,81 @@
+name: Promote Beta to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Promote beta to production?'
+        required: true
+        default: yes
+        type: choice
+        options:
+          - yes
+          - no
+
+permissions:
+  contents: write
+  statuses: write
+
+jobs:
+  build-and-promote:
+    if: ${{ github.event.inputs.confirm }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate GitHub App token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.BOT_KEY }}
+
+      - name: Checkout repo with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: beta
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Set Git identity
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Build project
+        run: |
+          echo "🏗️ Building project from beta branch..."
+          npm run build
+        continue-on-error: false
+
+      - name: Verify build
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Build successful, proceeding with promotion"
+          else
+            echo "❌ Build failed, aborting promotion"
+            exit 1
+          fi
+
+      - name: Force prod to match beta
+        if: success()
+        run: |
+          echo "🚀 Promoting beta to production..."
+          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
+          git fetch origin
+          git push origin beta:prod --force
+          echo "✅ Successfully promoted beta to production"
+  
+
+      - name: Verify promotion
+        if: success()
+        run: |
+          git fetch origin prod
+          if git diff --quiet origin/beta origin/prod; then
+            echo "✅ Verification successful: prod matches beta"
+          else
+            echo "❌ Verification failed: prod does not match beta"
+            exit 1
+          fi
