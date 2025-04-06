@@ -33,11 +33,24 @@ jobs:
           # Fetch parameters from SSM
           PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/$APP_ENV/customerUserPoolId" "/myRewardsApp/$APP_ENV/customerWebClientId" "/myRewardsApp/$APP_ENV/identityPoolIdCustomer" "/myRewardsApp/$APP_ENV/appConfig" --with-decryption --region us-east-1)
   
-          # Extract and set environment variables
-          echo "USER_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/customerUserPoolId\").Value") >> $GITHUB_ENV
-          echo "WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/customerWebClientId\").Value") >> $GITHUB_ENV
-          echo "IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/identityPoolIdCustomer\").Value") >> $GITHUB_ENV
-          echo "APP_CONFIG_VALUES=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/appConfig\").Value") >> $GITHUB_ENV
+          # Fix the environment variable setting syntax
+          echo "USERPOOL_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/'"$APP_ENV"'/customerUserPoolId").Value')" >> $GITHUB_ENV
+          echo "WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/'"$APP_ENV"'/customerWebClientId").Value')" >> $GITHUB_ENV
+          echo "IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/'"$APP_ENV"'/identityPoolIdCustomer").Value')" >> $GITHUB_ENV
+          echo "APP_CONFIG_VALUES=$(echo "$PARAMS" | jq -r '.Parameters[] | select(.Name=="/myRewardsApp/'"$APP_ENV"'/appConfig").Value')" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ vars.AWS_REGION }}" >> $GITHUB_ENV
+          echo "APP_ENV=$APP_ENV" >> $GITHUB_ENV
+
+      # Add environment validation step
+      - name: Validate Environment Variables
+        run: |
+          echo "Checking environment variables..."
+          [[ -n "$USERPOOL_ID" ]] || exit 1
+          [[ -n "$WEB_CLIENT_ID" ]] || exit 1
+          [[ -n "$IDENTITY_POOL_ID" ]] || exit 1
+          [[ -n "$APP_CONFIG_VALUES" ]] || exit 1
+          echo "Environment variables validated successfully"
+
 
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
