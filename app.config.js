@@ -3,7 +3,10 @@ require('dotenv').config();
 export default () => {
   const isProd = process.env.APP_ENV === 'prod';
   const RUNTIMEVERSION = '1.0.0'
-
+  let apiPath = "https://beta.api.myrewards.website"
+  if(isProd) {
+    apiPath = "https://api.myrewards.website"
+  }
   return {
     name: 'MyRewards',
     slug:'myrewardsapp',
@@ -62,6 +65,7 @@ export default () => {
       awsRegion: process.env.AWS_REGION,
       appEnv: process.env.APP_ENV,
       appConfig: JSON.parse(process.env.APP_CONFIG_VALUES),
+      apiPath: apiPath,
     },
     owner: "myrewards",
     updates: {

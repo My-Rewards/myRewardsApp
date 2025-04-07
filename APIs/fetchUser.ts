@@ -1,6 +1,8 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
-const url = process.env.CUSTOMER_GET_ENDPOINT;
+import Constants from "expo-constants";
+const { apiPath } = Constants.expoConfig?.extra || {};
+const url = apiPath + "/customer/user";
 const fetchUser = async () => {
   try {
     const { tokens } = await fetchAuthSession();
