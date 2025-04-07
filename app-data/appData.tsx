@@ -15,9 +15,11 @@ import {
 } from 'react';
 import * as Location from 'expo-location';
 import { useProps } from '@/app/LoadingProp/propsProvider';
-import { Plan, PreviewPlanProp, Profile, regionProp, ShopPreviewProps } from './data-types';
+import { Plan, PreviewPlanProp, Profile, regionProp, ShopPreviewProps, AppConfig } from './data-types';
 import Map from 'react-native-maps';
 import fetchUser from '@/APIs/fetchUser';
+import { fetchAppConfig } from '@/APIs/fetchConfig';
+import { set } from 'zod';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
@@ -39,7 +41,9 @@ const DataContext = createContext<{
     isPage2Loading: boolean;
     isPage3Loading: boolean;
     isPage4Loading: boolean;
-    userLocation:regionProp|null
+    userLocation:regionProp|null;
+    fetchAppConfig: () => Promise<AppConfig | null>;
+    appConfig: AppConfig | null;
     }>({
     fetchShopsByRadius: async () => null,
     fetchDiscoverShops: async () => null,
@@ -66,7 +70,9 @@ const DataContext = createContext<{
     isPage2Loading: false,
     isPage3Loading: false,
     isPage4Loading: false,
-    userLocation:null
+    userLocation:null,
+    fetchAppConfig: async () => null,
+    appConfig: null,
   });
 
   export function localData() {
@@ -83,7 +89,7 @@ const DataContext = createContext<{
     const [radiusShops, setRadiusShops] = useState<ShopPreviewProps[]|null>();    
     const [profile, setProfile] = useState<Profile|null>();
     const [userLocation, setUserLocation] = useState<regionProp|null>(null);
-
+    const [appConfig, setAppConfig] = useState<AppConfig|null>(null);
     // plans never gets updated (sort with filteredPlans)
     const [plans, setPlans] = useState<PreviewPlanProp[]|null>();
     const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]|null>();
@@ -115,6 +121,14 @@ const DataContext = createContext<{
               const fetchedProfile = await fetchUser();
               setProfile(fetchedProfile);
               setFetchingPage4(false);
+          }
+
+          if(!appConfig) {
+            // const appConfig = await fetchAppConfig();
+            // if (!appConfig) {
+            //   return null;
+            // }
+            setAppConfig(appConfig);
           }
     
           if (!(discoverShopsFilter1 || discoverShopsFilter2 || discoverShopsFilter3)) {
@@ -276,6 +290,7 @@ const DataContext = createContext<{
             fetchProfile: async () => {
               const profile = await fetchUser();
               setProfile(profile);
+              return profile;
             },
             setRegion: async (location:regionProp) => {setRegion(location)},
             locateMe: async (map:React.RefObject<Map>)=>{rebaseUserLocation(map)},
@@ -291,7 +306,16 @@ const DataContext = createContext<{
             isPage1Loading: fetchingPage1,
             isPage2Loading: fetchingPage2,
             isPage3Loading: fetchingPage3,
-            isPage4Loading: fetchingPage4
+            isPage4Loading: fetchingPage4,
+            fetchAppConfig: async () => { 
+              // const appConfig = await fetchAppConfig();
+              // if (!appConfig) {
+              //   return null;
+              // }
+              setAppConfig(appConfig);
+              return appConfig;
+            },
+            appConfig,
         }}>
         {children}
       </DataContext.Provider>

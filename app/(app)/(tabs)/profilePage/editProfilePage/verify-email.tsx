@@ -11,16 +11,40 @@ import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
+import { ZodError } from "zod";
+import { verifyEmailSchema } from "@/constants/validationTypes";
+import { useProps } from "@/app/LoadingProp/propsProvider";
+import { localData } from "@/app-data/appData";
 const reset_message =
   "To reset your password enter the email associated with your account below:";
 
 export default function verifyEmail() {
   const [email, setEmail] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const verifyEmail = () => {
-    //Do some verification here
-    router.push("profilePage/editProfilePage/forgot-password");
-  };
+  const { alert } = useProps();
+  const {profile} = localData();
+   const verifyEmail = () => {
+      try {
+        verifyEmailSchema.parse({email});
+        if(profile?.email !== email){
+          alert("", "Wrong email provided", "error");
+          return;
+        }
+        router.replace({
+          pathname:  "profilePage/editProfilePage/reset-password",
+          params: {
+            email: email,
+          },
+        });
+      } catch(error: unknown){
+        if(error instanceof ZodError){
+          const message = error.errors[0].message;
+           alert("", message, "error");
+           return;
+        }
+      }
+    };
+
 
   useEffect(() => {
     if (email !== "") {
@@ -44,6 +68,7 @@ export default function verifyEmail() {
           placeholder="Enter email"
           style={styles.inputBox}
           onChangeText={setEmail}
+          autoCapitalize="none"
         ></TextInput>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}

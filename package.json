@@ -41,7 +41,7 @@
     "axios": "^1.8.3",
     "dotenv": "^16.4.5",
     "eas-cli": "^14.2.0",
-    "expo": "^52.0.0",
+    "expo": "^52.0.42",
     "expo-constants": "~17.0.3",
     "expo-dev-client": "~5.0.10",
     "expo-font": "~13.0.2",
@@ -60,6 +60,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.6",
+    "react-native-bouncy-checkbox": "^4.1.2",
     "react-native-collapsible": "^1.6.2",
     "react-native-dotenv": "^3.4.11",
     "react-native-fast-image": "^8.6.3",
@@ -74,7 +75,8 @@
     "react-native-svg": "15.8.0",
     "react-native-swipe-gestures": "^1.0.5",
     "react-native-web": "~0.19.10",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -1,12 +1,19 @@
-import { useProps } from '@/app/LoadingProp/propsProvider';
-import { handStar } from '@/assets/images/MR-logos';
-import { color_pallete } from '@/constants/Colors';
-import React, { useEffect, useState, useRef } from 'react';
-import { Text, TouchableOpacity, View, StyleSheet, Animated, Dimensions } from 'react-native';
-import NfcManager, { NfcTech } from 'react-native-nfc-manager';
-import { SvgXml } from 'react-native-svg';
+import { useProps } from "@/app/LoadingProp/propsProvider";
+import { handStar } from "@/assets/images/MR-logos";
+import { color_pallete } from "@/constants/Colors";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Animated,
+  Dimensions,
+} from "react-native";
+import NfcManager, { NfcTech } from "react-native-nfc-manager";
+import { SvgXml } from "react-native-svg";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function ScanPage() {
   const [isScanning, setIsScanning] = useState(false);
@@ -15,9 +22,8 @@ export default function ScanPage() {
 
   const scaleAnim2 = useRef(new Animated.Value(1)).current;
   const fadeAnim2 = useRef(new Animated.Value(1)).current;
-  
-  const { alert } = useProps();
 
+  const { alert } = useProps();
 
   useEffect(() => {
     if (isScanning) {
@@ -56,8 +62,8 @@ export default function ScanPage() {
         ]),
       ])
     ).start();
-  
-    setTimeout(()=>{
+
+    setTimeout(() => {
       Animated.loop(
         Animated.sequence([
           Animated.parallel([
@@ -86,7 +92,7 @@ export default function ScanPage() {
           ]),
         ])
       ).start();
-    },600)
+    }, 600);
   };
 
   const stopPulsating = () => {
@@ -106,97 +112,96 @@ export default function ScanPage() {
       setIsScanning(true);
       await NfcManager.requestTechnology(NfcTech.Ndef);
       const tag = await NfcManager.getTag();
-      console.log('Tag found:', tag);
+      console.log("Tag found:", tag);
 
       if (tag?.ndefMessage) {
-        alert('Visit tracked Successfully', '', 'success');
+        alert("Visit tracked Successfully", "", "success");
       }
     } catch (ex) {
-      alert('Something went wrong', '', 'error');
-      console.warn('NFC read error:', ex);
+      alert("Something went wrong", "", "error");
+      console.warn("NFC read error:", ex);
       setIsScanning(false);
     } finally {
       setIsScanning(false);
-      NfcManager.cancelTechnologyRequest().catch(() => { /* do nothing */ });
+      NfcManager.cancelTechnologyRequest().catch(() => {
+        /* do nothing */
+      });
     }
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{position:'relative'}}>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View style={{ position: "relative" }}>
         <TouchableOpacity
           onPress={readNdef}
           style={{
-            zIndex:5,
+            zIndex: 5,
             padding: 20,
             backgroundColor: color_pallete[3],
-            borderRadius: width/2,
-            justifyContent:'center',
-            alignItems:'center',
-            minWidth:150,
-            minHeight:150,
-            width:'55%',
-            aspectRatio:1,
+            borderRadius: width / 2,
+            justifyContent: "center",
+            alignItems: "center",
+            minWidth: 150,
+            minHeight: 150,
+            width: "55%",
+            aspectRatio: 1,
           }}
           disabled={isScanning}
         >
           <View style={styles.buttonContainer}>
-            <SvgXml
-              xml={handStar}
-              width="50%"
-              height="50%" 
-              color={'white'} 
-            />
-            {isScanning?
-            <Text style={styles.buttonText}>Scanning...</Text>
-            :
-            <Text style={styles.buttonText}>Click to Scan Tag</Text>
-            }
+            <SvgXml xml={handStar} width="50%" height="50%" color={"white"} />
+            {isScanning ? (
+              <Text style={styles.buttonText}>Scanning...</Text>
+            ) : (
+              <Text style={styles.buttonText}>Click to Scan Tag</Text>
+            )}
           </View>
         </TouchableOpacity>
-        <Animated.View 
-        style={{
-          backgroundColor:color_pallete[3],
-          position:'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex:1,
-          borderRadius: width/2,
-          transform: [{ scale: scaleAnim }],
-          opacity:fadeAnim
-        }}/>
-        <Animated.View 
-        style={{
-          backgroundColor:color_pallete[3],
-          position:'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex:1,
-          borderRadius: width/2,
-          transform: [{ scale: scaleAnim2 }],
-          opacity:fadeAnim2
-        }}/>
+        <Animated.View
+          style={{
+            backgroundColor: color_pallete[3],
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+            borderRadius: width / 2,
+            transform: [{ scale: scaleAnim }],
+            opacity: fadeAnim,
+          }}
+        />
+        <Animated.View
+          style={{
+            backgroundColor: color_pallete[3],
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+            borderRadius: width / 2,
+            transform: [{ scale: scaleAnim2 }],
+            opacity: fadeAnim2,
+          }}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  buttonContainer:{
-    width:'100%', 
-    height:'100%', 
-    justifyContent:'center', 
-    alignItems:'center',
-    flexDirection:'column',
-    gap:20
+  buttonContainer: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    gap: 20,
   },
-  buttonText:{
-    fontFamily:'Avenir Next',
-    color:'white',
-    fontWeight:'700'
-  }
-})
+  buttonText: {
+    fontFamily: "Avenir Next",
+    color: "white",
+    fontWeight: "700",
+  },
+});

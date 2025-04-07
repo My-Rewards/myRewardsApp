@@ -138,3 +138,9 @@ export interface PreviewPlanProp extends PlanProps{
   banner: string,
   logo:string
 }
+
+export type AppConfig = { 
+  CUSTOMER_GET_ENDPOINT: string;
+  CUSTOMER_UPDATE_ENDPOINT: string;
+  CUSTOMER_DELETE_ENDPOINT: string;
+}

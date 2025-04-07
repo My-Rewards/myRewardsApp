@@ -15,7 +15,6 @@ import {
 } from "aws-amplify/auth";
 import { userSignIn, userSignUp } from "@/params/auth";
 import "aws-amplify/auth/enable-oauth-listener";
-import fetchUser from "@/APIs/fetchUser";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 /* 
   Serves to check authentication inclosing the app, each time a new screen is triggered this code is referenced and checks
@@ -86,7 +85,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   return (
     <AuthContext.Provider
       value={{
-        signIn: async (profile: userSignIn) => {
+        signIn: async (profile: userSignIn): Promise<string> => {
           setFetching(true);
 
           try {
@@ -118,7 +117,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
             setFetching(false);
 
-            return data.isSignedIn ? "success" : "error";
+            return data.nextStep.signInStep;
           } catch (error) {
             setFetching(false);
             return "error";

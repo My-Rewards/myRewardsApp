@@ -12,6 +12,8 @@ import { useProps } from "@/app/LoadingProp/propsProvider";
 import { BackButton } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ZodError } from "zod";
+import { verifyPasswordSchema } from "@/constants/validationTypes";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -29,19 +31,24 @@ function ForgotPassword() {
     }
   }, [password, confirmPassword, code]);
 
-  const handleResetPassword = () => {
-    if (password !== confirmPassword) {
-      alert("", "Passwords do not match", "error");
-      return;
-    } else if (code !== getCode.toString()) {
-      alert("", "Invalid code", "error");
-      return;
-    }
-    /*
-    API logic here to update password for user
-    */
-    router.push("profilePage/editProfilePage/password-reset-success");
-  };
+    const handleResetPassword = () => {
+      try {
+        verifyPasswordSchema.parse({password, confirmPassword});
+        if (password !== confirmPassword) {
+          alert("", "Passwords do not match", "error");
+          return;
+        } 
+        //Call on resetpassword function
+        router.navigate("profilePage/editProfilePage/password-reset-success");
+      } catch(error: unknown) {
+        if (error instanceof ZodError) {
+          const message = error.errors[0].message;
+          alert("", message, "error");
+          return;
+        }
+      }
+  
+    };
 
   return (
     <View style={styles.container} >

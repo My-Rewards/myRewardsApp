@@ -1,22 +1,12 @@
-import {useState, useEffect} from 'react'
-import {fetchAppConfig} from '@/services/fetchConfig';
+import { fetchAppConfig } from "@/APIs/fetchConfig";
 
-type AppConfig = {
-  isBeta: boolean;
-}
-export const useAppConfig = () => {
-  const [config, setConfig] = useState<AppConfig | null>(null);
+export const useAppConfig = async () => {
+  const data = await fetchAppConfig();
+  if (!data) {
+    return null;
+  }
+  const stringifiedData = JSON.stringify(data);
+  const parsedData = JSON.parse(stringifiedData);
 
-    
-    useEffect(() => {
-        const getConfig = async () => {
-          const data = await fetchAppConfig();
-          const stringifiedData = JSON.stringify(data)
-          const parsedData = JSON.parse(stringifiedData);
-          setConfig(parsedData);
-        };
-        getConfig();
-      }, []);
-
-      return config;
-}
+  return parsedData;
+};

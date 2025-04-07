@@ -8,14 +8,17 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
-import formatDate from "@/services/formatDate";
+import formatDate from "@/constants/formatDate";
 import updateUser from "@/APIs/updateUser";
 import { localData } from "@/app-data/appData";
+import { useProps } from "@/app/LoadingProp/propsProvider";
 export default function EditProfilePage() {
   const router = useRouter();
+  const { alert, triggerLoadingScreen } = useProps();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
@@ -31,14 +34,22 @@ export default function EditProfilePage() {
 
   const handleSaveChanges = async () => {
     if (firstName !== "" || lastName !== "") {
-      await updateUser({
+      triggerLoadingScreen({ isLoading: true });
+      const result = await updateUser({
         fullname: {
           firstName,
           lastName,
         },
       });
+      if(result === null){
+        triggerLoadingScreen({ isLoading: false });
+        alert("", "Name is invalid or too long", "error");
+        return;
+      }
       fetchProfile();
+      triggerLoadingScreen({ isLoading: false });
       router.back();
+      alert("", "Profile updated successfully", "success");
     }
   };
 
@@ -84,14 +95,14 @@ export default function EditProfilePage() {
                 )}
               </Text>
             </View>
-            <View style={styles.membershipRow}>
+            {/* <View style={styles.membershipRow}>
               <Text style={styles.membershipText}>Birthday:</Text>
               <Text style={styles.membershipText}>
                 {formatDate(
                   profile?.birthdate ? new Date(profile.birthdate) : new Date()
                 )}
               </Text>
-            </View>
+            </View> */}
           </View>
         </View>
 
@@ -101,17 +112,30 @@ export default function EditProfilePage() {
           <TextInput
             value={firstName}
             onChangeText={setFirstName}
-            style={styles.inputField}
+            style={[
+              styles.inputField,
+              firstName.length > 14 && { marginBottom: 4 },
+            ]}
             placeholder="Firstname"
           />
+         {firstName.length > 14 && (
+           <Text style={styles.nameDescriptionText}>*Max of 14 characters</Text>
+         )}
+          
 
           <Text style={styles.inputLabel}>Edit last name</Text>
           <TextInput
             value={lastName}
             onChangeText={setLastName}
-            style={styles.inputField}
+            style={[
+              styles.inputField,
+              lastName.length > 14 && { marginBottom: 4 },
+            ]}
             placeholder="Lastname"
           />
+           {lastName.length > 14 && (
+           <Text style={styles.nameDescriptionText}>*Max of 14 characters</Text>
+         )}
         </View>
 
         {/* Reset Password Button */}
@@ -302,5 +326,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
+  },
+  nameDescriptionText: {
+    fontFamily: "Avenir Next",
+    fontSize: 11,
+    color: "#8B4513",
+    marginBottom: 6,
   },
 });
