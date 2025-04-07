@@ -85,7 +85,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   return (
     <AuthContext.Provider
       value={{
-        signIn: async (profile: userSignIn) => {
+        signIn: async (profile: userSignIn): Promise<string> => {
           setFetching(true);
 
           try {
@@ -117,7 +117,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
             setFetching(false);
 
-            return data.isSignedIn ? "success" : "error";
+            return data.nextStep.signInStep;
           } catch (error) {
             setFetching(false);
             return "error";

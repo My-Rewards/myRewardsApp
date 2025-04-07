@@ -68,6 +68,7 @@ export default function verifyEmail() {
           placeholder="Enter email"
           style={styles.inputBox}
           onChangeText={setEmail}
+          autoCapitalize="none"
         ></TextInput>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
