@@ -30,6 +30,10 @@ export default function verifyEmail() {
           alert("", "Wrong email provided", "error");
           return;
         }
+        if(email.includes("gmail")) {
+          alert("", "Please use a non-Gmail email address", "error");
+          return;
+        }
         router.replace({
           pathname:  "profilePage/editProfilePage/reset-password",
           params: {

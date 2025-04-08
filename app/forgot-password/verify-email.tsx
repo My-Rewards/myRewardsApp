@@ -32,6 +32,10 @@ export default function verifyEmail() {
   const verifyEmail = () => {
     try {
       verifyEmailSchema.parse({email});
+      if(email.includes("gmail")) {
+        alert("", "Please use a non-Gmail email address", "error");
+        return;
+      }
       router.replace({
         pathname: "forgot-password/forgot-password",
         params: {
@@ -62,6 +66,7 @@ export default function verifyEmail() {
           placeholder="Enter email"
           style={styles.inputBox}
           onChangeText={setEmail}
+          autoCapitalize="none"
         ></TextInput>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}

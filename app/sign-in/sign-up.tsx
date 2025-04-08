@@ -54,6 +54,11 @@ export default function SignUp() {
         alert("", "Please agree to the terms and services", "error");
         return false;
       }
+      
+      if(email.includes("gmail")) {
+        alert("", "Please use a non-Gmail email address", "error");
+        return false;
+      }
 
       return true;
     } catch (error: unknown) {
