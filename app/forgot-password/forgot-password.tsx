@@ -16,6 +16,7 @@ import { BackButton } from "@/assets/images/MR-logos";
 import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
 import { verifyPasswordSchema } from "@/app-data/validation/validationTypes";
 import { ZodError } from "zod";
+import { resetPasswordFn } from "@/app-data/validation/resetPasswordFn";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +26,7 @@ function ForgotPassword() {
   const email = params.email;
   const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
   const { alert } = useProps();
-
+  const successRoute = "forgot-password/password-reset-success";
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
       setButtonColor("#F98B4E");
@@ -34,40 +35,7 @@ function ForgotPassword() {
     }
   }, [password, confirmPassword, code]);
   const handleResetPassword = async () => {
-    try {
-      verifyPasswordSchema.parse({ password, confirmPassword });
-      if (password !== confirmPassword) {
-        alert("", "Passwords do not match", "error");
-        return;
-      }
-      if (typeof email === "string") {
-        await confirmResetPassword({
-          username: email,
-          confirmationCode: code,
-          newPassword: password,
-        })
-          .then(() => {
-            router.navigate("forgot-password/password-reset-success");
-          })
-          .catch((error: unknown) => {
-            if (error instanceof Error) {
-              alert("", error.message, "error");
-            } else {
-              alert("", "An unknown error occurred", "error");
-            }
-            return;
-          });
-      } else {
-        alert("", "Invalid email format", "error");
-      }
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        console.log(error);
-        const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
-      }
-    }
+    await resetPasswordFn(email, password, confirmPassword, code, alert, successRoute);
   };
 
   return (
