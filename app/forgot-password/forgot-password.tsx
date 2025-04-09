@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
-import { resetPassword } from "aws-amplify/auth";
+import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
 import { verifyPasswordSchema } from "@/constants/validationTypes";
 import { ZodError } from "zod";
 function ForgotPassword() {
@@ -21,10 +21,10 @@ function ForgotPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const { email } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const email = params.email;
   const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
   const { alert } = useProps();
-  const getCode = 123456;
 
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
@@ -33,34 +33,51 @@ function ForgotPassword() {
       setButtonColor("#FBC19F");
     }
   }, [password, confirmPassword, code]);
-
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     try {
-      verifyPasswordSchema.parse({password, confirmPassword});
+      verifyPasswordSchema.parse({ password, confirmPassword });
       if (password !== confirmPassword) {
         alert("", "Passwords do not match", "error");
         return;
-      } 
-      //Call on resetpassword function
-      router.navigate("forgot-password/password-reset-success");
-    } catch(error: unknown) {
+      }
+      if (typeof email === "string") {
+        await confirmResetPassword({
+          username: email,
+          confirmationCode: code,
+          newPassword: password,
+        })
+          .then(() => {
+            router.navigate("forgot-password/password-reset-success");
+          })
+          .catch((error: unknown) => {
+            if (error instanceof Error) {
+              alert("", error.message, "error");
+            } else {
+              alert("", "An unknown error occurred", "error");
+            }
+            return;
+          });
+      } else {
+        alert("", "Invalid email format", "error");
+      }
+    } catch (error: unknown) {
       if (error instanceof ZodError) {
+        console.log(error);
         const message = error.errors[0].message;
         alert("", message, "error");
         return;
       }
     }
-
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={styles.backButtonContainer}>
-          <Pressable onPress={() => router.back()}>
-            <SvgXml xml={BackButton} fill={styles.backButton.color} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => router.back()}>
+          <SvgXml xml={BackButton} fill={styles.backButton.color} />
+        </Pressable>
+      </View>
       <View style={styles.topTextContainer}>
         <Text style={styles.title}>Reset password</Text>
         <Text style={styles.text}>{textNotificationBox}</Text>

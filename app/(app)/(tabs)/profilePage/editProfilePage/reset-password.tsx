@@ -7,21 +7,23 @@ import {
   Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { BackButton } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ZodError } from "zod";
 import { verifyPasswordSchema } from "@/constants/validationTypes";
+import { confirmResetPassword } from "aws-amplify/auth";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const textNotificationBox = `We sent a password reset code by email to test*****@ufl.com. Enter it below to reset your password.`;
+  const params = useLocalSearchParams();
+  const email = params.email;
+  const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
   const { alert } = useProps();
-  const getCode = 123456;
 
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
@@ -31,32 +33,52 @@ function ForgotPassword() {
     }
   }, [password, confirmPassword, code]);
 
-    const handleResetPassword = () => {
-      try {
-        verifyPasswordSchema.parse({password, confirmPassword});
-        if (password !== confirmPassword) {
-          alert("", "Passwords do not match", "error");
-          return;
-        } 
-        //Call on resetpassword function
-        router.navigate("profilePage/editProfilePage/password-reset-success");
-      } catch(error: unknown) {
-        if (error instanceof ZodError) {
-          const message = error.errors[0].message;
-          alert("", message, "error");
-          return;
-        }
+  const handleResetPassword = async () => {
+    try {
+      verifyPasswordSchema.parse({ password, confirmPassword });
+      if (password !== confirmPassword) {
+        alert("", "Passwords do not match", "error");
+        return;
       }
-  
-    };
+      if (typeof email === "string") {
+        await confirmResetPassword({
+          username: email,
+          confirmationCode: code,
+          newPassword: password,
+        })
+          .then(() => {
+            router.navigate(
+              "profilePage/editProfilePage/password-reset-success"
+            );
+          })
+          .catch((error: unknown) => {
+            if (error instanceof Error) {
+              alert("", error.message, "error");
+            } else {
+              alert("", "An unknown error occurred", "error");
+            }
+            return;
+          });
+      } else {
+        alert("", "Invalid email format", "error");
+      }
+    } catch (error: unknown) {
+      if (error instanceof ZodError) {
+        console.log(error);
+        const message = error.errors[0].message;
+        alert("", message, "error");
+        return;
+      }
+    }
+  };
 
   return (
-    <View style={styles.container} >
-      <SafeAreaView/>
+    <View style={styles.container}>
+      <SafeAreaView />
       <View style={styles.backButtonContainer}>
-      <Pressable onPress={() => router.back()}>
-        <SvgXml xml={BackButton} fill={styles.backButton.color}/>
-      </Pressable>
+        <Pressable onPress={() => router.back()}>
+          <SvgXml xml={BackButton} fill={styles.backButton.color} />
+        </Pressable>
       </View>
       <View style={styles.topTextContainer}>
         <Text style={styles.title}>Reset password</Text>
