@@ -12,10 +12,11 @@ import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
 import { ZodError } from "zod";
-import { verifyEmailSchema } from "@/constants/validationTypes";
+import { verifyEmailSchema } from "@/app-data/validation/validationTypes";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { localData } from "@/app-data/appData";
 import { resetPassword } from "aws-amplify/auth";
+import { verifyEmailFn } from "@/app-data/validation/verifyEmailFn";
 const reset_message =
   "To reset your password enter the email associated with your account below:";
 
@@ -23,7 +24,7 @@ export default function verifyEmail() {
   const [email, setEmail] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const { alert } = useProps();
-  const { profile } = localData();
+  const {profile} = localData();
   useEffect(() => {
     if (email !== "") {
       setButtonColor("#F98B4E");
@@ -31,38 +32,9 @@ export default function verifyEmail() {
       setButtonColor("#FBC19F");
     }
   }, [email]);
-  
+
   const verifyEmail = async () => {
-    try {
-      verifyEmailSchema.parse({ email });
-      if (profile?.email !== email) {
-        alert("", "Wrong email provided", "error");
-        return;
-      }
-      if (email.includes("gmail")) {
-        alert("", "Please use a non-Gmail email address", "error");
-        return;
-      }
-      const result = await resetPassword({ username: email });
-      const { nextStep } = result;
-      if (nextStep.resetPasswordStep === "CONFIRM_RESET_PASSWORD_WITH_CODE")
-        router.replace({
-          pathname: "profilePage/editProfilePage/reset-password",
-          params: {
-            email: email,
-          },
-        });
-      else {
-        alert("", "An error occurred while sending the code", "error");
-        return;
-      }
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
-      }
-    }
+   await verifyEmailFn(email, alert, "profilePage/editProfilePage/reset-password", profile ?? null);
   };
 
   useEffect(() => {

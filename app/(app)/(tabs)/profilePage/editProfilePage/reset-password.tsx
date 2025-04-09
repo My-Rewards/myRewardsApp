@@ -13,7 +13,7 @@ import { BackButton } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ZodError } from "zod";
-import { verifyPasswordSchema } from "@/constants/validationTypes";
+import { verifyPasswordSchema } from "@/app-data/validation/validationTypes";
 import { confirmResetPassword } from "aws-amplify/auth";
 function ForgotPassword() {
   const [code, setCode] = useState("");

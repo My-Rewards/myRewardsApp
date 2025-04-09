@@ -14,7 +14,7 @@ import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
 import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
-import { verifyPasswordSchema } from "@/constants/validationTypes";
+import { verifyPasswordSchema } from "@/app-data/validation/validationTypes";
 import { ZodError } from "zod";
 function ForgotPassword() {
   const [code, setCode] = useState("");

@@ -11,10 +11,9 @@ import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
-import { verifyEmailSchema } from "@/constants/validationTypes";
-import { ZodError } from "zod";
 import { useProps } from "../LoadingProp/propsProvider";
-import { resetPassword } from "aws-amplify/auth";
+import { localData } from "@/app-data/appData";
+import { verifyEmailFn } from "@/app-data/validation/verifyEmailFn";
 const reset_message =
   "To reset your password enter the email associated with your account below:";
 
@@ -22,6 +21,7 @@ export default function verifyEmail() {
   const [email, setEmail] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const { alert } = useProps();
+  const {profile} = localData();
   useEffect(() => {
     if (email !== "") {
       setButtonColor("#F98B4E");
@@ -31,32 +31,7 @@ export default function verifyEmail() {
   }, [email]);
 
   const verifyEmail = async () => {
-    try {
-      verifyEmailSchema.parse({ email });
-      if (email.includes("gmail")) {
-        alert("", "Please use a non-Gmail email address", "error");
-        return;
-      }
-      const result = await resetPassword({ username: email });
-      const { nextStep } = result;
-      if (nextStep.resetPasswordStep === "CONFIRM_RESET_PASSWORD_WITH_CODE")
-        router.replace({
-          pathname: "forgot-password/forgot-password",
-          params: {
-            email: email,
-          },
-        });
-      else {
-        alert("", "An error occurred while sending the code", "error");
-        return;
-      }
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
-      }
-    }
+   await verifyEmailFn(email, alert, "forgot-password/forgot-password", profile ?? null);
   };
 
   return (

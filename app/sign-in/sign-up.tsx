@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useProps } from "../LoadingProp/propsProvider";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { signUpSchema } from "@/constants/validationTypes";
+import { signUpSchema } from "@/app-data/validation/validationTypes";
 import { ZodError } from "zod";
 export default function SignUp() {
   const { signUp, isLoading, googleSignIn } = useSession();
@@ -54,8 +54,8 @@ export default function SignUp() {
         alert("", "Please agree to the terms and services", "error");
         return false;
       }
-      
-      if(email.includes("gmail")) {
+
+      if (email.includes("gmail")) {
         alert("", "Please use a non-Gmail email address", "error");
         return false;
       }
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     color: "#8B4513",
     fontSize: 10,
     lineHeight: 12,
-    marginBottom: 8, 
+    marginBottom: 8,
   },
   lastInput: {
     height: 40,
@@ -317,9 +317,9 @@ const styles = StyleSheet.create({
   otherOptionContainer: {
     marginBottom: 10,
   },
-  otherOptionText: {  
+  otherOptionText: {
     fontFamily: "Avenir Next",
     fontSize: 12,
     color: "#8B4513",
-  }
+  },
 });

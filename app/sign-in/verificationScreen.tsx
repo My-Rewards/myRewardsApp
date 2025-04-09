@@ -73,7 +73,7 @@ export default function VerificationScreen() {
       })
       .then(() => {
         setVerifying(false);
-        router.replace("/");
+        router.replace("../app/(app)/tabs.tsx");
       })
       .catch((error: Error) => {
         setVerifying(false);
