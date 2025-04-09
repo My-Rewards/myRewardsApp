@@ -31,7 +31,7 @@ export const verifyPasswordSchema = z.object({
   password: z.string()
   .min(8, 'Password must be at least 8 characters')
   .regex(password_regex,'Password requires uppercase, number, and special character'),
-  confirmPassword: z.string()
+  confirmationPassword: z.string()
   .min(8, 'Password must be at least 8 characters')
   .regex(password_regex,'Password requires uppercase, number, and special character'),
 })

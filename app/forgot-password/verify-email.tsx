@@ -11,10 +11,9 @@ import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
-import { verifyEmailSchema } from "@/utils/validation/validationTypes";
+import { verifyEmailSchema } from "@/constants/validationTypes";
 import { ZodError } from "zod";
 import { useProps } from "../LoadingProp/propsProvider";
-import { resetPassword } from "aws-amplify/auth";
 const reset_message =
   "To reset your password enter the email associated with your account below:";
 
@@ -24,44 +23,37 @@ export default function verifyEmail() {
   const { alert } = useProps();
   useEffect(() => {
     if (email !== "") {
-      setButtonColor("#F98B4E");
-    } else {
-      setButtonColor("#FBC19F");
-    }
+        setButtonColor("#F98B4E");
+      } else {
+        setButtonColor("#FBC19F");
+      }
   }, [email]);
 
-  const verifyEmail = async () => {
+  const verifyEmail = () => {
     try {
-      verifyEmailSchema.parse({ email });
-      if (email.includes("gmail")) {
+      verifyEmailSchema.parse({email});
+      if(email.includes("gmail")) {
         alert("", "Please use a non-Gmail email address", "error");
         return;
       }
-      const result = await resetPassword({ username: email });
-      const { nextStep } = result;
-      if (nextStep.resetPasswordStep === "CONFIRM_RESET_PASSWORD_WITH_CODE")
-        router.replace({
-          pathname: "forgot-password/forgot-password",
-          params: {
-            email: email,
-          },
-        });
-      else {
-        alert("", "An error occurred while sending the code", "error");
-        return;
-      }
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
+      router.replace({
+        pathname: "forgot-password/forgot-password",
+        params: {
+          email: email,
+        },
+      });
+    } catch(error: unknown){
+      if(error instanceof ZodError){
         const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
+         alert("", message, "error");
+         return;
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <SafeAreaView />
+    <SafeAreaView/>
       <Text style={styles.title}>Verify your email</Text>
       <View style={styles.backButtonContainer}>
         <Pressable onPress={() => router.back()}>
@@ -79,8 +71,7 @@ export default function verifyEmail() {
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
           disabled={buttonColor === "#FBC19F"}
-          onPress={verifyEmail}
-        >
+          onPress={verifyEmail} >
           <Text style={styles.buttonText}>Verify email</Text>
         </TouchableOpacity>
       </View>

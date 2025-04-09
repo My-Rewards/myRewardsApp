@@ -7,21 +7,22 @@ import {
   Pressable,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { BackButton } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { handleResetPassword } from "@/utils/validation/handleResetPassword";
-async function ForgotPassword() {
+import { ZodError } from "zod";
+import { verifyPasswordSchema } from "@/constants/validationTypes";
+function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const { email } = useLocalSearchParams();
+  const textNotificationBox = `We sent a password reset code by email to test*****@ufl.com. Enter it below to reset your password.`;
   const { alert } = useProps();
-  const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
-  const successRoute = "profilePage/editProfilePage/password-reset-success";
+  const getCode = 123456;
+
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
       setButtonColor("#F98B4E");
@@ -30,32 +31,32 @@ async function ForgotPassword() {
     }
   }, [password, confirmPassword, code]);
 
-  const resetPassword = async () => {
-    try {
-      await handleResetPassword(
-        password,
-        confirmPassword,
-        email,
-        code,
-        alert,
-        successRoute
-      );
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert("", error.message, "error");
-      } else {
-        alert("", "An unknown error occurred", "error");
+    const handleResetPassword = () => {
+      try {
+        verifyPasswordSchema.parse({password, confirmPassword});
+        if (password !== confirmPassword) {
+          alert("", "Passwords do not match", "error");
+          return;
+        } 
+        //Call on resetpassword function
+        router.navigate("profilePage/editProfilePage/password-reset-success");
+      } catch(error: unknown) {
+        if (error instanceof ZodError) {
+          const message = error.errors[0].message;
+          alert("", message, "error");
+          return;
+        }
       }
-    }
-  };
+  
+    };
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView />
+    <View style={styles.container} >
+      <SafeAreaView/>
       <View style={styles.backButtonContainer}>
-        <Pressable onPress={() => router.back()}>
-          <SvgXml xml={BackButton} fill={styles.backButton.color} />
-        </Pressable>
+      <Pressable onPress={() => router.back()}>
+        <SvgXml xml={BackButton} fill={styles.backButton.color}/>
+      </Pressable>
       </View>
       <View style={styles.topTextContainer}>
         <Text style={styles.title}>Reset password</Text>
@@ -95,7 +96,7 @@ async function ForgotPassword() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={resetPassword}
+          onPress={handleResetPassword}
           disabled={buttonColor === "#FBC19F"}
         >
           <Text style={styles.buttonText}>Reset Password</Text>
