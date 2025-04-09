@@ -13,9 +13,7 @@ import { router } from "expo-router";
 import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
-import { resetPassword } from "aws-amplify/auth";
-import { verifyPasswordSchema } from "@/constants/validationTypes";
-import { ZodError } from "zod";
+import { handleResetPassword } from "@/utils/validation/handleResetPassword";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -24,8 +22,7 @@ function ForgotPassword() {
   const { email } = useLocalSearchParams();
   const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
   const { alert } = useProps();
-  const getCode = 123456;
-
+  const successRoute = "forgot-password/password-reset-success";
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
       setButtonColor("#F98B4E");
@@ -34,33 +31,33 @@ function ForgotPassword() {
     }
   }, [password, confirmPassword, code]);
 
-  const handleResetPassword = () => {
+  const resetPassword = async () => {
     try {
-      verifyPasswordSchema.parse({password, confirmPassword});
-      if (password !== confirmPassword) {
-        alert("", "Passwords do not match", "error");
-        return;
-      } 
-      //Call on resetpassword function
-      router.navigate("forgot-password/password-reset-success");
-    } catch(error: unknown) {
-      if (error instanceof ZodError) {
-        const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
+      await handleResetPassword(
+        password,
+        confirmPassword,
+        email,
+        code,
+        alert,
+        successRoute
+      );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert("", error.message, "error");
+      } else {
+        alert("", "An unknown error occurred", "error");
       }
     }
-
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={styles.backButtonContainer}>
-          <Pressable onPress={() => router.back()}>
-            <SvgXml xml={BackButton} fill={styles.backButton.color} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => router.back()}>
+          <SvgXml xml={BackButton} fill={styles.backButton.color} />
+        </Pressable>
+      </View>
       <View style={styles.topTextContainer}>
         <Text style={styles.title}>Reset password</Text>
         <Text style={styles.text}>{textNotificationBox}</Text>
@@ -99,7 +96,7 @@ function ForgotPassword() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
-          onPress={handleResetPassword}
+          onPress={resetPassword}
           disabled={buttonColor === "#FBC19F"}
         >
           <Text style={styles.buttonText}>Reset Password</Text>

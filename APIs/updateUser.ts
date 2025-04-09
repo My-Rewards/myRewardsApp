@@ -1,7 +1,7 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import { Profile } from "@/app-data/data-types";
-import { updateUserSchema } from "@/constants/validationTypes";
+import { updateUserSchema } from "@/utils/validation/validationTypes";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const url = apiPath + "/customer/user/update";
