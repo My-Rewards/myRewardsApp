@@ -7,8 +7,13 @@ export const resetPasswordFn = async (
   password: string,
   confirmPassword: string,
   code: string,
-  alert: (title: string, description: string, type: "success" | "error") => void,
-  route: string
+  alert: (
+    title: string,
+    description: string,
+    type: "success" | "error"
+  ) => void,
+  route: string,
+  triggerLoadingScreen: (isLoading: boolean) => void
 ) => {
   try {
     verifyPasswordSchema.parse({ password, confirmPassword });
@@ -17,15 +22,18 @@ export const resetPasswordFn = async (
       return;
     }
     if (typeof email === "string") {
-      const result = await confirmResetPassword({
+      triggerLoadingScreen(true);
+      await confirmResetPassword({
         username: email,
         confirmationCode: code,
         newPassword: password,
       })
         .then(() => {
+          triggerLoadingScreen(false);
           router.navigate(route);
         })
         .catch((error: unknown) => {
+          triggerLoadingScreen(false);
           if (error instanceof Error) {
             alert("", error.message, "error");
           } else {
@@ -34,6 +42,7 @@ export const resetPasswordFn = async (
           return;
         });
     } else {
+      triggerLoadingScreen(false);
       alert("", "Invalid email format", "error");
     }
   } catch (error: unknown) {

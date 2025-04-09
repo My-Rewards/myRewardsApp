@@ -24,8 +24,8 @@ function ForgotPassword() {
   const params = useLocalSearchParams();
   const email = params.email;
   const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
-  const { alert } = useProps();
-  const successRoute =  "profilePage/editProfilePage/password-reset-success";
+  const { alert, triggerLoadingScreen } = useProps();
+  const successRoute = "profilePage/editProfilePage/password-reset-success";
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
       setButtonColor("#F98B4E");
@@ -35,7 +35,15 @@ function ForgotPassword() {
   }, [password, confirmPassword, code]);
 
   const handleResetPassword = async () => {
-    await resetPasswordFn(email, password, confirmPassword, code, alert, successRoute);
+    await resetPasswordFn(
+      email,
+      password,
+      confirmPassword,
+      code,
+      alert,
+      successRoute,
+      (isLoading: boolean) => triggerLoadingScreen({ isLoading })
+    );
   };
 
   return (
@@ -69,6 +77,11 @@ function ForgotPassword() {
             placeholder="Enter new password"
             secureTextEntry
           />
+          {password.length < 8 && (
+            <Text style={styles.passwordText}>
+              *Password must contain at least 8 characters
+            </Text>
+          )}
         </View>
         <View>
           <Text style={styles.text}>Confirm Password</Text>
@@ -136,7 +149,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#7F513A",
     padding: 10,
-    marginBottom: 15,
+    marginBottom: 10,
     borderRadius: 10,
     fontFamily: "Avenir Next",
     fontSize: 15,
@@ -167,6 +180,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Avenir Next",
     textDecorationLine: "underline",
+  },
+  passwordText: {
+    fontFamily: "Avenir Next",
+    color: "#8B4513",
+    fontSize: 10,
+    lineHeight: 12,
+    marginBottom: 10,
   },
 });
 
