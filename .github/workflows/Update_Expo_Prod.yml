@@ -50,4 +50,13 @@ jobs:
           run: npm install
             
         - name: 🚀 Create update
-          run: eas update --auto --non-interactive
+          run: eas update --auto --non-interactive --branch production --message "Production update $(date +'%Y-%m-%d %H:%M:%S')"
+
+        - name: 🏗 Build for App Store
+          run: |
+            eas build --platform ios --profile production --non-interactive --auto-submit
+
+        # - name: 🏗 Build for Play Store
+        #   run: |
+        #     eas build --platform android --profile production --non-interactive --auto-submit
+  

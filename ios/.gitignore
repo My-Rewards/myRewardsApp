@@ -28,7 +28,9 @@ project.xcworkspace
 
 # CocoaPods
 /Pods/
-Podfile.lock
+/*.xcworkspace
+!Podfile
+!Podfile.lock
 
 # Ignore project.pbxproj0
 ios/myRewards.xcodeproj/project.pbxproj0

@@ -1,10 +1,10 @@
-name: Promote Beta to Prod
+name: Promote development to master
 
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Promote beta to production?'
+        description: 'Promote development to masteruction?'
         required: true
         default: yes
         type: choice
@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: beta
+          ref: development
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Set Git identity
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build project
         run: |
-          echo "🏗️ Building project from beta branch..."
+          echo "🏗️ Building project from development branch..."
           npm run build
         continue-on-error: false
 
@@ -59,23 +59,23 @@ jobs:
             exit 1
           fi
 
-      - name: Force prod to match beta
+      - name: Force master to match development
         if: success()
         run: |
-          echo "🚀 Promoting beta to production..."
+          echo "🚀 Promoting development to masteruction..."
           git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
           git fetch origin
-          git push origin beta:prod --force
-          echo "✅ Successfully promoted beta to production"
+          git push origin development:master --force
+          echo "✅ Successfully promoted development to masteruction"
   
 
       - name: Verify promotion
         if: success()
         run: |
-          git fetch origin prod
-          if git diff --quiet origin/beta origin/prod; then
-            echo "✅ Verification successful: prod matches beta"
+          git fetch origin master
+          if git diff --quiet origin/development origin/master; then
+            echo "✅ Verification successful: master matches development"
           else
-            echo "❌ Verification failed: prod does not match beta"
+            echo "❌ Verification failed: master does not match development"
             exit 1
           fi

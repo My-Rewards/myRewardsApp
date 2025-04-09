@@ -1,7 +1,7 @@
 require('dotenv').config(); 
 
 export default () => {
-  const isProd = process.env.APP_ENV === 'prod';
+  const isProd = process.env.APP_ENV == 'prod';
   const RUNTIMEVERSION = '1.0.0'
   let apiPath = "https://beta.api.myrewards.website"
   if(isProd) {
@@ -29,7 +29,7 @@ export default () => {
       ]
     ],
     ios: {
-      bundleIdentifier: isProd ? 'com.myRewards.website.prod' : 'com.myRewards.website.beta',
+      bundleIdentifier: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
       icon: './assets/images/MyRewardsLogo1.png',
       runtimeVersion: RUNTIMEVERSION,
       requireFullScreen: true,
@@ -41,26 +41,24 @@ export default () => {
         ],
         "NSLocationWhenInUseUsageDescription": "MyRewards needs access to you location when using the app.",
         "LSApplicationQueriesSchemes": ["tel"],
+        "ITSAppUsesNonExemptEncryption": false
       },
       config:{
         googleMapsApiKey:'AIzaSyBmgtn62Neco3iFbjYKnWiVTSEYgRelDxk'
       },
-
     },
     android: {
-      package: isProd ? 'com.myRewards.website.prod' : 'com.myRewards.website.beta',
+      package: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
       icon: './assets/images/MyRewardsLogo1.png',
       runtimeVersion: RUNTIMEVERSION
     },
     extra: {
       eas: {
-        projectId: isProd
-          ? "988bf54c-1d84-4d0b-a539-7be1ee48f0dd"
-          : "4e3dda5a-96f6-4d5f-89fe-af470de180a8",
+        projectId: "4b2c2eb6-67bb-469c-b5ad-0d7c82b741b2"
       },
+      cognitoDomain: isProd ? 'https://api.myrewards.website':'https://beta.api.myrewards.website',
       userPoolId: process.env.USERPOOL_ID,
       webClientId: process.env.WEB_CLIENT_ID,
-      cognitoDomain: process.env.APP_ENV == 'prod' ? 'https://api.myrewards.website':'https://beta.api.myrewards.website',
       identityPoolId: process.env.IDENTITY_POOL_ID,
       awsRegion: process.env.AWS_REGION,
       appEnv: process.env.APP_ENV,
@@ -74,7 +72,7 @@ export default () => {
         : "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8",
     },
     runtimeVersion: "1.0.0",
-    description: 'MyRrewards Mobile App',
+    description: 'MyRewards Mobile App',
     orientation:'default',
   };
 };
