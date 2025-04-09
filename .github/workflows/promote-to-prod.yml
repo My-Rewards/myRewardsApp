@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Promote development to masteruction?'
+        description: 'Promote development to master?'
         required: true
         default: yes
         type: choice

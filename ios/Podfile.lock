@@ -2403,31 +2403,31 @@ SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
-  EASClient: 98a61222936d688d74ec09297b84c18dac478880
-  EXConstants: fcfc75800824ac2d5c592b5bc74130bad17b146b
+  EASClient: d7420d607795707821b8bcd30ab7444159e802e0
+  EXConstants: a1f35b9aabbb3c6791f8e67722579b1ffcdd3f18
   EXJSONUtils: 01fc7492b66c234e395dcffdd5f53439c5c29c93
-  EXManifests: 15142dee1be3ea1cd0039feddef3888c3f0bb057
-  Expo: e8f11c8e0290deca7be9254569e23f884b95a777
-  expo-dev-client: 837811fcdc69e50023605eec10d4bf5821ad16f4
-  expo-dev-launcher: 11eaec43962ea79f33512d656c3dcf612dbc47f3
-  expo-dev-menu: 479f12851e9d70421731fe8cf76905c240c26823
+  EXManifests: 81324537a654111964f6e7994dbc351a4233dcfa
+  Expo: 0d4aa839420656a1e2be905f04f53930f5b5d91c
+  expo-dev-client: 5271a230c19b164b0e42cb2c4986a690ad684990
+  expo-dev-launcher: 7f9b00ecc338a91ae57b816b6b1e4d3b073e5e22
+  expo-dev-menu: 820909830e12dc9cbc2a2d875f16312acd199bed
   expo-dev-menu-interface: 00dc42302a72722fdecec3fa048de84a9133bcc4
-  ExpoAdapterGoogleSignIn: 6393c1ad521f880f6e467bca40baf1e5dcaea4a3
-  ExpoAsset: 48386d40d53a8c1738929b3ed509bcad595b5516
-  ExpoFileSystem: 42d363d3b96f9afab980dcef60d5657a4443c655
-  ExpoFont: f354e926f8feae5e831ec8087f36652b44a0b188
-  ExpoHaptics: 8d199b2f33245ea85289ff6c954c7ee7c00a5b5d
-  ExpoHead: 5d1c5c20e3933db5d9ca349424cb3b9a4a84b706
-  ExpoKeepAwake: b0171a73665bfcefcfcc311742a72a956e6aa680
-  ExpoLinearGradient: 35ebd83b16f80b3add053a2fd68cc328ed927f60
-  ExpoLinking: 8d12bee174ba0cdf31239706578e29e74a417402
-  ExpoLocation: 5437fb925d0b0dbe728c20536335a964e9202f5a
-  ExpoModulesCore: 15f60d00e33ca0cea27147543877ca6e70c42ef5
-  ExpoScreenOrientation: 6fc2ea3a965207b580c6c295558c94ee6a75f1eb
-  ExpoSecureStore: 9a3665d7161dd1031be386e278bffd623658f316
-  ExpoSplashScreen: e6a16a1ea280d4f59b095df901f43a1a5e2cc4ca
-  ExpoSystemUI: 2e5356d22b077c56c132b4dcbc5d69dd667b1f8c
-  ExpoWebBrowser: a212e6b480d8857d3e441fba51e0c968333803b3
+  ExpoAdapterGoogleSignIn: da10ae7e7c1d73a10c2facebcdfe5ebea8e073ce
+  ExpoAsset: 0687fe05f5d051c4a34dd1f9440bd00858413cfe
+  ExpoFileSystem: c8c19bf80d914c83dda3beb8569d7fb603be0970
+  ExpoFont: 773955186469acc5108ff569712a2d243857475f
+  ExpoHaptics: e01cce0741d68c281853118eb0267f88d42c6b7a
+  ExpoHead: 3d555eb5d0d68c478b9ea259337686c58de22c71
+  ExpoKeepAwake: 2a5f15dd4964cba8002c9a36676319a3394c85c7
+  ExpoLinearGradient: ee9efc5acb988b911320e964fab9b4cbdeb198c4
+  ExpoLinking: 0381341519ca7180a3a057d20edb1cf6a908aaf4
+  ExpoLocation: a4b472b3cb2d42f1a3f3d7e2ec0e7a4db061ea22
+  ExpoModulesCore: d786e1b76105f52b2a2aef218464e9d05fc1efd4
+  ExpoScreenOrientation: eb2229ceeab36ce787ccae413d23273698b946fa
+  ExpoSecureStore: d006eea5e316283099d46f80a6b10055b89a6008
+  ExpoSplashScreen: 83f585abeb0506103f9309628634dbbcd9bc5573
+  ExpoSystemUI: ba4507df7d8d15f5e1694a3c7fc6bc3cca3803e5
+  ExpoWebBrowser: 6890a769e6c9d83da938dceb9a03e764afc3ec9c
   EXStructuredHeaders: 09c70347b282e3d2507e25fb4c747b1b885f87f6
   EXUpdates: 6d7a71361b6c4a20f9b0e6b5b6b0fda11fe7ae0d
   EXUpdatesInterface: 1dcebac98ac5dad4289e6ff2bd5616822e894397
@@ -2441,7 +2441,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   hermes-engine: 1949ca944b195a8bde7cbf6316b9068e19cf53c6
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
-  RCT-Folly: 84578c8756030547307e4572ab1947de1685c599
+  RCT-Folly: bf5c0376ffe4dd2cf438dcf86db385df9fdce648
   RCTDeprecation: 063fc281b30b7dc944c98fe53a7e266dab1a8706
   RCTRequired: 8eda2a5a745f6081157a4f34baac40b65fe02b31
   RCTTypeSafety: 0f96bf6c99efc33eb43352212703854933f22930

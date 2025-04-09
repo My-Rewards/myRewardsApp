@@ -32,16 +32,6 @@
     }
   },
   "submit": {
-    "development": {
-      "ios": {
-        "ascAppId": "6744370530",
-        "bundleIdentifier": "com.myrewards.app.dev"
-      },
-      "android": {
-        "track": "internal",
-        "releaseStatus": "completed"
-      }
-    },
     "production": {
       "ios": {
         "ascAppId": "6744338057",

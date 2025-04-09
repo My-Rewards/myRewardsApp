@@ -184,7 +184,7 @@ export default function SignUp() {
 
       <View style={styles.signInContainer}>
         <Text style={styles.signInText}>Have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("sign-in/sign-in")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.signInLink}>Sign in</Text>
         </TouchableOpacity>
       </View>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#FFF6ED",
+    backgroundColor: "#F8F6F1",
   },
   headerContainer: {
     marginBottom: 25,
