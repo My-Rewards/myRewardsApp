@@ -30,12 +30,14 @@ export const resetPasswordFn = async (
       })
         .then(() => {
           triggerLoadingScreen(false);
+          alert("", "Password reset successfully", "success");
           router.navigate(route);
         })
         .catch((error: unknown) => {
           triggerLoadingScreen(false);
           if (error instanceof Error) {
-            alert("", error.message, "error");
+            console.log(error);
+            alert("", "An unknown error occurred", "error");
           } else {
             alert("", "An unknown error occurred", "error");
           }
