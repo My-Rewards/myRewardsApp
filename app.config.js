@@ -67,9 +67,7 @@ export default () => {
     },
     owner: "myrewards",
     updates: {
-      url: isProd
-        ? "https://u.expo.dev/988bf54c-1d84-4d0b-a539-7be1ee48f0dd"
-        : "https://u.expo.dev/4e3dda5a-96f6-4d5f-89fe-af470de180a8",
+      url: "https://u.expo.dev/4b2c2eb6-67bb-469c-b5ad-0d7c82b741b2"
     },
     runtimeVersion: "1.0.0",
     description: 'MyRewards Mobile App',
