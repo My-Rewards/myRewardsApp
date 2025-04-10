@@ -37,8 +37,6 @@ export interface OrganizationProps{
 export interface shop {
   shop_id: string; 
   organization_id: string; 
-  location_id: string;
-  geohash: string;
   name:string;
   banner: string;
   logo:string;
@@ -49,7 +47,8 @@ export interface shop {
   shop_hours: ShopHour[];
   location:{
     city:string,
-    state:string
+    state:string,
+    address:string
   };
   latitude: number;
   longitude: number;
@@ -75,23 +74,14 @@ export type Profile = {
   };
 };
 
-export type Reward = {
-  // type: 'cost'|'percentage'|'item'; 
-  // value?: number; 
-  // item?: string;
-  // rule: string|number;
-  // bonusReward?: string;
- reward: string;
-};
-
 export interface Tier {
   id: string;
-  rewards: Reward[];
+  rewards: string[];
 }
 
 export interface ExpentiureProps {
   expenditure: number;
-  rewardsOptions: Reward[];
+  rewardsOptions: string[];
 };
 
 export interface RewardMapProps{
@@ -99,8 +89,8 @@ export interface RewardMapProps{
 };
 
 export interface RewardSystem {
-  road_map?: RewardMapProps
-  exp_rewards?: ExpentiureProps
+  rewards_loyalty?: RewardMapProps
+  rewards_milestone?: ExpentiureProps
 }
 
 export interface Plan{
@@ -109,12 +99,11 @@ export interface Plan{
   visits:number,
   points:number,
   organization_id:string
-  reward_planAvail:boolean,
-  exp_rewardsAvail:boolean,
+  rl_active:boolean,
+  rm_active:boolean,
   firstPlan:boolean,
   activePlan:boolean,
   redeemableRewards:string[],
-  bonusRewards?: Reward[],
 }
 
 export interface PlanProps{
@@ -123,15 +112,13 @@ export interface PlanProps{
   visits:number,
   points:number,
   organization_id:string
-  shop_id: string,
-  favorite:boolean,
-  reward_planAvail:boolean,
-  exp_rewardsAvail:boolean,
+  rl_active:boolean,
+  rm_active:boolean,
   name:string,
   firstPlan:boolean,
   activePlan:boolean,
   redeemableRewards:string[],
-  bonusRewards?: Reward[],
+  active:boolean
 }
 
 export interface PreviewPlanProp extends PlanProps{

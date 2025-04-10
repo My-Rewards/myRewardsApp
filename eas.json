@@ -11,7 +11,7 @@
         "simulator": true
       },
       "env": {
-        "APP_ENV": "development"
+        "APP_ENV": "beta"
       }
     },
     "development:simulator": {
@@ -27,11 +27,20 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "APP_ENV": "production"
+        "APP_ENV": "prod"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6744338057",
+        "bundleIdentifier": "com.myrewards.app"
+      },
+      "android": {
+        "track": "production",
+        "releaseStatus": "completed"
+      }
+    }
   }
 }
