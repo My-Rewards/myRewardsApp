@@ -36,146 +36,146 @@ const organizationIds=[
 
 const rewardTemplates:RewardSystem[]=[
   {
-    road_map: {
+    rewards_loyalty: {
       3: {
         id: "tier-1",
         rewards: [
-          { reward: "$5 off any menu item" },
-          { reward: "10% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off any menu item",
+          "10% off next meal",
+          "$5 dollars off",
         ],
       },
       6: {
         id: "tier-2",
         rewards: [
-          { reward: "$10 off any menu item" },
-          { reward: "15% off next meal" },
-          { reward: "$15 dollars off" },
+          "$10 off any menu item",
+          "15% off next meal",
+          "15% off next meal",
         ],
       },
       9: {
         id: "tier-3",
         rewards: [
-          { reward: "$15 off any menu item" },
-          { reward: "20% off next meal" },
-          { reward: "$25 dollars off" },
+          "$15 off any menu item" ,
+          "20% off next meal",
+          "$25 dollars off",
         ],
       },
     },
-      exp_rewards: {
+      rewards_milestone: {
         expenditure: 150,
         rewardsOptions: [
-          { reward: "$5 off menu item" },
-          { reward: "5% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off menu item",
+          "5% off next meal",
+          "$5 dollars off",
         ],
       }
 },
  {
-  road_map: {
+  rewards_loyalty: {
     3: {
       id: "tier-1",
       rewards: [
-        { reward: "$5 off any menu item" },
-        { reward: "10% off next meal" },
-        { reward: "$5 dollars off" },
+        "$5 off any menu item",
+        "10% off next meal",
+        "$5 dollars off",
       ],
     },
     6: {
       id: "tier-2",
       rewards: [
-        { reward: "$10 off any menu item" },
-        { reward: "15% off next meal" },
-        { reward: "$15 dollars off" },
+        "$10 off any menu item",
+        "15% off next meal",
+        "$15 dollars off",
       ],
     },
     9: {
       id: "tier-3",
       rewards: [
-        { reward: "$15 off any menu item" },
-        { reward: "20% off next meal" },
-        { reward: "$25 dollars off" },
+        "$15 off any menu item",
+        "20% off next meal",
+        "$25 dollars off",
       ],
     },
   },
-    exp_rewards: {
+    rewards_milestone: {
       expenditure: 150,
       rewardsOptions: [
-        { reward: "$5 off menu item" },
-        { reward: "5% off next meal" },
-        { reward: "$5 dollars off" },
+        "$5 off menu item",
+        "5% off next meal",
+        "$5 dollars off",
       ],
     }
 },
   {
-    road_map: {
+    rewards_loyalty: {
       3: {
         id: "tier-1",
         rewards: [
-          { reward: "$5 off any menu item" },
-          { reward: "10% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off any menu item",
+          "10% off next meal",
+          "$5 dollars off",
         ],
       },
       6: {
         id: "tier-2",
         rewards: [
-          { reward: "$10 off any menu item" },
-          { reward: "15% off next meal" },
-          { reward: "$15 dollars off" },
+          "$10 off any menu item",
+          "15% off next meal",
+          "$15 dollars off",
         ],
       },
       9: {
         id: "tier-3",
         rewards: [
-          { reward: "$15 off any menu item" },
-          { reward: "20% off next meal" },
-          { reward: "$25 dollars off" },
+          "$15 off any menu item",
+          "20% off next meal",
+          "$25 dollars off",
         ],
       },
     },
-      exp_rewards: {
+      rewards_milestone: {
         expenditure: 150,
         rewardsOptions: [
-          { reward: "$5 off menu item" },
-          { reward: "5% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off menu item",
+          "5% off next meal",
+          "$5 dollars off",
         ],
       }
   },
   {
-    road_map: {
+    rewards_loyalty: {
       3: {
         id: "tier-1",
         rewards: [
-          { reward: "$5 off any menu item" },
-          { reward: "10% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off any menu item",
+          "10% off next meal",
+          "$5 dollars off",
         ],
       },
       6: {
         id: "tier-2",
         rewards: [
-          { reward: "$10 off any menu item" },
-          { reward: "15% off next meal" },
-          { reward: "$15 dollars off" },
+          "$10 off any menu item",
+          "15% off next meal",
+          "15% off next meal",
         ],
       },
       9: {
         id: "tier-3",
         rewards: [
-          { reward: "$15 off any menu item" },
-          { reward: "20% off next meal" },
-          { reward: "$25 dollars off" },
+          "$15 off any menu item" ,
+          "20% off next meal",
+          "$25 dollars off",
         ],
       },
     },
-      exp_rewards: {
+      rewards_milestone: {
         expenditure: 150,
         rewardsOptions: [
-          { reward: "$5 off menu item" },
-          { reward: "5% off next meal" },
-          { reward: "$5 dollars off" },
+          "$5 off menu item",
+          "5% off next meal",
+          "$5 dollars off",
         ],
       }
   },
@@ -195,8 +195,6 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           latitude: 29.6542,
           longitude: -82.3351,
           name: shopNames[0],
-          location_id: "loc789",
-          geohash: "dr5regw3n",
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           menu:undefined,
@@ -205,7 +203,8 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           favorite:true,
           location: {
             city: 'Gainesville',
-            state: 'Florida'
+            state: 'Florida',
+            address: '543 Archer Rd'
           },
           shop_hours: [
             { day: "Monday", open: "08:00", close: "20:00" },
@@ -224,8 +223,6 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           longitude: -82.3173,
           name: shopNames[1],
           shop_id,
-          location_id: "loc789",
-          geohash: "dr5regw3n",
           menu:'https://www.mock-menu-link.com',
           phoneNumber:'5614936645',
           banner: "https://picsum.photos/300/200",
@@ -234,7 +231,8 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           favorite:false,
           location: {
             city: 'Gainesville',
-            state: 'Florida'
+            state: 'Florida',
+            address: '123 Main St'
           },
           shop_hours: [
             { day: "Monday", open: "08:00", close: "20:00" },
@@ -253,8 +251,6 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           shop_id,
           latitude: 29.6569,
           longitude: -82.3214,
-          location_id: "loc789",
-          geohash: "dr5regw3n",
           menu:'https://www.mock-menu-link.com',
           phoneNumber:'5612331223',
           banner: "https://picsum.photos/300/200",
@@ -263,7 +259,8 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           favorite:false,
           location: {
             city: 'Gainesville',
-            state: 'Florida'
+            state: 'Florida',
+            address: '543 Archer Rd'
           },
           shop_hours: [
             { day: "Monday", open: "08:00", close: "20:00" },
@@ -282,8 +279,6 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           shop_id,
           latitude: 29.6569,
           longitude: -82.3214,
-          location_id: "loc789",
-          geohash: "dr5regw3n",
           menu:'https://www.mock-menu-link.com',
           phoneNumber:'5612331223',
           banner: "https://picsum.photos/300/200",
@@ -292,7 +287,8 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           favorite:false,
           location: {
             city: 'Gainesville',
-            state: 'Florida'
+            state: 'Florida',
+            address: '543 Archer Rd'
           },
           shop_hours: [
             { day: "Monday", open: "08:00", close: "20:00" },
@@ -440,59 +436,48 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             visits: visits[0],
             points: points[0],
             redeemableRewards:[],
-            reward_planAvail:true,
-            exp_rewardsAvail:false,
+            rl_active:true,
+            rm_active:false,
             banner: "https://picsum.photos/300/200",
             logo: "https://picsum.photos/300/200",
             organization_id: organizationIds[0],
-            shop_id:shopIds[0],
             name:shopNames[0],
             id:'24hHsk345m',
-            favorite:true,
             firstPlan:true,
             activePlan:false,
-            bonusRewards:[
-              { reward: "10 dollars off birthday deal"},
-              { reward: "20% off any menu item birthday deal"},
-            ]
+            active:true
           },
           {
             reward_plan: rewardTemplates[1],
             visits: visits[1],
             points: points[1],
             redeemableRewards:[],
-            reward_planAvail:true,
-            exp_rewardsAvail:true,
+            rl_active:true,
+            rm_active:true,
             banner: "https://picsum.photos/300/200",
             logo: "https://picsum.photos/300/200",
             organization_id: organizationIds[1],
-            shop_id:shopIds[1],
             name:shopNames[1],
             id:'34nDi3',
-            favorite:false,
             firstPlan:false,
-            activePlan:true
+            activePlan:true,
+            active:true
           },
           {
             reward_plan: rewardTemplates[1],
             visits: visits[2],
             points: points[2],
             redeemableRewards:['tier-2'],
-            reward_planAvail:true,
-            exp_rewardsAvail:false,
+            rl_active:true,
+            rm_active:false,
             banner: "https://picsum.photos/300/200",
             logo: "https://picsum.photos/300/200",
             organization_id: organizationIds[2],
-            shop_id:shopIds[2],
             name:shopNames[2],
             id:'abcde',
-            favorite:false,
             firstPlan:true,
             activePlan:false,
-            bonusRewards:[
-              { reward: "10 dollars off birthday deal"},
-              { reward: "20% off any menu item birthday deal"},
-            ]
+            active:true
           }
         ];
         resolve(samplePlans);
@@ -509,15 +494,14 @@ export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
         visits: visits[0],
         points: points[0],
         redeemableRewards: [],
-        reward_planAvail: true,
-        exp_rewardsAvail: true,
+        rl_active: true,
+        rm_active: true,
         firstPlan: false,
         activePlan: false,
         organization_id: organizationIds[0],
-        shop_id: shopIds[0],
         name: shopNames[0],
         id: '341Dig',
-        favorite: true
+        active:true
       };
       const samplePlan2: PlanProps = 
       {
@@ -526,14 +510,13 @@ export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
         points: points[1],
         firstPlan: false,
         redeemableRewards: [],
-        reward_planAvail:true,
-        exp_rewardsAvail:true,
+        rl_active:true,
+        rm_active:true,
         activePlan: true,
         organization_id: organizationIds[1],
-        shop_id:shopIds[1],
         name: shopNames[1],
         id: '341Dig',
-        favorite: false
+        active:true
 
       };
       const samplePlan3: PlanProps = 
@@ -544,13 +527,12 @@ export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
         firstPlan:false,
         activePlan:true,
         redeemableRewards:['tier-2'],
-        reward_planAvail:true,
-        exp_rewardsAvail:true,
+        rl_active:true,
+        rm_active:true,
         organization_id: organizationIds[2],
-        shop_id:shopIds[2],
         name: shopNames[2],
         id:'341Dig',
-        favorite: false
+        active:true
       };
       const samplePlan4: PlanProps = 
       {
@@ -560,13 +542,12 @@ export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
         firstPlan:true,
         activePlan:false,
         redeemableRewards:[],
-        reward_planAvail:true,
-        exp_rewardsAvail:true,
+        rl_active:true,
+        rm_active:true,
         organization_id: organizationIds[3],
-        shop_id:shopIds[3],
         name: shopNames[3],
         id:'341Dig',
-        favorite: false
+        active:true
       };
       if(org_id === organizationIds[0]){
         resolve(samplePlan1)

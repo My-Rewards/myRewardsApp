@@ -1,4 +1,4 @@
-import { Plan, Reward, Tier, RewardMapProps } from "@/app-data/data-types";
+import { Plan, Tier, RewardMapProps } from "@/app-data/data-types";
 import {
   View,
   Text,
@@ -31,11 +31,11 @@ type CategorizeProps = {
 function getNextRewardVisits(plan: Plan) {
   const { reward_plan, visits } = plan;
 
-  if (!reward_plan || !reward_plan.road_map) {
+  if (!reward_plan || !reward_plan.rewards_loyalty) {
     throw new Error("Invalid reward plan structure");
   }
 
-  const milestones = Object.keys(reward_plan.road_map)
+  const milestones = Object.keys(reward_plan.rewards_loyalty)
     .map(Number)
     .sort((a, b) => a - b);
   for (const milestone of milestones) {
@@ -125,14 +125,14 @@ const categorizeRewards = ({
 };
 
 const ListRewards: React.FC<{
-  rewardList: Reward[];
+  rewardList: string[];
   option: number;
   redeemable: boolean;
 }> = ({ rewardList, option, redeemable }) => {
   return (
     <View>
-      {rewardList.map((rewards, index) => {
-        const rewardOption = rewards.reward;
+      {rewardList.map((reward, index) => {
+        const rewardOption = reward;
         return (
           <View key={index}>
             {index == 0 && <View style={dropDown.seperaterLine} />}
@@ -171,19 +171,19 @@ const ListRewards: React.FC<{
 };
 
 export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
-  if (!plan.reward_plan.road_map) {
+  if (!plan.reward_plan.rewards_loyalty) {
     return null;
   }
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const milestones = Object.entries(plan.reward_plan.road_map);
+  const milestones = Object.entries(plan.reward_plan.rewards_loyalty);
   const lineWidth =
     ((width - milestones.length * 30) / (milestones.length - 1)) * 0.8;
   const tillNextRew = getNextRewardVisits(plan);
 
   const taggedRewards = categorizeRewards({
-    road_map: plan.reward_plan.road_map,
+    road_map: plan.reward_plan.rewards_loyalty,
     visits: plan.visits,
     redeemableRewards: plan.redeemableRewards,
   });
@@ -381,21 +381,21 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 };
 
 export const ExpendatureMap: React.FC<RoadMapProps> = ({ plan }) => {
-  if (!plan.reward_plan.exp_rewards) {
+  if (!plan.reward_plan.rewards_milestone) {
     return null;
   }
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   let dark_ratio = Math.round(
-    (plan.points / plan.reward_plan.exp_rewards.expenditure) * 100
+    (plan.points / plan.reward_plan.rewards_milestone.expenditure) * 100
   );
-  let pointsTill = plan.reward_plan.exp_rewards.expenditure - plan.points;
+  let pointsTill = plan.reward_plan.rewards_milestone.expenditure - plan.points;
   let points = plan.points;
 
   if (dark_ratio === 0 && plan.firstPlan) {
-    pointsTill = plan.reward_plan.exp_rewards.expenditure - 50;
+    pointsTill = plan.reward_plan.rewards_milestone.expenditure - 50;
     dark_ratio = Math.round(
-      (50 / plan.reward_plan.exp_rewards.expenditure) * 100
+      (50 / plan.reward_plan.rewards_milestone.expenditure) * 100
     );
     points = 50;
   }
@@ -439,7 +439,7 @@ export const ExpendatureMap: React.FC<RoadMapProps> = ({ plan }) => {
           <View style={[milestoneStyle.darker, { width: `${dark_ratio}%` }]} />
         </View>
         <Text style={milestoneStyle.text}>
-          {plan.reward_plan.exp_rewards.expenditure}
+          {plan.reward_plan.rewards_milestone.expenditure}
         </Text>
       </View>
       {/* Drop Down */}
@@ -469,10 +469,10 @@ export const ExpendatureMap: React.FC<RoadMapProps> = ({ plan }) => {
             </TouchableOpacity>
             <Collapsible collapsed={selectedIndex !== 1}>
               <ListRewards
-                rewardList={plan.reward_plan.exp_rewards.rewardsOptions}
+                rewardList={plan.reward_plan.rewards_milestone.rewardsOptions}
                 option={0}
                 redeemable={
-                  plan.points >= plan.reward_plan.exp_rewards.expenditure
+                  plan.points >= plan.reward_plan.rewards_milestone.expenditure
                 }
               />
             </Collapsible>

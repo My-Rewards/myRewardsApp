@@ -182,16 +182,16 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
   const [liked, setLiked] = useState<boolean>(plan.favorite);
 
   useEffect(() => {
-    if (plan.reward_plan.road_map) {
-      setMilestonePlan(Object.entries(plan.reward_plan.road_map));
+    if (plan.reward_plan.rewards_loyalty) {
+      setMilestonePlan(Object.entries(plan.reward_plan.rewards_loyalty));
       setCheckPoints(
-        Object.entries(plan.reward_plan.road_map).map(([checkpoint]) =>
+        Object.entries(plan.reward_plan.rewards_loyalty).map(([checkpoint]) =>
           parseInt(checkpoint, 10)
         )
       );
     }
-    if (plan.reward_plan.exp_rewards) {
-      setExpenditurePlan(plan.reward_plan.exp_rewards);
+    if (plan.reward_plan.rewards_milestone) {
+      setExpenditurePlan(plan.reward_plan.rewards_milestone);
     }
   }, []);
 

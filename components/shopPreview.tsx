@@ -338,21 +338,21 @@ export const ExpandedShop = ({
           <Animated.View
             style={[
               modalStyle.wrapper,
-              plan.reward_planAvail && plan.exp_rewardsAvail
+              plan.rl_active && plan.rm_active
                 ? { width: width * 2 }
                 : { width: width },
               { transform: [{ translateX }] },
             ]}
-            {...(plan.reward_planAvail &&
-              plan.exp_rewardsAvail &&
+            {...(plan.rl_active &&
+              plan.rm_active &&
               panResponder.panHandlers)}
           >
-            {plan.reward_planAvail && (
+            {plan.rl_active && (
               <View style={{ width }}>
                 <RoadMap plan={plan} />
               </View>
             )}
-            {plan.exp_rewardsAvail && (
+            {plan.rm_active && (
               <View style={{ width }}>
                 <ExpendatureMap plan={plan} />
               </View>
@@ -642,7 +642,7 @@ export const ExpandedShop = ({
                   </View>
                 </View>
               </View>
-              {plan?.exp_rewardsAvail && plan?.reward_planAvail && (
+              {plan?.rm_active && plan?.rl_active && (
                 <View style={{ width: "100%", backgroundColor: "white" }}>
                   <Animated.View
                     style={[

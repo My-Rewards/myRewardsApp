@@ -13,8 +13,12 @@ export const amplifyConfiguration:ResourcesConfig = {
         oauth: {
           domain: appEnv === 'beta' ? `user.beta.auth.myrewards.website`:`user.auth.myrewards.website`,
           scopes: ['openid','email','profile'],
-          redirectSignIn: ['exp://127.0.0.1:19000/--/', 'myrewards://'],
-          redirectSignOut: ['exp://127.0.0.1:19000/--/', 'myrewards://'],
+          redirectSignIn: appEnv === 'beta' 
+            ? ['exp://127.0.0.1:19000/--/', 'myrewards://']
+            : ['myrewards://', 'com.myrewards.app://'],
+          redirectSignOut: appEnv === 'beta'
+            ? ['exp://127.0.0.1:19000/--/', 'myrewards://']
+            : ['myrewards://', 'com.myrewards.app://'],
           responseType: 'code',
           providers: ['Google'] 
         },
