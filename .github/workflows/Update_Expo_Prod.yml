@@ -25,7 +25,7 @@ jobs:
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_PROD }}
             aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_VAL_PROD }}
-            aws-region: ${{ secrets.AWS_REGION }}
+            aws-region: ${{ vars.AWS_REGION }}
   
         - name: Fetch SSM Parameters
           id: fetch_ssm_parameters
