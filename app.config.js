@@ -69,8 +69,10 @@ export default () => {
     updates: {
       url: "https://u.expo.dev/4b2c2eb6-67bb-469c-b5ad-0d7c82b741b2"
     },
-    runtimeVersion: "1.0.0",
     description: 'MyRewards Mobile App',
+    runtimeVersion: {
+      policy: "appVersion"
+    },
     orientation:'default',
   };
 };
