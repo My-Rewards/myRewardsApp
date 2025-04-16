@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   build-test-promote:
-    if: ${{ github.event.inputs.confirm}}
+    if: ${{ github.event.inputs.confirm == 'yes' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -58,8 +58,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-#      - name: Run tests
-#        run: npm test
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
 
       - name: Calculate version
         id: semver
