@@ -61,7 +61,6 @@ jobs:
           git fetch origin
           git push origin development:master --force
           echo "✅ Successfully promoted development to master"
-  
 
       - name: Verify promotion
         if: success()

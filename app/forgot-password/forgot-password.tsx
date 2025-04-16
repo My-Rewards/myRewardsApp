@@ -13,19 +13,20 @@ import { router } from "expo-router";
 import { useProps } from "../LoadingProp/propsProvider";
 import { SvgXml } from "react-native-svg";
 import { BackButton } from "@/assets/images/MR-logos";
-import { resetPassword } from "aws-amplify/auth";
-import { verifyPasswordSchema } from "@/constants/validationTypes";
+import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
+import { verifyPasswordSchema } from "@/app-data/validation/validationTypes";
 import { ZodError } from "zod";
+import { resetPasswordFn } from "@/app-data/validation/resetPasswordFn";
 function ForgotPassword() {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
-  const { email } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const email = params.email;
   const textNotificationBox = `We sent a password reset code by email to ${email}. Enter it below to reset your password.`;
-  const { alert } = useProps();
-  const getCode = 123456;
-
+  const { alert, triggerLoadingScreen } = useProps();
+  const successRoute = "forgot-password/password-reset-success";
   useEffect(() => {
     if (password !== "" && confirmPassword !== "" && code !== "") {
       setButtonColor("#F98B4E");
@@ -33,34 +34,26 @@ function ForgotPassword() {
       setButtonColor("#FBC19F");
     }
   }, [password, confirmPassword, code]);
-
-  const handleResetPassword = () => {
-    try {
-      verifyPasswordSchema.parse({password, confirmPassword});
-      if (password !== confirmPassword) {
-        alert("", "Passwords do not match", "error");
-        return;
-      } 
-      //Call on resetpassword function
-      router.navigate("forgot-password/password-reset-success");
-    } catch(error: unknown) {
-      if (error instanceof ZodError) {
-        const message = error.errors[0].message;
-        alert("", message, "error");
-        return;
-      }
-    }
-
+  const handleResetPassword = async () => {
+    await resetPasswordFn(
+      email,
+      password,
+      confirmPassword,
+      code,
+      alert,
+      successRoute,
+      (isLoading: boolean) => triggerLoadingScreen({ isLoading })
+    );
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView />
       <View style={styles.backButtonContainer}>
-          <Pressable onPress={() => router.back()}>
-            <SvgXml xml={BackButton} fill={styles.backButton.color} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => router.back()}>
+          <SvgXml xml={BackButton} fill={styles.backButton.color} />
+        </Pressable>
+      </View>
       <View style={styles.topTextContainer}>
         <Text style={styles.title}>Reset password</Text>
         <Text style={styles.text}>{textNotificationBox}</Text>
@@ -84,6 +77,11 @@ function ForgotPassword() {
             placeholder="Enter new password"
             secureTextEntry
           />
+          {password.length < 8 && (
+            <Text style={styles.passwordText}>
+              *Password must contain at least 8 characters
+            </Text>
+          )}
         </View>
         <View>
           <Text style={styles.text}>Confirm Password</Text>
@@ -154,7 +152,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#7F513A",
     padding: 10,
-    marginBottom: 15,
+    marginBottom: 10,
     borderRadius: 10,
     fontFamily: "Avenir Next",
     fontSize: 15,
@@ -185,6 +183,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Avenir Next",
     textDecorationLine: "underline",
+  },
+  passwordText: {
+    fontFamily: "Avenir Next",
+    color: "#8B4513",
+    fontSize: 10,
+    lineHeight: 12,
+    marginBottom: 8,
   },
 });
 

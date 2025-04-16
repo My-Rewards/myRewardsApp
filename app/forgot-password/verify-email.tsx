@@ -11,9 +11,9 @@ import { SvgXml } from "react-native-svg";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";
-import { verifyEmailSchema } from "@/constants/validationTypes";
-import { ZodError } from "zod";
 import { useProps } from "../LoadingProp/propsProvider";
+import { localData } from "@/app-data/appData";
+import { verifyEmailFn } from "@/app-data/validation/verifyEmailFn";
 const reset_message =
   "To reset your password enter the email associated with your account below:";
 
@@ -21,35 +21,22 @@ export default function verifyEmail() {
   const [email, setEmail] = useState("");
   const [buttonColor, setButtonColor] = useState("#FBC19F");
   const { alert } = useProps();
+  const {profile} = localData();
   useEffect(() => {
     if (email !== "") {
-        setButtonColor("#F98B4E");
-      } else {
-        setButtonColor("#FBC19F");
-      }
+      setButtonColor("#F98B4E");
+    } else {
+      setButtonColor("#FBC19F");
+    }
   }, [email]);
 
-  const verifyEmail = () => {
-    try {
-      verifyEmailSchema.parse({email});
-      router.replace({
-        pathname: "forgot-password/forgot-password",
-        params: {
-          email: email,
-        },
-      });
-    } catch(error: unknown){
-      if(error instanceof ZodError){
-        const message = error.errors[0].message;
-         alert("", message, "error");
-         return;
-      }
-    }
+  const verifyEmail = async () => {
+   await verifyEmailFn(email, alert, "forgot-password/forgot-password", profile ?? null);
   };
 
   return (
     <View style={styles.container}>
-    <SafeAreaView/>
+      <SafeAreaView />
       <Text style={styles.title}>Verify your email</Text>
       <View style={styles.backButtonContainer}>
         <Pressable onPress={() => router.back()}>
@@ -62,11 +49,13 @@ export default function verifyEmail() {
           placeholder="Enter email"
           style={styles.inputBox}
           onChangeText={setEmail}
+          autoCapitalize="none"
         ></TextInput>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: buttonColor }]}
           disabled={buttonColor === "#FBC19F"}
-          onPress={verifyEmail} >
+          onPress={verifyEmail}
+        >
           <Text style={styles.buttonText}>Verify email</Text>
         </TouchableOpacity>
       </View>
