@@ -56,7 +56,7 @@ jobs:
           id: ios_build
           run: |
             # Start the build with auto runtime version
-            BUILD_OUTPUT=$(eas build --platform ios --profile production --non-interactive --auto-runtime-version --json)
+            BUILD_OUTPUT=$(eas build --platform ios --profile production --non-interactive --json)
             BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
             
             # Store the build ID for later steps
