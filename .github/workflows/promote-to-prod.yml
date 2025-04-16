@@ -44,12 +44,6 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - name: Build project
-        run: |
-          echo "🏗️ Building project from development branch..."
-          npm run build
-        continue-on-error: false
-
       - name: Verify build
         run: |
           if [ $? -eq 0 ]; then
@@ -62,11 +56,11 @@ jobs:
       - name: Force master to match development
         if: success()
         run: |
-          echo "🚀 Promoting development to masteruction..."
+          echo "🚀 Promoting development to master..."
           git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
           git fetch origin
           git push origin development:master --force
-          echo "✅ Successfully promoted development to masteruction"
+          echo "✅ Successfully promoted development to master"
   
 
       - name: Verify promotion
