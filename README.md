@@ -72,11 +72,11 @@ export AWS_SESSION_TOKEN= xxxxx
 ##### 1. Start the app
 
    ```
-    ./sync.sh
+    ./run.sh
    ```
 or 
    ```
-    npm run-script sync
+    npm run-script run
    ```
 
 In the output, you'll find options to open the app in a

@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies
         run: npm i
-
+        
       - name: Verify build
         run: |
           if [ $? -eq 0 ]; then
