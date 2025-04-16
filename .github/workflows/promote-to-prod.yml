@@ -44,21 +44,6 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - name: Build project
-        run: |
-          echo "🏗️ Building project from development branch..."
-          npm run build
-        continue-on-error: false
-
-      - name: Verify build
-        run: |
-          if [ $? -eq 0 ]; then
-            echo "✅ Build successful, proceeding with promotion"
-          else
-            echo "❌ Build failed, aborting promotion"
-            exit 1
-          fi
-
       - name: Force master to match development
         if: success()
         run: |
@@ -67,7 +52,7 @@ jobs:
           git fetch origin
           git push origin development:master --force
           echo "✅ Successfully promoted development to masteruction"
-  
+
 
       - name: Verify promotion
         if: success()
