@@ -44,15 +44,23 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      - name: Verify build
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Build successful, proceeding with promotion"
+          else
+            echo "❌ Build failed, aborting promotion"
+            exit 1
+          fi
+
       - name: Force master to match development
         if: success()
         run: |
-          echo "🚀 Promoting development to masteruction..."
+          echo "🚀 Promoting development to master..."
           git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
           git fetch origin
           git push origin development:master --force
-          echo "✅ Successfully promoted development to masteruction"
-
+          echo "✅ Successfully promoted development to master"
 
       - name: Verify promotion
         if: success()

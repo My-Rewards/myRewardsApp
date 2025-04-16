@@ -31,13 +31,13 @@ jobs:
           id: fetch_ssm_parameters
           run: |
             # Fetch parameters from SSM
-            PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/$APP_ENV/customerUserPoolId" "/myRewardsApp/$APP_ENV/customerWebClientId" "/myRewardsApp/$APP_ENV/identityPoolIdCustomer" "/myRewardsApp/$APP_ENV/appConfig" --with-decryption --region us-east-1)
+            PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/prod/customerUserPoolId" "/myRewardsApp/prod/customerWebClientId" "/myRewardsApp/prod/identityPoolIdCustomer" "/myRewardsApp/prod/appConfig" --with-decryption --region us-east-1)
     
             # Extract and set environment variables
-            echo "USER_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/customerUserPoolId\").Value") >> $GITHUB_ENV
-            echo "WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/customerWebClientId\").Value") >> $GITHUB_ENV
-            echo "IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/identityPoolIdCustomer\").Value") >> $GITHUB_ENV
-            echo "APP_CONFIG_VALUES=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/$APP_ENV/appConfig\").Value") >> $GITHUB_ENV
+            echo "USER_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/customerUserPoolId\").Value") >> $GITHUB_ENV
+            echo "WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/customerWebClientId\").Value") >> $GITHUB_ENV
+            echo "IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/identityPoolIdCustomer\").Value") >> $GITHUB_ENV
+            echo "APP_CONFIG_VALUES=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/appConfig\").Value") >> $GITHUB_ENV
 
   
         - name: 🏗 Setup EAS
@@ -51,10 +51,25 @@ jobs:
             
         - name: 🚀 Create update
           run: eas update --auto --non-interactive --branch production --message "Production update $(date +'%Y-%m-%d %H:%M:%S')"
-
+          
         - name: 🏗 Build for App Store
+          id: ios_build
           run: |
-            eas build --platform ios --profile production --non-interactive --auto-submit
+            # Start the build with auto runtime version
+            BUILD_OUTPUT=$(eas build --platform ios --profile production --non-interactive --auto-runtime-version --json)
+            BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
+            
+            # Store the build ID for later steps
+            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+            echo "iOS build started with ID: $BUILD_ID"
+
+
+        - name: 🚀 Submit to App Store
+          if: steps.ios_build.outputs.build_id != ''
+          run: |
+            # Wait for build to complete and submit
+            eas submit --platform ios --id ${{ steps.ios_build.outputs.build_id }} --non-interactive
+
 
         # - name: 🏗 Build for Play Store
         #   run: |
