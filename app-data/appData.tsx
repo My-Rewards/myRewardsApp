@@ -20,6 +20,7 @@ import Map from 'react-native-maps';
 import fetchUser from '@/APIs/fetchUser';
 import { fetchAppConfig } from '@/APIs/fetchConfig';
 import { set } from 'zod';
+import { discoverShops } from '@/APIs/discoverShops';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
@@ -136,9 +137,11 @@ const DataContext = createContext<{
             try {
               // Replace mock API with actual API
               // set discover and maps to same value because theyre identical upon load until we figure more optimal method
-              const shops1 = await mockDiscoverShops(userSub, region)
-              setDiscoverShopsFilter1(shops1);
-              setRadiusShops(shops1);
+              // const shops1 = await mockDiscoverShops(userSub, region)
+              // setDiscoverShopsFilter1(shops1);
+              // setRadiusShops(shops1);   
+              const shops = await discoverShops(userLocation?.longitude, userLocation?.latitude, 0);
+              console.log(shops);
 
               const shops2 = await mockPopularShops(userSub, 0, region)
               setDiscoverShopsFilter2(shops2);
@@ -179,7 +182,6 @@ const DataContext = createContext<{
       setFetchingPage2(true);
       try {
         const location = await Location.getCurrentPositionAsync({});
-
         setUserLocation({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,

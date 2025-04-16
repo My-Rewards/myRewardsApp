@@ -26,7 +26,8 @@ export default () => {
         {
           "initialOrientation": "DEFAULT"
         }
-      ]
+      ],
+      "expo-router",
     ],
     ios: {
       bundleIdentifier: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
