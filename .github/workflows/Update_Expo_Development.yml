@@ -30,7 +30,6 @@ jobs:
       - name: Fetch SSM Parameters
         id: fetch_ssm_parameters
         run: |
-          # Fetch parameters from SSM
           PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/$APP_ENV/customerUserPoolId" "/myRewardsApp/$APP_ENV/customerWebClientId" "/myRewardsApp/$APP_ENV/identityPoolIdCustomer" "/myRewardsApp/$APP_ENV/appConfig" --with-decryption --region us-east-1)
   
           # Fix the environment variable setting syntax
