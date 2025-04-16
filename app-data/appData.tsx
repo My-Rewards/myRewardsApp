@@ -139,9 +139,20 @@ const DataContext = createContext<{
               // set discover and maps to same value because theyre identical upon load until we figure more optimal method
               // const shops1 = await mockDiscoverShops(userSub, region)
               // setDiscoverShopsFilter1(shops1);
-              // setRadiusShops(shops1);   
-              const shops = await discoverShops(userLocation?.longitude, userLocation?.latitude, 0);
-              console.log(shops);
+              // setRadiusShops(shops1);  
+              let coords = userLocation;
+              if (!coords) {
+                const location = await getCurrentLocation();
+                if (location) {
+                  coords = location;
+                }
+              }
+              if (coords) {
+                const shops = await discoverShops(coords.longitude, coords.latitude, 0);
+                console.log(shops);
+                setDiscoverShopsFilter1(shops);
+                setRadiusShops(shops);
+              } 
 
               const shops2 = await mockPopularShops(userSub, 0, region)
               setDiscoverShopsFilter2(shops2);
@@ -182,18 +193,25 @@ const DataContext = createContext<{
       setFetchingPage2(true);
       try {
         const location = await Location.getCurrentPositionAsync({});
-        setUserLocation({
+        const coords = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        };
+        setUserLocation({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         });
         setRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: coords.longitude,
+          longitude: coords.longitude,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         });
+        return coords;
       } catch (error) {
         const { status } = await Location.getForegroundPermissionsAsync();
         if (status !== 'granted') {
