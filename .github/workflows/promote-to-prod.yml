@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   build-test-promote:
-    if: ${{ github.event.inputs.confirm == 'yes' }}
+    if: ${{ github.event.inputs.confirm}}
     runs-on: ubuntu-latest
 
     steps:
