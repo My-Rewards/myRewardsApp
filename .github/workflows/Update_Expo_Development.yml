@@ -50,7 +50,6 @@ jobs:
           [[ -n "$APP_CONFIG_VALUES" ]] || exit 1
           echo "Environment variables validated successfully"
 
-
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
         with:
@@ -59,18 +58,6 @@ jobs:
 
       - name: 📦 Install dependencies
         run: npm install
-
-
-      - name: 🏗 Build for App Store
-        id: ios_build
-        run: |
-          # Start the build with auto runtime version
-          BUILD_OUTPUT=$(eas build --platform ios --profile development --non-interactive --json)
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | jq -r '.id')
-          
-          # Store the build ID for later steps
-          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-          echo "iOS build started with ID: $BUILD_ID"
           
       - name: 🚀 Create update
         run: eas update --auto --non-interactive
