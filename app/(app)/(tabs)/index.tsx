@@ -17,7 +17,6 @@ import { ShopPreview } from "@/components/shopPreview";
 import { ShopPreviewProps, shop } from "@/app-data/data-types";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { discoverShops } from "@/APIs/discoverShops";
 
 const { width } = Dimensions.get("window");
 
