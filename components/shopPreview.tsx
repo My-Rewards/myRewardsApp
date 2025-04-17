@@ -73,12 +73,6 @@ type OpenMapArgs = {
 
 export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
   const { userLocation } = localData();
-  // const distance = calculateDistance(
-  //   selectedPin.latitude,
-  //   selectedPin.longitude,
-  //   userLocation
-  // );
-  const miles = selectedPin.distance *  0.00062137;
   const shopStatus = getShopStatus(selectedPin.shop_hours);
 
   return (
@@ -162,7 +156,7 @@ export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
                       : { color: color_pallete[2] },
                   ]}
                 >
-                  {miles.toFixed(1)} miles away
+                  {selectedPin.distance} miles away
                 </Text>
               </View>
               <View>
