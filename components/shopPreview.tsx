@@ -74,7 +74,6 @@ type OpenMapArgs = {
 export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
   const { userLocation } = localData();
   const shopStatus = getShopStatus(selectedPin.shop_hours);
-
   return (
     <View style={[type == 0 ? styles.mapsPreview : styles.discoverPreview]}>
       <View style={[type == 0 ? styles.modalContent1 : styles.modalContent2]}>
@@ -156,7 +155,9 @@ export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
                       : { color: color_pallete[2] },
                   ]}
                 >
-                  {selectedPin.distance} miles away
+                {selectedPin.distance != null
+                  ? `${selectedPin.distance} miles away`
+                  : "location unavailable"}
                 </Text>
               </View>
               <View>
