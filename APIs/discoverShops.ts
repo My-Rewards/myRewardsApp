@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const url = apiPath + "/userShops/discover";
 
-export const discoverShops = async (longitude: number | undefined, latitude: number | undefined, page: number) => {
+export const fetchNearbyShops = async (longitude: number | undefined, latitude: number | undefined, page: number) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
   if (!longitude && !latitude) {   
@@ -30,7 +30,6 @@ export const discoverShops = async (longitude: number | undefined, latitude: num
             limit: 4,
         }
       });
-      console.log("Data: " + data);
       console.log(JSON.stringify(data));
       return data;
   } catch (error: unknown) {

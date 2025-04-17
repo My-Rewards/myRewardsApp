@@ -20,7 +20,7 @@ import Map from 'react-native-maps';
 import fetchUser from '@/APIs/fetchUser';
 import { fetchAppConfig } from '@/APIs/fetchConfig';
 import { set } from 'zod';
-import { discoverShops } from '@/APIs/discoverShops';
+import { fetchNearbyShops } from '@/APIs/discoverShops';
 
 const DataContext = createContext<{
     fetchShopsByRadius: (currRegion:regionProp) => void; 
@@ -148,10 +148,9 @@ const DataContext = createContext<{
                 }
               }
               if (coords) {
-                const shops = await discoverShops(coords.longitude, coords.latitude, 0);
-                console.log(shops);
+                const shops = await fetchNearbyShops(coords.longitude, coords.latitude, 1);
                 setDiscoverShopsFilter1(shops);
-                setRadiusShops(shops);
+                // setRadiusShops(shops);
               } 
 
               const shops2 = await mockPopularShops(userSub, 0, region)
@@ -261,9 +260,21 @@ const DataContext = createContext<{
                 try {
                   switch (filterOption) {
                     case 0:
-                      const shop1 = await mockDiscoverShops(userSub, region)
-                      setDiscoverShopsFilter1(shop1)
-                      setFetchingPage1(false)
+                      // const shop1 = await mockDiscoverShops(userSub, region)
+                      // setDiscoverShopsFilter1(shop1)
+                      // setFetchingPage1(false)
+                      let coords = userLocation;
+                      if (!coords) {
+                        const location = await getCurrentLocation();
+                        if (location) {
+                          coords = location;
+                        }
+                        if (coords) {
+                          const shops = await fetchNearbyShops(coords.longitude, coords.latitude, 1);
+                          setDiscoverShopsFilter1(shops);
+                          // setRadiusShops(shops);
+                        } 
+                      }
                       break;
                     case 1:
                       const shops2 = await mockPopularShops(userSub, pagination, region)
