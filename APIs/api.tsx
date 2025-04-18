@@ -7,10 +7,10 @@ import { OrganizationProps, PlanProps, PreviewPlanProp, Profile, RewardSystem, s
 
 // This will serve as mock data for consistency
 const shopIds=[
-  'shopabc',
-  'shop123',
-  'shopa1',
-  'shopb2'
+  '1333d3c6-b143-48b6-4556-3e1ecf3e743c',
+  '1333d3c6-b143-48b6-4556-3e1ecf3e743c',
+  '1333d3c6-b143-48b6-4556-3e1ecf3e743c',
+  '1333d3c6-b143-48b6-4556-3e1ecf3e743c'
 ]
 
 const shopNames=[
@@ -28,10 +28,10 @@ const orgDescription = [
 ]
 
 const organizationIds=[
-  'orgabc',
-  'org123',
-  'orga1',
-  'orgb2'
+  '7e55caf9-9899-4621-b549-3796e31725d5',
+  '7e55caf9-9899-4621-b549-3796e31725d5',
+  '7e55caf9-9899-4621-b549-3796e31725d5',
+  '7e55caf9-9899-4621-b549-3796e31725d5'
 ]
 
 const rewardTemplates:RewardSystem[]=[

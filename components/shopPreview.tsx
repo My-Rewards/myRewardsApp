@@ -24,7 +24,6 @@ import {
   shop,
   ShopPreviewProps,
 } from "@/app-data/data-types";
-import { mockOrg, mockPlan, mockShop } from "@/APIs/api";
 import ShopScrollView from "./ShopScrollView";
 import { localData } from "@/app-data/appData";
 import { modalStyle, styles } from "./styling/mapPreviewStyle";
@@ -43,6 +42,7 @@ import {
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import { SafeAreaView } from "react-native";
+import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
 
 const { width } = Dimensions.get("window");
 
@@ -228,7 +228,7 @@ export const ExpandedShop = ({
           if (!profile.id) {
             throw new Error("No profile id found");
           }
-          const shopData = await mockShop(shopId, profile.id);
+          const shopData = await fetchShop(shopId);
           setShopDetails(shopData);
           setDistance(
             calculateDistance(
@@ -238,7 +238,7 @@ export const ExpandedShop = ({
             )
           );
           setLiked(shopData.favorite);
-          const planData = await mockPlan(profile.id, shopData.organization_id);
+          const planData = await fetchPlan(shopData.organization_id);
           setPlan(planData);
         } catch (error) {
           console.error("Error fetching shop details:", error);
