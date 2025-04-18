@@ -24,7 +24,6 @@ import {
   shop,
   ShopPreviewProps,
 } from "@/app-data/data-types";
-import { mockOrg, mockPlan, mockShop } from "@/APIs/api";
 import ShopScrollView from "./ShopScrollView";
 import { localData } from "@/app-data/appData";
 import { modalStyle, styles } from "./styling/mapPreviewStyle";
@@ -42,7 +41,8 @@ import {
   getShopStatus,
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
-import { SafeAreaView } from "react-native";
+import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
+import {PlanLoadingState} from "@/components/navigation/loadingState";
 
 const { width } = Dimensions.get("window");
 
@@ -214,7 +214,6 @@ export const ExpandedShop = ({
   const [distance, setDistance] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const backgroundColor = useRef(new Animated.Value(0)).current;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const highlightPosition = useRef(new Animated.Value(-15)).current;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -228,7 +227,7 @@ export const ExpandedShop = ({
           if (!profile.id) {
             throw new Error("No profile id found");
           }
-          const shopData = await mockShop(shopId, profile.id);
+          const shopData = await fetchShop(shopId);
           setShopDetails(shopData);
           setDistance(
             calculateDistance(
@@ -238,7 +237,7 @@ export const ExpandedShop = ({
             )
           );
           setLiked(shopData.favorite);
-          const planData = await mockPlan(profile.id, shopData.organization_id);
+          const planData = await fetchPlan(shopData.organization_id);
           setPlan(planData);
         } catch (error) {
           console.error("Error fetching shop details:", error);
@@ -250,30 +249,6 @@ export const ExpandedShop = ({
     fetchShopDetails();
   }, [shopId]);
 
-  useEffect(() => {
-    const startGlow = Animated.loop(
-      Animated.sequence([
-        Animated.timing(backgroundColor, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: false,
-        }),
-        Animated.timing(backgroundColor, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: false,
-        }),
-      ])
-    );
-    startGlow.start();
-
-    return () => startGlow.stop();
-  }, []);
-
-  const animatedBackgroundColor = backgroundColor.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["gray", "darkgray"],
-  });
 
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
@@ -405,23 +380,7 @@ export const ExpandedShop = ({
     <View style={{ flex: 1, justifyContent: "flex-end" }}>
       <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
         {loading || !shopDetails || !distance ? (
-          <View style={modalStyle.loadingContainer}>
-            <Animated.View
-              style={[
-                { height: 250, width: "100%" },
-                { backgroundColor: animatedBackgroundColor },
-              ]}
-            />
-            <View
-              style={{
-                alignContent: "center",
-                justifyContent: "center",
-                flex: 1,
-              }}
-            >
-              <ActivityIndicator />
-            </View>
-          </View>
+            <PlanLoadingState />
         ) : (
           <ShopScrollView
             headerBackgroundColor={{
@@ -693,7 +652,7 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
-                {!plan?.activePlan && (
+                {plan && !plan.activePlan && (
                   <View
                     style={{
                       alignSelf: "center",

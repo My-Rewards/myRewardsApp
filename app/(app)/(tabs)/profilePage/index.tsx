@@ -23,7 +23,7 @@ import {
   legalSvg,
   privacySvg,
 } from "@/constants/profileSvgs";
-import { ProfileLoadingState } from "@/components/navigation/profileLoadingState";
+import { ProfileLoadingState } from "@/components/navigation/loadingState";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 
 export default function ProfilePage() {

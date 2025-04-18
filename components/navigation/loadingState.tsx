@@ -1,5 +1,6 @@
-import { View, StyleSheet, Dimensions, Animated } from "react-native";
-import { useEffect, useRef } from "react";
+import {View, StyleSheet, Dimensions, Animated, ActivityIndicator} from "react-native";
+import React, { useEffect, useRef } from "react";
+import {modalStyle} from "@/components/styling/mapPreviewStyle";
 
 export function ProfileLoadingState() {
   const animatedValue = useRef(new Animated.Value(0)).current;
@@ -189,16 +190,104 @@ export function ProfileLoadingState() {
   );
 }
 
+export function PlanLoadingState(){
+  const animatedValue1 = useRef(new Animated.Value(0)).current;
+  const animatedValue2 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animateGradient = () => {
+      Animated.loop(
+          Animated.sequence([
+            Animated.timing(animatedValue1, {
+              toValue: 1,
+              duration: 700,
+              useNativeDriver: false,
+            }),
+            Animated.timing(animatedValue1, {
+              toValue: 0,
+              duration: 700,
+              useNativeDriver: false,
+            }),
+          ])
+      ).start();
+
+      const timer = setTimeout(() => {
+        Animated.loop(
+            Animated.sequence([
+              Animated.timing(animatedValue2, {
+                toValue: 1,
+                duration: 700,
+                useNativeDriver: false,
+              }),
+              Animated.timing(animatedValue2, {
+                toValue: 0,
+                duration: 700,
+                useNativeDriver: false,
+              }),
+            ])
+        ).start();
+      }, 350);
+
+      return () => clearTimeout(timer);
+    };
+
+    animateGradient();
+  }, [animatedValue1, animatedValue2]);
+
+  const animatedBackgroundColor = animatedValue1.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["gray", "darkgray"],
+  });
+
+  const animatedBackgroundColorDelay = animatedValue2.interpolate({
+    inputRange: [0.5, 1],
+    outputRange: ["gray", "darkgray"],
+  });
+
+    return(
+        <View style={modalStyle.loadingContainer}>
+          <Animated.View
+              style={[
+                { height: 250, width: "100%" },
+                { backgroundColor: animatedBackgroundColor },
+              ]}
+          />
+          <Animated.View
+              style={{
+                height: 200,
+                width: "100%",
+                backgroundColor: animatedBackgroundColorDelay
+              }}
+          />
+          <View
+              style={{
+                alignContent: "center",
+                justifyContent: "center",
+                flex: 1,
+              }}
+          >
+            <Animated.View
+                style={[
+                  { height: 200, width: "100%", },
+                  { backgroundColor: 'red' },
+                ]}
+            />
+          </View>
+        </View>
+    )
+
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fffbf7",
-    justifyContent: "center", // Center vertically
-    alignItems: "center", // Center horizontally
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
-    width: "100%", // Ensure content doesn't exceed screen width
-    maxWidth: 320, // Optional: Limit max width for better layout
+    width: "100%",
+    maxWidth: 320,
     paddingHorizontal: 20,
     paddingTop: 16,
   },
