@@ -17,10 +17,10 @@ export const verifyEmailFn = async (
 ) => {
   try {
     verifyEmailSchema.parse({ email });
-    if(email.includes("gmail")){
-        alert("", "Please use a non-Gmail email address", "error");
-        return;
-    }
+    // if(email.includes("gmail")){
+    //     alert("", "Please use a non-Gmail email address", "error");
+    //     return;
+    // }
 
     if (profile) {
         if(profile.email !== email) {

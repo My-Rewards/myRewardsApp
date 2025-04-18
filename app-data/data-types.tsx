@@ -17,14 +17,16 @@ export interface ShopPreviewProps {
   shop_id: string;
   preview:string;
   name:string;
-  latitude: number;
-  longitude: number;
+  // latitude: number;
+  // longitude: number;
+  distance: number;
   favorite:boolean;
   location:{
     city:string,
+    address: string,
     state:string
   }
-  shop_hours: ShopHour[];
+  shop_hours: ShopHour[]
 }
 
 export interface OrganizationProps{

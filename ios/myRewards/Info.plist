@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>myrewards</string>
-          <string>com.myRewards.website.beta</string>
+          <string>com.myrewards.app.dev</string>
         </array>
       </dict>
       <dict>
@@ -44,6 +44,8 @@
     <string>UIInterfaceOrientationMaskAllButUpsideDown</string>
     <key>GMSApiKey</key>
     <string>AIzaSyBmgtn62Neco3iFbjYKnWiVTSEYgRelDxk</string>
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
     <key>LSApplicationQueriesSchemes</key>
     <array>
       <string>tel</string>
@@ -63,6 +65,10 @@
     </dict>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>MyRewards needs access to you location when using the app.</string>
+    <key>NSUserActivityTypes</key>
+    <array>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
+    </array>
     <key>UIBackgroundModes</key>
     <array>
       <string>location</string>
