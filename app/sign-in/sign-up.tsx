@@ -55,10 +55,10 @@ export default function SignUp() {
         return false;
       }
 
-      if (email.includes("gmail")) {
-        alert("", "Please use a non-Gmail email address", "error");
-        return false;
-      }
+      // if (email.includes("gmail")) {
+      //   alert("", "Please use a non-Gmail email address", "error");
+      //   return false;
+      // }
 
       return true;
     } catch (error: unknown) {
