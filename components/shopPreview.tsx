@@ -41,8 +41,8 @@ import {
   getShopStatus,
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
+import { SafeAreaView } from "react-native";
 import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
-import {PlanLoadingState} from "@/components/navigation/loadingState";
 
 const { width } = Dimensions.get("window");
 
@@ -214,6 +214,7 @@ export const ExpandedShop = ({
   const [distance, setDistance] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
+  const backgroundColor = useRef(new Animated.Value(0)).current;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const highlightPosition = useRef(new Animated.Value(-15)).current;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -249,6 +250,30 @@ export const ExpandedShop = ({
     fetchShopDetails();
   }, [shopId]);
 
+  useEffect(() => {
+    const startGlow = Animated.loop(
+      Animated.sequence([
+        Animated.timing(backgroundColor, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+        Animated.timing(backgroundColor, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    startGlow.start();
+
+    return () => startGlow.stop();
+  }, []);
+
+  const animatedBackgroundColor = backgroundColor.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["gray", "darkgray"],
+  });
 
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
@@ -380,7 +405,23 @@ export const ExpandedShop = ({
     <View style={{ flex: 1, justifyContent: "flex-end" }}>
       <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
         {loading || !shopDetails || !distance ? (
-            <PlanLoadingState />
+          <View style={modalStyle.loadingContainer}>
+            <Animated.View
+              style={[
+                { height: 250, width: "100%" },
+                { backgroundColor: animatedBackgroundColor },
+              ]}
+            />
+            <View
+              style={{
+                alignContent: "center",
+                justifyContent: "center",
+                flex: 1,
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          </View>
         ) : (
           <ShopScrollView
             headerBackgroundColor={{
@@ -652,7 +693,7 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
-                {plan && !plan.activePlan && (
+                {!plan?.activePlan && (
                   <View
                     style={{
                       alignSelf: "center",
