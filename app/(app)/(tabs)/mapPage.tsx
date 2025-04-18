@@ -11,7 +11,7 @@ import {
   Text,
   ActivityIndicator,
 } from "react-native";
-import Map, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import Map, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapView from "react-native-map-clustering";
 import {
   ExpandedModalShop,
@@ -229,8 +229,6 @@ export default function mapPage() {
       }}
     >
       <View
-        style={[styles.mapContainer, { height: "100%" }]}
-        pointerEvents={isExpanded ? "box-only" : "auto"}
       >
         <MapView
           style={styles.map}
@@ -240,7 +238,7 @@ export default function mapPage() {
           loadingEnabled={true}
           showsUserLocation
           pitchEnabled={false}
-          provider={PROVIDER_GOOGLE}
+          provider={PROVIDER_DEFAULT}
           scrollEnabled={!isExpanded}
           zoomEnabled={!isExpanded}
           rotateEnabled={!isExpanded}

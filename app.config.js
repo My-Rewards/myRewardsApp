@@ -42,10 +42,11 @@ export default () => {
         ],
         "NSLocationWhenInUseUsageDescription": "MyRewards needs access to you location when using the app.",
         "LSApplicationQueriesSchemes": ["tel"],
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationDefaultAccuracyReduced": false
       },
       config:{
-        googleMapsApiKey:'AIzaSyBmgtn62Neco3iFbjYKnWiVTSEYgRelDxk'
+        googleMapsApiKey:'AIzaSyAZyqCWWwjwJ6Oa6Qzp7EEWhwIwI7XJz8g'
       },
     },
     android: {
