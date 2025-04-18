@@ -41,8 +41,8 @@ import {
   getShopStatus,
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
+import { SafeAreaView } from "react-native";
 import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
-import {PlanLoadingState, RewardsLoadingState} from "@/components/navigation/loadingState";
 
 const { width } = Dimensions.get("window");
 
@@ -214,6 +214,7 @@ export const ExpandedShop = ({
   const [distance, setDistance] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
+  const backgroundColor = useRef(new Animated.Value(0)).current;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const highlightPosition = useRef(new Animated.Value(-15)).current;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -237,7 +238,7 @@ export const ExpandedShop = ({
             )
           );
           setLiked(shopData.favorite);
-          const planData = await fetchPlan(shopData.org_id);
+          const planData = await fetchPlan(shopData.organization_id);
           setPlan(planData);
         } catch (error) {
           console.error("Error fetching shop details:", error);
@@ -249,6 +250,30 @@ export const ExpandedShop = ({
     fetchShopDetails();
   }, [shopId]);
 
+  useEffect(() => {
+    const startGlow = Animated.loop(
+      Animated.sequence([
+        Animated.timing(backgroundColor, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+        Animated.timing(backgroundColor, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    startGlow.start();
+
+    return () => startGlow.stop();
+  }, []);
+
+  const animatedBackgroundColor = backgroundColor.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["gray", "darkgray"],
+  });
 
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
@@ -334,7 +359,7 @@ export const ExpandedShop = ({
     } else {
       return (
         <View>
-          <RewardsLoadingState />
+          <ActivityIndicator />
         </View>
       );
     }
@@ -346,6 +371,8 @@ export const ExpandedShop = ({
         const supported = await Linking.canOpenURL(url);
         if (supported) {
           await Linking.openURL(url);
+        } else {
+          console.log(`Can't handle URL: ${url}`);
         }
       } catch (error) {
         console.error("Something went wrong", error);
@@ -375,10 +402,26 @@ export const ExpandedShop = ({
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "flex-end"}}>
+    <View style={{ flex: 1, justifyContent: "flex-end" }}>
       <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
         {loading || !shopDetails || !distance ? (
-            <PlanLoadingState />
+          <View style={modalStyle.loadingContainer}>
+            <Animated.View
+              style={[
+                { height: 250, width: "100%" },
+                { backgroundColor: animatedBackgroundColor },
+              ]}
+            />
+            <View
+              style={{
+                alignContent: "center",
+                justifyContent: "center",
+                flex: 1,
+              }}
+            >
+              <ActivityIndicator />
+            </View>
+          </View>
         ) : (
           <ShopScrollView
             headerBackgroundColor={{
@@ -574,12 +617,12 @@ export const ExpandedShop = ({
                       style={modalStyle.internalInfoRow}
                       activeOpacity={1}
                       onPress={() =>
-                        redirectWeb(`tel:${shopDetails.phone_number}`)
+                        redirectWeb(`tel:${shopDetails.phoneNumber}`)
                       }
                     >
                       <View style={{ flex: 1 }}>
                         <Text style={modalStyle.underline_infoText}>
-                          {shopDetails.phone_number}
+                          {shopDetails.phoneNumber}
                         </Text>
                       </View>
                       <Ionicons
@@ -650,26 +693,17 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
-                {plan && !plan.active && (
+                {!plan?.activePlan && (
                   <View
                     style={{
                       alignSelf: "center",
-                      justifyContent:'center',
                       marginBottom: "20%",
-                      width: "80%",
+                      width: "100%",
                     }}
                   >
-                    <Text style={{
-                      color: color_pallete[2],
-                      marginHorizontal:'auto',
-                      opacity:0.6, fontWeight:'500',
-                      fontFamily:'Avenir Next',
-                      textAlign:'center',
-                      fontSize:16,
-                      flexWrap:'wrap'
-                    }}>
-                      Visit a store and log a transaction to get started
-                    </Text>
+                    <TouchableOpacity style={styles.startPlanBttn}>
+                      <Text style={styles.startPlanBttnText}>Start Plan</Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>

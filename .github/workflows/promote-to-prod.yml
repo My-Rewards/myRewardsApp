@@ -26,10 +26,60 @@ permissions:
   statuses: write
 
 jobs:
-  build-test-promote:
-    if: ${{ github.event.inputs.confirm == 'yes' }}
+  test:
+    if: ${{ github.event.inputs.confirm }}
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: prod
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          cache-dependency-path: "**/package-lock.json"
+          node-version: 20
+          cache: 'npm'
+
+      - name: ☁️ Configure AWS credentials ☁️
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_VAL_PROD }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Fetch SSM Parameters
+        id: fetch_ssm_parameters
+        run: |
+          # Fetch parameters from SSM
+          PARAMS=$(aws ssm get-parameters --names "/myRewardsApp/prod/customerUserPoolId" "/myRewardsApp/prod/customerWebClientId" "/myRewardsApp/prod/identityPoolIdCustomer" "/myRewardsApp/prod/appConfig" --with-decryption --region us-east-1)
+          
+          # Extract and set environment variables
+          echo "USER_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/customerUserPoolId\").Value") >> $GITHUB_ENV
+          echo "WEB_CLIENT_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/customerWebClientId\").Value") >> $GITHUB_ENV
+          echo "IDENTITY_POOL_ID=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/identityPoolIdCustomer\").Value") >> $GITHUB_ENV
+          echo "APP_CONFIG_VALUES=$(echo "$PARAMS" | jq -r ".Parameters[] | select(.Name==\"/myRewardsApp/prod/appConfig\").Value") >> $GITHUB_ENV
+      
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🚀 Create update
+        run: eas update --auto --non-interactive --branch production --message "Production update $(date +'%Y-%m-%d %H:%M:%S')"
+
+
+  promote:
+    needs: test
+    runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub App token
         uses: actions/create-github-app-token@v1
@@ -48,21 +98,6 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build application
-        run: npm run build
 
       - name: Calculate version
         id: semver
@@ -84,41 +119,59 @@ jobs:
           git commit -m "chore: bump version to ${{ steps.semver.outputs.version }}"
           git push origin release/v${{ steps.semver.outputs.version }}
 
-      - name: Merge to master
+      - name: Check for merge conflicts with master
+        id: check_conflicts
+        run: |
+          git checkout master
+          git pull origin master
+          # Try merging into a temporary branch to check for conflicts
+          git checkout -b temp-merge-check
+          if git merge --no-commit --no-ff release/v${{ steps.semver.outputs.version }}; then
+            echo "No merge conflicts detected"
+            echo "has_conflicts=false" >> $GITHUB_OUTPUT
+            git merge --abort
+          else
+            echo "Merge conflicts detected"
+            echo "has_conflicts=true" >> $GITHUB_OUTPUT
+            git merge --abort
+          fi
+          git checkout release/v${{ steps.semver.outputs.version }}
+
+      - name: Handle merge conflicts
+        if: steps.check_conflicts.outputs.has_conflicts == 'true'
+        run: |
+          echo "::warning::Merge conflicts detected between development and master"
+          # Create a pull request instead of direct merge
+          gh pr create --base master --head release/v${{ steps.semver.outputs.version }} --title "Release v${{ steps.semver.outputs.version }}" --body "This PR was created automatically to promote development to master. There are merge conflicts that need to be resolved manually."
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Merge to master if no conflicts
+        if: steps.check_conflicts.outputs.has_conflicts == 'false'
         run: |
           git checkout master
           git pull origin master
           git merge --no-ff release/v${{ steps.semver.outputs.version }} -m "chore: release version ${{ steps.semver.outputs.version }}"
           git push origin master
-
-      - name: Tag release
-        run: |
+          
+          # Tag the release
           git tag -a v${{ steps.semver.outputs.version }} -m "Release v${{ steps.semver.outputs.version }}"
           git push origin v${{ steps.semver.outputs.version }}
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-        with:
-          tag_name: v${{ steps.semver.outputs.version }}
-          release_name: Release v${{ steps.semver.outputs.version }}
-          draft: false
-          prerelease: false
-
-      - name: Merge release back to development
-        run: |
+          
+          # Create GitHub Release
+          gh release create v${{ steps.semver.outputs.version }} --title "Release v${{ steps.semver.outputs.version }}" --notes "Release v${{ steps.semver.outputs.version }}"
+          
+          # Merge back to development
           git checkout development
           git merge --no-ff v${{ steps.semver.outputs.version }} -m "chore: merge release v${{ steps.semver.outputs.version }} back to development"
           git push origin development
-
-      - name: Clean up release branch
-        if: success()
-        run: |
-          # Only attempt to delete if the branch exists remotely
+          
+          # Clean up release branch
           if git ls-remote --heads origin release/v${{ steps.semver.outputs.version }} | grep -q release/v${{ steps.semver.outputs.version }}; then
             git push origin --delete release/v${{ steps.semver.outputs.version }}
             echo "✅ Removed temporary release branch"
           else
             echo "⚠️ Release branch doesn't exist or was already deleted"
           fi
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
