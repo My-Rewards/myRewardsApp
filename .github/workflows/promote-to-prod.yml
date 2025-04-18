@@ -105,13 +105,11 @@ jobs:
         with:
           bump: ${{ github.event.inputs.version }}
           tag_prefix: "v"
-
       - name: Create release branch
         run: |
           git checkout development
           git pull origin development
           git checkout -b release/v${{ steps.semver.outputs.version }}
-
       - name: Create version commit
         run: |
           echo "Version ${{ steps.semver.outputs.version }}" > VERSION
