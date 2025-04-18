@@ -318,8 +318,10 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
           id: '24hHsk345m',
           name: shopNames[0],
           favorite: true,
+          distance:1234,
           location: {
             city: 'Gainesville',
+            address:'Coral 123',
             state: 'Florida'
           },
           shop_hours: [
@@ -340,9 +342,11 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
           shop_id: shopIds[1],
           id: '24hHsk346m',
           name: shopNames[1],
+          distance:1234,
           favorite: false,
           location: {
             city: 'Gainesville',
+            address:'Coral 123',
             state: 'Florida'
           },
           shop_hours: [
@@ -363,9 +367,11 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
           name: shopNames[2],
           preview: 'https://picsum.photos/200',
           id: 'wjn4Sj320B',
+          distance:1234,
           favorite: false,
           location: {
             city: 'Gainesville',
+            address:'Coral 123',
             state: 'Florida'
           },
           shop_hours: [
@@ -387,8 +393,10 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
           id: 'ien5J2k2',
           name: shopNames[3],
           favorite: false,
+          distance:1234,
           location: {
             city: 'Gainesville',
+            address:'Coral 123',
             state: 'Florida'
           },
           shop_hours: [
@@ -623,7 +631,8 @@ export const mockDiscoverShops = (user_id: string, region: { latitude: number; l
           name: shopNames[0],
           id: '24hHsk345m',
           favorite: true,
-          location: { city: 'Gainesville', state: 'Florida' },
+          distance:1234,
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         },
         {
@@ -634,8 +643,9 @@ export const mockDiscoverShops = (user_id: string, region: { latitude: number; l
           id: '24hHsk346m',
           shop_id: shopIds[1],
           name: shopNames[1],
+          distance:1234,
           favorite: false,
-          location: { city: 'Gainesville', state: 'Florida' },
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         },
         {
@@ -647,7 +657,8 @@ export const mockDiscoverShops = (user_id: string, region: { latitude: number; l
           preview: 'https://picsum.photos/200',
           id: 'wjn4Sj320B',
           favorite: false,
-          location: { city: 'Gainesville', state: 'Florida' },
+          distance:1234,
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         },
         {
@@ -658,8 +669,9 @@ export const mockDiscoverShops = (user_id: string, region: { latitude: number; l
           shop_id: shopIds[3],
           name: shopNames[3],
           id: 'ien5J2k2',
+          distance:1234,
           favorite: false,
-          location: { city: 'Gainesville', state: 'Florida' },
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         }
       ];
@@ -681,7 +693,8 @@ export const mockPopularShops = (user_id: string, pagination: number, region: { 
           name: shopNames[0],
           id: 'pop1234',
           favorite: true,
-          location: { city: 'Gainesville', state: 'Florida' },
+          distance:1234,
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         },
         {
@@ -693,7 +706,8 @@ export const mockPopularShops = (user_id: string, pagination: number, region: { 
           name: shopNames[1],
           id: 'pop5678',
           favorite: false,
-          location: { city: 'Gainesville', state: 'Florida' },
+          distance:1234,
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         }
       ];
@@ -715,7 +729,8 @@ export const mockFavoriteShops = (user_id: string, pagination: number, region: {
           name: shopNames[0],
           id: 'fav1234',
           favorite: true,
-          location: { city: 'Gainesville', state: 'Florida' },
+          distance:1234,
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         },
         {
@@ -725,9 +740,10 @@ export const mockFavoriteShops = (user_id: string, pagination: number, region: {
           organization_id: organizationIds[1],
           shop_id: shopIds[1],
           name: shopNames[1],
+          distance:1234,
           id: 'fav5678',
           favorite: true,
-          location: { city: 'Gainesville', state: 'Florida' },
+          location: { city: 'Gainesville', state: 'Florida', address:'123 Coral' },
           shop_hours: generateShopHours(),
         }
       ];

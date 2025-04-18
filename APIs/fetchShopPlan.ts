@@ -3,7 +3,7 @@ import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const shopUrl = apiPath + "/app/shops/fetch";
-const planUrl = apiPath + "/app/shops/fetch";
+const planUrl = apiPath + "/app/plans/fetch";
 
 export const fetchShop = async (shopId:string) => {
     try {
@@ -24,6 +24,13 @@ export const fetchShop = async (shopId:string) => {
                 shop_id: shopId
             },
         });
+
+        console.log(data)
+
+        if(!data){
+            throw new Error("Something went wrong");
+        }
+
         return data;
 
     } catch (error: any) {
@@ -31,8 +38,6 @@ export const fetchShop = async (shopId:string) => {
             "Error fetching user:",
             error.response?.data || error.message
         );
-        console.error("Status code:", error.response?.status);
-        console.error("Headers:", error.response?.headers);
 
         return null;
     }
@@ -58,6 +63,10 @@ export const fetchPlan = async (org_id:string) => {
             },
         });
 
+        if(!data){
+            throw new Error("Something went wrong");
+        }
+
         return data;
 
     } catch (error: any) {
@@ -65,8 +74,6 @@ export const fetchPlan = async (org_id:string) => {
             "Error fetching user:",
             error.response?.data || error.message
         );
-        console.error("Status code:", error.response?.status);
-        console.error("Headers:", error.response?.headers);
 
         return null;
     }

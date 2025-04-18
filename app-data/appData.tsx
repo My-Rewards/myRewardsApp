@@ -276,6 +276,8 @@ export function AppData({
               shop_id: shop.shop_id,
               name: shop.name,
               preview: shop.preview,
+              latitude:shop.latitude,
+              longitude:shop.longitude,
               distance: shop.distance,
               favorite: shop.favorite,
               location: {

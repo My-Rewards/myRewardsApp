@@ -184,6 +184,8 @@ export const modalStyle = StyleSheet.create({
   loadingContainer: {
     display: "flex",
     flex: 1,
+    justifyContent:'flex-start',
+    alignItems:'flex-start'
   },
   container2: {
     flex: 1,
