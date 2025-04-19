@@ -376,6 +376,7 @@ const setMapPageShops = async () => {
                 // setDiscoverShopsFilter1(shop1)
                 // setFetchingPage1(false)
                 await setDiscoverShopsPage1(pagination);
+                setFetchingPage1(false);
                 break;
               case 1:
                 const shops2 = await mockPopularShops(
