@@ -2,7 +2,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "/userShops/discover";
+const url = apiPath + "/app/shops/discover";
 
 export const fetchNearbyShops = async (longitude: number | undefined, latitude: number | undefined, page: number) => {
   const { tokens } = await fetchAuthSession();
@@ -30,7 +30,6 @@ export const fetchNearbyShops = async (longitude: number | undefined, latitude: 
             limit: 4,
         }
       });
-      //console.log(JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {

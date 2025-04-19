@@ -87,7 +87,10 @@ export interface ExpentiureProps {
 };
 
 export interface RewardMapProps{
-  [tier: number]: Tier;
+  tierStep: number,
+  rewards: {
+    [tier: number]: Tier;
+  }
 };
 
 export interface RewardSystem {
@@ -120,7 +123,8 @@ export interface PlanProps{
   firstPlan:boolean,
   activePlan:boolean,
   redeemableRewards:string[],
-  active:boolean
+  active:boolean,
+  favorite:boolean,
 }
 
 export interface PreviewPlanProp extends PlanProps{

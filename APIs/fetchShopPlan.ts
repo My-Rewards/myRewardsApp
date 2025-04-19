@@ -2,8 +2,8 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const shopUrl = apiPath + "/app/shops/fetch";
-const planUrl = apiPath + "/app/plans/fetch";
+const shopUrl = apiPath + "/app/shops/shop";
+const planUrl = apiPath + "/app/plans/plan";
 
 export const fetchShop = async (shopId:string) => {
     try {
@@ -25,8 +25,6 @@ export const fetchShop = async (shopId:string) => {
             },
         });
 
-        console.log(data)
-
         if(!data){
             throw new Error("Something went wrong");
         }
@@ -35,7 +33,7 @@ export const fetchShop = async (shopId:string) => {
 
     } catch (error: any) {
         console.error(
-            "Error fetching user:",
+            "Error fetching shop details:",
             error.response?.data || error.message
         );
 
@@ -71,7 +69,7 @@ export const fetchPlan = async (org_id:string) => {
 
     } catch (error: any) {
         console.error(
-            "Error fetching user:",
+            "Error fetching plan:",
             error.response?.data || error.message
         );
 

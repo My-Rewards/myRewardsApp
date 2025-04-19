@@ -49,75 +49,42 @@ function getNextRewardVisits(plan: Plan) {
   return 0;
 }
 
-// function anlyzeInput(reward:Reward){
-//     if (!reward || !reward.type) {
-//         return "Invalid reward";
-//       }
-
-//       switch (reward.type) {
-//         case "item":
-//           if (typeof reward.rule === "number" && reward.rule > 0) {
-//             return `Free ${reward.item} with any purchase of +$${reward.rule}`;
-//           } else if (typeof reward.rule === "string") {
-//             return `Free ${reward.item} with any ${reward.rule}`;
-//           }
-//           return `Free ${reward.item}`;
-
-//         case "percentage":
-//           if (typeof reward.rule === "number" && reward.rule >0) {
-//             return `${reward.value}% off any order +$${reward.rule}+`;
-//           }
-//           else if (typeof reward.rule === "string" && reward.rule !== ''){
-//             return `$${reward.value} off any ${reward.rule}`;
-//           }
-//           return `${reward.value}% off`;
-
-//         case "cost":
-//           if (typeof reward.rule === "string") {
-//             return `$${reward.value} off any ${reward.rule}`;
-//           }
-//           else if (typeof reward.rule === "number" && reward.rule >0){
-//             return `$${reward.value} with any purchase of +$${reward.rule}`;
-//           }
-//           return `$${reward.value} off`;
-
-//         default:
-//           return "Unknown reward type";
-//       }
-// }
-
 const categorizeRewards = ({
-  road_map,
-  visits,
-  redeemableRewards,
+    road_map,
+    visits,
+    redeemableRewards,
 }: CategorizeProps) => {
-  const milestones = Object.keys(road_map)
-    .map((key) => Number(key))
-    .filter((milestone) => !isNaN(milestone));
+  const rewardsObj = road_map.rewards || {};
+  const tierStep = road_map.tierStep;
 
-  return milestones.map((milestone) => {
-    const tier_id = road_map[milestone].id;
+  const milestones = Object.keys(rewardsObj)
+      .map((key) => Number(key))
+      .filter((milestone) => !isNaN(milestone));
+
+  return milestones.map((pos) => {
+    const tier_id = rewardsObj[pos].id;
     const redeemable = redeemableRewards.includes(tier_id);
+    const milestone = pos * tierStep+1;
 
     if (milestone <= visits && !redeemable) {
       return {
         milestone,
         status: "passed",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     } else if (redeemable || milestone <= visits) {
       return {
         milestone,
         status: "current",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     } else {
       return {
         milestone,
         status: "upcoming",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     }
@@ -177,7 +144,9 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const milestones = Object.entries(plan.reward_plan.rewards_loyalty);
+  const milestones = Object.entries(plan.reward_plan.rewards_loyalty.rewards || {});
+  const tierStep = plan.reward_plan.rewards_loyalty.tierStep;
+
   const lineWidth =
     ((width - milestones.length * 30) / (milestones.length - 1)) * 0.8;
   const tillNextRew = getNextRewardVisits(plan);
@@ -187,6 +156,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     visits: plan.visits,
     redeemableRewards: plan.redeemableRewards,
   });
+
   const checkpoints = milestones.map(([checkpoint]) =>
     parseInt(checkpoint, 10)
   );
@@ -196,7 +166,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     index,
   }) => {
     const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
-    const checkpoint = parseInt(milestone[0], 10);
+    const checkpoint = (parseInt(milestone[0], 10)+1)*tierStep;
     const prevCheckpoint = checkpoints
       .filter((findCheckpoint: number) => findCheckpoint < checkpoint)
       .pop();

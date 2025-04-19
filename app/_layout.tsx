@@ -33,6 +33,12 @@ export default function Root() {
               }}
             />
             <Stack.Screen
+              name={"Success Scan"}
+              options={{
+                  headerShown: false,
+              }}
+            />
+            <Stack.Screen
               name={"(app)"}
               options={{
                 headerShown: false,
