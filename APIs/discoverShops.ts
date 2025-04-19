@@ -30,7 +30,7 @@ export const fetchNearbyShops = async (longitude: number | undefined, latitude: 
             limit: 4,
         }
       });
-      //console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
