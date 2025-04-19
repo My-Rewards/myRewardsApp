@@ -2,7 +2,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "userShops/filter/radius";
+const url = apiPath + "/app/shops/filter/radius";
 
 export const fetchRadiusShops = async (longitude: number | undefined, latitude: number | undefined) => {
   const { tokens } = await fetchAuthSession();
@@ -28,7 +28,7 @@ export const fetchRadiusShops = async (longitude: number | undefined, latitude: 
             lat: latitude,
         }
       });
-      console.log("Maps shops: ", JSON.stringify(data));
+      //console.log("Maps shops: ", JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
