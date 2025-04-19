@@ -28,6 +28,7 @@ import fetchUser from "@/APIs/fetchUser";
 import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
+import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
@@ -165,7 +166,7 @@ export function AppData({
             // setDiscoverShopsFilter1(shops1);
             // setRadiusShops(shops1);
             await setDiscoverShopsPage1();
-
+            await setMapPageShops();
             const shops2 = await mockPopularShops(userSub, 0, region);
             setDiscoverShopsFilter2(shops2);
             const shops3 = await mockFavoriteShops(userSub, 0, region);
@@ -292,6 +293,48 @@ export function AppData({
           setDiscoverShopsFilter1(shops);
         }
 
+  }
+}
+
+const setMapPageShops = async () => {
+  let coords = userLocation;
+  if (!coords) {
+    const location = await getCurrentLocation();
+    if (location) {
+      coords = location;
+    }
+    if (coords) {
+      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
+
+      if (!response || !Array.isArray(response.value)) {
+        console.error("Expected an array of shops in response.value, but got:", response);
+        return;
+      }
+      const shops = response.value;
+
+      const radiusShopsArray = [];
+      for (const shop of shops) {
+        const shopSchema: ShopPreviewProps = {
+          id: shop.id,
+          organization_id: shop.organization_id,
+          shop_id: shop.shop_id,
+          name: shop.name,
+          preview: shop.preview,
+          latitude:shop.latitude,
+          longitude:shop.longitude,
+          distance: shop.distance,
+          favorite: shop.favorite,
+          location: {
+            city: shop.location.city,
+            address: shop.location.address,
+            state: shop.location.state,
+          },
+          shop_hours: shop.shop_hours,
+        };
+        radiusShopsArray.push(shopSchema);
+      }
+      setRadiusShops(shops);
+    }
   }
 }
   return (
