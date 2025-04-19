@@ -44,7 +44,7 @@ export interface shop {
   logo:string;
   favorite:boolean;
   menu:string|undefined;
-  phoneNumber:string;
+  phone_number:string;
   description:string;
   shop_hours: ShopHour[];
   location:{
@@ -83,11 +83,15 @@ export interface Tier {
 
 export interface ExpentiureProps {
   expenditure: number;
-  rewardsOptions: string[];
+  id: string;
+  rewards: string[];
 };
 
 export interface RewardMapProps{
-  [tier: number]: Tier;
+  tierStep: number,
+  rewards: {
+    [tier: number]: Tier;
+  }
 };
 
 export interface RewardSystem {
@@ -113,14 +117,15 @@ export interface PlanProps{
   reward_plan:RewardSystem,
   visits:number,
   points:number,
-  organization_id:string
+  org_id:string
   rl_active:boolean,
   rm_active:boolean,
   name:string,
   firstPlan:boolean,
   activePlan:boolean,
   redeemableRewards:string[],
-  active:boolean
+  active:boolean,
+  favorite:boolean,
 }
 
 export interface PreviewPlanProp extends PlanProps{

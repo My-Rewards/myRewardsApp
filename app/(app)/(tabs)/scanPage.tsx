@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import NfcManager, { NfcTech } from "react-native-nfc-manager";
 import { SvgXml } from "react-native-svg";
+import {toggleVisit} from "@/APIs/toggleVisit";
 
 const { width } = Dimensions.get("window");
 
@@ -23,7 +24,7 @@ export default function ScanPage() {
   const scaleAnim2 = useRef(new Animated.Value(1)).current;
   const fadeAnim2 = useRef(new Animated.Value(1)).current;
 
-  const { alert } = useProps();
+  const { alert, scanStatus } = useProps();
 
   useEffect(() => {
     if (isScanning) {
@@ -110,22 +111,35 @@ export default function ScanPage() {
   async function readNdef() {
     try {
       setIsScanning(true);
-      await NfcManager.requestTechnology(NfcTech.Ndef);
-      const tag = await NfcManager.getTag();
-      console.log("Tag found:", tag);
 
-      if (tag?.ndefMessage) {
-        alert("Visit tracked Successfully", "", "success");
-      }
-    } catch (ex) {
-      alert("Something went wrong", "", "error");
-      console.warn("NFC read error:", ex);
-      setIsScanning(false);
-    } finally {
-      setIsScanning(false);
-      NfcManager.cancelTechnologyRequest().catch(() => {
-        /* do nothing */
-      });
+        await NfcManager.requestTechnology(NfcTech.Ndef, {
+            alertMessage: "Scan the MyRewards Beacon"
+        });
+        const tag = await NfcManager.getTag();
+
+        if (tag?.ndefMessage) {
+            const record = tag.ndefMessage[0];
+
+            const payload = record.payload;
+            const languageCodeLength = payload[0] & 0x3F;
+            const textBytes = payload.slice(1 + languageCodeLength);
+
+            const textDecoder = new TextDecoder('utf-8');
+            const tagValue = textDecoder.decode(new Uint8Array(textBytes));
+
+            const result = await toggleVisit(tagValue)
+
+            setIsScanning(false);
+            await NfcManager.cancelTechnologyRequest()
+
+            setTimeout(() => {
+                scanStatus(result.success);
+            },2000)
+        }
+
+    } catch{
+        setIsScanning(false);
+        scanStatus(false)
     }
   }
 

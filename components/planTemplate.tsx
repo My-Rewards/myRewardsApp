@@ -35,89 +35,60 @@ function getNextRewardVisits(plan: Plan) {
     throw new Error("Invalid reward plan structure");
   }
 
-  const milestones = Object.keys(reward_plan.rewards_loyalty)
+  const tierStep = reward_plan.rewards_loyalty.tierStep;
+
+  const milestones = Object.keys(reward_plan.rewards_loyalty.rewards)
     .map(Number)
     .sort((a, b) => a - b);
   for (const milestone of milestones) {
-    if (milestone === visits) {
-      return milestone - visits;
-    } else if (visits < milestone) {
-      return milestone - visits;
+    const checkpoint = (milestone + 1) * tierStep;
+
+    if (checkpoint === visits) {
+      return checkpoint - visits;
+    } else if (visits < checkpoint) {
+      return checkpoint - visits;
     }
   }
 
   return 0;
 }
 
-// function anlyzeInput(reward:Reward){
-//     if (!reward || !reward.type) {
-//         return "Invalid reward";
-//       }
-
-//       switch (reward.type) {
-//         case "item":
-//           if (typeof reward.rule === "number" && reward.rule > 0) {
-//             return `Free ${reward.item} with any purchase of +$${reward.rule}`;
-//           } else if (typeof reward.rule === "string") {
-//             return `Free ${reward.item} with any ${reward.rule}`;
-//           }
-//           return `Free ${reward.item}`;
-
-//         case "percentage":
-//           if (typeof reward.rule === "number" && reward.rule >0) {
-//             return `${reward.value}% off any order +$${reward.rule}+`;
-//           }
-//           else if (typeof reward.rule === "string" && reward.rule !== ''){
-//             return `$${reward.value} off any ${reward.rule}`;
-//           }
-//           return `${reward.value}% off`;
-
-//         case "cost":
-//           if (typeof reward.rule === "string") {
-//             return `$${reward.value} off any ${reward.rule}`;
-//           }
-//           else if (typeof reward.rule === "number" && reward.rule >0){
-//             return `$${reward.value} with any purchase of +$${reward.rule}`;
-//           }
-//           return `$${reward.value} off`;
-
-//         default:
-//           return "Unknown reward type";
-//       }
-// }
-
 const categorizeRewards = ({
-  road_map,
-  visits,
-  redeemableRewards,
+    road_map,
+    visits,
+    redeemableRewards,
 }: CategorizeProps) => {
-  const milestones = Object.keys(road_map)
-    .map((key) => Number(key))
-    .filter((milestone) => !isNaN(milestone));
+  const rewardsObj = road_map.rewards || {};
+  const tierStep = road_map.tierStep;
 
-  return milestones.map((milestone) => {
-    const tier_id = road_map[milestone].id;
+  const milestones = Object.keys(rewardsObj)
+      .map((key) => Number(key))
+      .filter((milestone) => !isNaN(milestone));
+
+  return milestones.map((pos) => {
+    const tier_id = rewardsObj[pos].id;
     const redeemable = redeemableRewards.includes(tier_id);
+    const milestone = (pos+1) * tierStep;
 
     if (milestone <= visits && !redeemable) {
       return {
         milestone,
         status: "passed",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     } else if (redeemable || milestone <= visits) {
       return {
         milestone,
         status: "current",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     } else {
       return {
         milestone,
         status: "upcoming",
-        rewards: road_map[milestone],
+        rewards: road_map.rewards[pos],
         redeemable,
       };
     }
@@ -129,9 +100,10 @@ const ListRewards: React.FC<{
   option: number;
   redeemable: boolean;
 }> = ({ rewardList, option, redeemable }) => {
+
   return (
     <View>
-      {rewardList.map((reward, index) => {
+      {rewardList?.map((reward, index) => {
         const rewardOption = reward;
         return (
           <View key={index}>
@@ -177,7 +149,18 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const milestones = Object.entries(plan.reward_plan.rewards_loyalty);
+  const tierStep = plan.reward_plan.rewards_loyalty.tierStep;
+
+  const zeroPointReward: Tier = {
+    id: "start",
+    rewards: []
+  };
+
+  const milestones: [string, Tier][] = [
+    ["-1", zeroPointReward],
+    ...Object.entries(plan.reward_plan.rewards_loyalty.rewards || {})
+  ];
+
   const lineWidth =
     ((width - milestones.length * 30) / (milestones.length - 1)) * 0.8;
   const tillNextRew = getNextRewardVisits(plan);
@@ -187,8 +170,9 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     visits: plan.visits,
     redeemableRewards: plan.redeemableRewards,
   });
+
   const checkpoints = milestones.map(([checkpoint]) =>
-    parseInt(checkpoint, 10)
+    (parseInt(checkpoint, 10)+1)*tierStep
   );
 
   const PointStatus: React.FC<{ milestone: [string, Tier]; index: number }> = ({
@@ -196,18 +180,19 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
     index,
   }) => {
     const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
-    const checkpoint = parseInt(milestone[0], 10);
+    const checkpoint = (parseInt(milestone[0], 10)+1)*tierStep;
     const prevCheckpoint = checkpoints
       .filter((findCheckpoint: number) => findCheckpoint < checkpoint)
       .pop();
 
-    const completion = prevCheckpoint
-      ? plan.visits < prevCheckpoint
-        ? 0
-        : plan.visits >= checkpoint
-        ? 1
-        : (plan.visits % checkpoint) / checkpoint
-      : 0;
+
+    let completion=0;
+    switch(true){
+      case plan.visits < prevCheckpoint! : completion = 0; break;
+      case plan.visits >= checkpoint : completion = 1; break;
+      case plan.visits % checkpoint != 0 : completion = checkpoint % plan.visits / checkpoint; break;
+      default : completion = 0; break;
+    }
 
     return (
       <View key={index} style={modalStyle.stepContainer}>
@@ -217,7 +202,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
               style={[
                 modalStyle.completion,
                 {
-                  width: lineWidth * completion,
+                  width: (lineWidth * completion),
                   position: "absolute",
                   height: "100%",
                 },
@@ -228,7 +213,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
             />
           </View>
         )}
-        {plan.visits >= checkpoint && !rewardRedeemable ? (
+        {plan.visits >= checkpoint && !rewardRedeemable && checkpoint>0 ? (
           <View
             style={[modalStyle.circle, { backgroundColor: color_pallete[2] }]}
           >
@@ -240,7 +225,7 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
           >
             <Ionicons name="star" color={"white"} />
           </View>
-        ) : (
+        ) :(
           <View style={[modalStyle.circle]}>
             <Text style={modalStyle.circleText}>{checkpoint}</Text>
           </View>
@@ -254,13 +239,16 @@ export const RoadMap: React.FC<RoadMapProps> = ({ plan }) => {
       return <Text style={modalStyle.visitsText}>Start Your Plan now!</Text>;
     }
     return (
-      <Text style={modalStyle.visitsText}>
-        {tillNextRew && tillNextRew > 0
-          ? `${tillNextRew} ${
-              tillNextRew === 1 ? "Visit" : "Visits"
-            } until your next reward!`
-          : `Redeem a reward on your next visit!`}
-      </Text>
+        <Text style={modalStyle.visitsText}>
+          {tillNextRew && tillNextRew > 0
+              ? (
+                  <>
+                    <Text style={{ fontWeight: '700', textDecorationLine:'underline' }}>{tillNextRew}</Text>
+                    {` ${tillNextRew === 1 ? "Visit" : "Visits"} until your next reward!`}
+                  </>
+              )
+              : `Redeem a reward on your next visit!`}
+        </Text>
     );
   };
 
@@ -469,7 +457,7 @@ export const ExpendatureMap: React.FC<RoadMapProps> = ({ plan }) => {
             </TouchableOpacity>
             <Collapsible collapsed={selectedIndex !== 1}>
               <ListRewards
-                rewardList={plan.reward_plan.rewards_milestone.rewardsOptions}
+                rewardList={plan.reward_plan.rewards_milestone.rewards}
                 option={0}
                 redeemable={
                   plan.points >= plan.reward_plan.rewards_milestone.expenditure

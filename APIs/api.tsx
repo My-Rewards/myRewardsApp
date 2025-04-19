@@ -37,7 +37,40 @@ const organizationIds=[
 const rewardTemplates:RewardSystem[]=[
   {
     rewards_loyalty: {
-      3: {
+      tierStep: 3,
+      rewards: {
+        0: {
+          id: "tier-1",
+          rewards: [
+            "$5 off any menu item",
+            "10% off next meal",
+            "$5 dollars off",
+          ],
+        },
+        1: {
+          id: "tier-2",
+          rewards: [
+            "$10 off any menu item",
+            "15% off next meal",
+            "15% off next meal",
+          ],
+        },
+        2: {
+          id: "tier-3",
+          rewards: [
+            "$15 off any menu item",
+            "20% off next meal",
+            "$25 dollars off",
+          ],
+        },
+      }
+    }
+},
+ {
+  rewards_loyalty: {
+    tierStep:3,
+    rewards:{
+      0: {
         id: "tier-1",
         rewards: [
           "$5 off any menu item",
@@ -45,58 +78,23 @@ const rewardTemplates:RewardSystem[]=[
           "$5 dollars off",
         ],
       },
-      6: {
+      1: {
         id: "tier-2",
         rewards: [
           "$10 off any menu item",
           "15% off next meal",
-          "15% off next meal",
+          "$15 dollars off",
         ],
       },
-      9: {
+      2: {
         id: "tier-3",
         rewards: [
-          "$15 off any menu item" ,
+          "$15 off any menu item",
           "20% off next meal",
           "$25 dollars off",
         ],
       },
-    },
-      rewards_milestone: {
-        expenditure: 150,
-        rewardsOptions: [
-          "$5 off menu item",
-          "5% off next meal",
-          "$5 dollars off",
-        ],
-      }
-},
- {
-  rewards_loyalty: {
-    3: {
-      id: "tier-1",
-      rewards: [
-        "$5 off any menu item",
-        "10% off next meal",
-        "$5 dollars off",
-      ],
-    },
-    6: {
-      id: "tier-2",
-      rewards: [
-        "$10 off any menu item",
-        "15% off next meal",
-        "$15 dollars off",
-      ],
-    },
-    9: {
-      id: "tier-3",
-      rewards: [
-        "$15 off any menu item",
-        "20% off next meal",
-        "$25 dollars off",
-      ],
-    },
+    }
   },
     rewards_milestone: {
       expenditure: 150,
@@ -109,30 +107,33 @@ const rewardTemplates:RewardSystem[]=[
 },
   {
     rewards_loyalty: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          "$5 off any menu item",
-          "10% off next meal",
-          "$5 dollars off",
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          "$10 off any menu item",
-          "15% off next meal",
-          "$15 dollars off",
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          "$15 off any menu item",
-          "20% off next meal",
-          "$25 dollars off",
-        ],
-      },
+      tierStep: 3,
+      rewards: {
+        0: {
+          id: "tier-1",
+          rewards: [
+            "$5 off any menu item",
+            "10% off next meal",
+            "$5 dollars off",
+          ],
+        },
+        1: {
+          id: "tier-2",
+          rewards: [
+            "$10 off any menu item",
+            "15% off next meal",
+            "$15 dollars off",
+          ],
+        },
+        2: {
+          id: "tier-3",
+          rewards: [
+            "$15 off any menu item",
+            "20% off next meal",
+            "$25 dollars off",
+          ],
+        },
+      }
     },
       rewards_milestone: {
         expenditure: 150,
@@ -145,30 +146,33 @@ const rewardTemplates:RewardSystem[]=[
   },
   {
     rewards_loyalty: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          "$5 off any menu item",
-          "10% off next meal",
-          "$5 dollars off",
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          "$10 off any menu item",
-          "15% off next meal",
-          "15% off next meal",
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          "$15 off any menu item" ,
-          "20% off next meal",
-          "$25 dollars off",
-        ],
-      },
+      tierStep:3,
+      rewards:{
+        0: {
+          id: "tier-1",
+          rewards: [
+            "$5 off any menu item",
+            "10% off next meal",
+            "$5 dollars off",
+          ],
+        },
+        1: {
+          id: "tier-2",
+          rewards: [
+            "$10 off any menu item",
+            "15% off next meal",
+            "15% off next meal",
+          ],
+        },
+        2: {
+          id: "tier-3",
+          rewards: [
+            "$15 off any menu item" ,
+            "20% off next meal",
+            "$25 dollars off",
+          ],
+        },
+      }
     },
       rewards_milestone: {
         expenditure: 150,
@@ -453,7 +457,8 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             id:'24hHsk345m',
             firstPlan:true,
             activePlan:false,
-            active:true
+            active:true,
+            favorite:false
           },
           {
             reward_plan: rewardTemplates[1],
@@ -469,7 +474,8 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             id:'34nDi3',
             firstPlan:false,
             activePlan:true,
-            active:true
+            active:true,
+            favorite:false
           },
           {
             reward_plan: rewardTemplates[1],
@@ -485,7 +491,8 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
             id:'abcde',
             firstPlan:true,
             activePlan:false,
-            active:true
+            active:true,
+            favorite:false
           }
         ];
         resolve(samplePlans);
@@ -493,84 +500,6 @@ export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
     });
 }
 
-export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const samplePlan1: PlanProps = 
-      {
-        reward_plan: rewardTemplates[0],
-        visits: visits[0],
-        points: points[0],
-        redeemableRewards: [],
-        rl_active: true,
-        rm_active: true,
-        firstPlan: false,
-        activePlan: false,
-        organization_id: organizationIds[0],
-        name: shopNames[0],
-        id: '341Dig',
-        active:true
-      };
-      const samplePlan2: PlanProps = 
-      {
-        reward_plan: rewardTemplates[1],
-        visits: visits[1],
-        points: points[1],
-        firstPlan: false,
-        redeemableRewards: [],
-        rl_active:true,
-        rm_active:true,
-        activePlan: true,
-        organization_id: organizationIds[1],
-        name: shopNames[1],
-        id: '341Dig',
-        active:true
-
-      };
-      const samplePlan3: PlanProps = 
-      {
-        reward_plan: rewardTemplates[2],
-        visits: visits[2],
-        points: points[2],
-        firstPlan:false,
-        activePlan:true,
-        redeemableRewards:['tier-2'],
-        rl_active:true,
-        rm_active:true,
-        organization_id: organizationIds[2],
-        name: shopNames[2],
-        id:'341Dig',
-        active:true
-      };
-      const samplePlan4: PlanProps = 
-      {
-        reward_plan: rewardTemplates[3],
-        visits: 0,
-        points: 0,
-        firstPlan:true,
-        activePlan:false,
-        redeemableRewards:[],
-        rl_active:true,
-        rm_active:true,
-        organization_id: organizationIds[3],
-        name: shopNames[3],
-        id:'341Dig',
-        active:true
-      };
-      if(org_id === organizationIds[0]){
-        resolve(samplePlan1)
-      }
-      else if (org_id === organizationIds[1]){
-        resolve(samplePlan2)
-      }else if (org_id === organizationIds[2]){
-        resolve(samplePlan3)
-      }
-      else{
-        resolve(samplePlan4)
-      }
-    }, 500);
-  });
-}
 
 export const mockOrg = (user_id:string, org_id:string): Promise<OrganizationProps> =>{
   return new Promise((resolve) => {

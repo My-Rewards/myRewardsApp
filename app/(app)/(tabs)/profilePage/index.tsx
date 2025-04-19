@@ -6,6 +6,7 @@ import {
   Image,
   Dimensions,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useSession } from "@/auth/ctx";
 import { SvgXml } from "react-native-svg";
@@ -80,7 +81,11 @@ export default function ProfilePage() {
   const windowHeight = Dimensions.get("window").height;
   if (profile) {
     return (
-      <View style={[styles.container, { height: windowHeight - 90 }]}>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        style={[styles.container, { height: windowHeight - 90 }]}>
         <View style={styles.content}>
           <View style={styles.topSection}>
             {/* User Icon */}
@@ -222,7 +227,7 @@ export default function ProfilePage() {
             onSubmit={handleDelete}
           />
         )}
-      </View>
+      </ScrollView>
     );
   } else {
     return <ProfileLoadingState />;
@@ -232,9 +237,11 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fffbf7",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#fffbf7"
+  },
+  contentContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,

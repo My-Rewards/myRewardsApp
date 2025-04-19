@@ -29,6 +29,7 @@ import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
+import {fetchUserPlans} from "@/APIs/fetchUserPlans";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
@@ -185,7 +186,7 @@ export function AppData({
           setFetchingPage4(true);
           try {
             // Replace mock API with actual API
-            const plansData = await mockPlans(userSub);
+            const plansData = await fetchUserPlans();
             setPlans(plansData);
 
             // find favorites and set it
@@ -207,7 +208,10 @@ export function AppData({
   async function getCurrentLocation() {
     setFetchingPage2(true);
     try {
-      const location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        mayShowUserSettingsDialog: true
+      });
       const coords = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -418,18 +422,16 @@ const setMapPageShops = async () => {
           }
         },
         fetchPlans: async () => {
-          // this will sort plans to show only the favorite
+          setFetchingPage3(true);
+
           try {
-            setFetchingPage3(true);
-            const fetchedPlans = await mockPlans(userSub);
+            const fetchedPlans = await fetchUserPlans();
             setPlans(fetchedPlans);
-            // Filter Plans again and set it
             setFavoritePlans(fetchedPlans);
-            setFetchingPage3(false);
           } catch (error) {
-            setFetchingPage3(false);
-            console.error("Error fetching shops:", error);
           }
+          setFetchingPage3(false);
+
         },
         fetchProfile: async () => {
           const profile = await fetchUser();
