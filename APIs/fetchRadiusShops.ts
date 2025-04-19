@@ -2,9 +2,9 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "/app/shops/discover";
+const url = apiPath + "/app/shops/filter/radius";
 
-export const fetchNearbyShops = async (longitude: number | undefined, latitude: number | undefined, page: number) => {
+export const fetchRadiusShops = async (longitude: number | undefined, latitude: number | undefined) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
   if (!longitude && !latitude) {   
@@ -14,7 +14,7 @@ export const fetchNearbyShops = async (longitude: number | undefined, latitude: 
     throw new Error("No access token available");
   }
   if (!url) {
-    throw new Error("discoverShops endpoint is not defined");
+    throw new Error("radiusShops endpoint is not defined");
   }
 
   try {
@@ -26,11 +26,9 @@ export const fetchNearbyShops = async (longitude: number | undefined, latitude: 
         params: {
             lon: longitude,
             lat: latitude,
-            page: page,
-            limit: 4,
         }
       });
-      // console.log(JSON.stringify(data));
+      // console.log("Maps shops: ", JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
