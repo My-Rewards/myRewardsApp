@@ -7,22 +7,49 @@ import {
   Keyboard,
   TouchableOpacity,
   StyleSheet,
+  FlatList,
 } from "react-native";
 import { router, Tabs } from "expo-router";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { color_pallete } from "@/constants/Colors";
 import { SvgXml } from "react-native-svg";
-import React from "react";
+import { useState } from "react";
 import { whtieStar } from "@/assets/images/MR-logos";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
 
 export default function TabLayout() {
   // check if iphone is new era or old era iphone
   const insets = useSafeAreaInsets();
   const hasSafeArea = insets.bottom > 0;
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    { id: string; name: string }[]
+  >([]);
 
+  const handleSearch = async (text: string) => {
+    setSearchText(text);
+
+    if (searchText.trim() === "") {
+      setSearchResults([]);
+    } else {
+      //Call on search API here with searchText
+      //const results = await (searchText);
+      const results = [
+        { id: "1", name: "abc" },
+        { id: "2", name: "def" },
+        { id: "3", name: "ghi" },
+      ];
+      setSearchResults(results);
+    }
+  };
+  const handleResultClick = (result: string) => {
+    setSearchText(result);
+    //Call an api to get the shops data here
+    setSearchResults([]);
+  };
   return (
     <Tabs
       screenOptions={{
@@ -56,11 +83,35 @@ export default function TabLayout() {
                     placeholder="Search"
                     autoCapitalize="none"
                     keyboardType="default"
+                    onChangeText={handleSearch}
+                    value={searchText}
+                    autoCorrect={false}
                     style={styles.searchBarText}
                     placeholderTextColor={color_pallete[4]}
+                    // onSubmitEditing={() => fetchSearchedShop(searchText)}
                   />
-                  <TabBarIcon name={"search"} color={color_pallete[3]} />
+                  <TouchableOpacity
+                  // onPress={() => fetchSearchedShop(searchText)}
+                  >
+                    <TabBarIcon name={"search"} color={color_pallete[3]} />
+                  </TouchableOpacity>
                 </View>
+                {searchText && searchResults.length > 0 && (
+                  <FlatList
+                    data={searchResults}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={styles.resultItem}
+                        onPress={() => handleResultClick(item.name)}
+                      >
+                        {/* Wrap the text inside a Text component */}
+                        <Text style={styles.resultText}>{item.name}</Text>
+                      </TouchableOpacity>
+                    )}
+                    style={styles.searchResults}
+                  />
+                )}
               </View>
             </TouchableWithoutFeedback>
           ),
@@ -308,10 +359,37 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   searchBarText: {
+    flex: 1,
     fontFamily: "Avenir Next",
     fontSize: 15,
-    display: "flex",
+    color: color_pallete[2],
+  },
+  resultItem: {
     flex: 1,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: color_pallete[3],
+  },
+  resultText: {
+    fontFamily: "Avenir Next",
+    fontSize: 15,
+    color: color_pallete[2],
+  },
+  searchResults: {
+    position: "absolute",
+    top: 145,
+    left: 15,
+    right: 15,
+    maxHeight: 200,
+    backgroundColor: "whitesmoke",
+    borderRadius: 10,
+    padding: 8,
+    marginTop: 10,
+    zIndex: 10,
+    shadowColor: "black",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
   },
   planHeader: {
     display: "flex",
