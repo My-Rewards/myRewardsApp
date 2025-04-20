@@ -28,6 +28,7 @@ import fetchUser from "@/APIs/fetchUser";
 import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
+import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
@@ -52,6 +53,7 @@ const DataContext = createContext<{
   userLocation: regionProp | null;
   fetchAppConfig: () => Promise<AppConfig | null>;
   appConfig: AppConfig | null;
+  pageNumber1: number;
 }>({
   fetchShopsByRadius: async () => null,
   fetchDiscoverShops: async () => null,
@@ -80,6 +82,7 @@ const DataContext = createContext<{
   userLocation: null,
   fetchAppConfig: async () => null,
   appConfig: null,
+  pageNumber1: 1,
 });
 
 export function localData() {
@@ -106,6 +109,7 @@ export function AppData({
   const [favoritePlans, setFavoritePlans] = useState<
     PreviewPlanProp[] | null
   >();
+  const [pageNumber1, setPageNumber1] = useState(1);
 
   const [region, setRegion] = useState({
     latitude: 28.5384,
@@ -164,8 +168,8 @@ export function AppData({
             // const shops1 = await mockDiscoverShops(userSub, region)
             // setDiscoverShopsFilter1(shops1);
             // setRadiusShops(shops1);
-            await setDiscoverShopsPage1();
-
+            await setDiscoverShopsPage1(pageNumber1);
+            await setMapPageShops();
             const shops2 = await mockPopularShops(userSub, 0, region);
             setDiscoverShopsFilter2(shops2);
             const shops3 = await mockFavoriteShops(userSub, 0, region);
@@ -252,46 +256,94 @@ export function AppData({
     }
   }
 
-  const setDiscoverShopsPage1 = async (): Promise<void> => {
-      let coords = userLocation;
-      if (!coords) {
+  const setDiscoverShopsPage1 = async (page: number): Promise<void> => {
+    let coords = userLocation;
+    if (!coords) {
         const location = await getCurrentLocation();
         if (location) {
-          coords = location;
+            coords = location;
         }
-        if (coords) {
-          const response = await fetchNearbyShops(coords.longitude, coords.latitude, 1);
+    }
 
-          if (!response || !Array.isArray(response.value)) {
+    if (coords) {
+        const currentShops = discoverShopsFilter1 || [];
+        const response = await fetchNearbyShops(coords.longitude, coords.latitude, page);
+
+        if (!response || !Array.isArray(response.value)) {
             console.error("Expected an array of shops in response.value, but got:", response);
             return;
-          }
-          const shops = response.value;
+        }
+        const shops = response.value;
 
-          const discoverShopsPage1Array = [];
-          for (const shop of shops) {
+        const discoverShopsPage1Array = [];
+        for (const shop of shops) {
             const shopSchema: ShopPreviewProps = {
-              id: shop.id,
-              organization_id: shop.organization_id,
-              shop_id: shop.shop_id,
-              name: shop.name,
-              preview: shop.preview,
-              latitude:shop.latitude,
-              longitude:shop.longitude,
-              distance: shop.distance,
-              favorite: shop.favorite,
-              location: {
-                city: shop.location.city,
-                address: shop.location.address,
-                state: shop.location.state,
-              },
-              shop_hours: shop.shop_hours,
+                id: shop.id,
+                organization_id: shop.organization_id,
+                shop_id: shop.shop_id,
+                name: shop.name,
+                preview: shop.preview,
+                latitude: shop.latitude,
+                longitude: shop.longitude,
+                distance: shop.distance,
+                favorite: shop.favorite,
+                location: {
+                    city: shop.location.city,
+                    address: shop.location.address,
+                    state: shop.location.state,
+                },
+                shop_hours: shop.shop_hours,
             };
             discoverShopsPage1Array.push(shopSchema);
-          }
-          setDiscoverShopsFilter1(shops);
         }
+        const updatedShops = [...currentShops, ...discoverShopsPage1Array];
+        
+        setDiscoverShopsFilter1(updatedShops);
 
+        setPageNumber1(page + 1);
+    }
+}
+
+
+const setMapPageShops = async () => {
+  let coords = userLocation;
+  if (!coords) {
+    const location = await getCurrentLocation();
+    if (location) {
+      coords = location;
+    }
+    if (coords) {
+      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
+
+      if (!response || !Array.isArray(response.value)) {
+        console.error("Expected an array of shops in response.value, but got:", response);
+        return;
+      }
+      const shops = response.value;
+
+      const radiusShopsArray = [];
+      for (const shop of shops) {
+        const shopSchema: ShopPreviewProps = {
+          id: shop.id,
+          organization_id: shop.organization_id,
+          shop_id: shop.shop_id,
+          name: shop.name,
+          preview: shop.preview,
+          latitude:shop.latitude,
+          longitude:shop.longitude,
+          distance: shop.distance,
+          favorite: shop.favorite,
+          location: {
+            city: shop.location.city,
+            address: shop.location.address,
+            state: shop.location.state,
+          },
+          shop_hours: shop.shop_hours,
+        };
+        radiusShopsArray.push(shopSchema);
+      }
+      setRadiusShops(shops);
+    }
   }
 }
   return (
@@ -323,7 +375,8 @@ export function AppData({
                 // const shop1 = await mockDiscoverShops(userSub, region)
                 // setDiscoverShopsFilter1(shop1)
                 // setFetchingPage1(false)
-                await setDiscoverShopsPage1();
+                await setDiscoverShopsPage1(pagination);
+                setFetchingPage1(false);
                 break;
               case 1:
                 const shops2 = await mockPopularShops(
@@ -411,6 +464,7 @@ export function AppData({
           return appConfig;
         },
         appConfig,
+        pageNumber1,
       }}
     >
       {children}
