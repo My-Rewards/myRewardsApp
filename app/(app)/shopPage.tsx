@@ -1,4 +1,3 @@
-import { mockfetchNearestShop } from "@/APIs/api";
 import { localData } from "@/app-data/appData";
 import { ExpandedShop } from "@/components/shopPreview";
 import { color_pallete } from "@/constants/Colors";
@@ -14,6 +13,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import {fetchNearestShop} from "@/APIs/fetchShopPlan";
 
 export default function shopPage() {
   const { parentPage, shop_id, org_id } = useLocalSearchParams<{
@@ -26,17 +26,23 @@ export default function shopPage() {
   const [shopId, setShopId] = useState(shop_id);
 
   useEffect(() => {
-    if (org_id && userLocation) {
-      mockfetchNearestShop(org_id, userLocation).then((shop) => [
-        setShopId(shop),
-      ]);
-    }
-  }, []);
+    const fetchShop = async () => {
+
+      if (org_id && userLocation) {
+        const shop = await fetchNearestShop(userLocation.latitude, userLocation.longitude, org_id);
+        if (shop) {
+          setShopId(shop);
+        }
+      }
+    };
+    fetchShop();
+  }, [org_id]);
+
 
   return (
     <View style={{ flex: 1 }}>
       <View>
-        <SafeAreaView />
+        <SafeAreaView style={{ backgroundColor: 'whitesmoke' }}/>
         <View style={[styles.header, { paddingBottom: 5 }]}>
           <SafeAreaView />
           <TouchableOpacity
@@ -77,7 +83,7 @@ export default function shopPage() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: "whitesmoke",
+    backgroundColor: 'whitesmoke',
     elevation: 0,
     shadowOpacity: 0.1,
     borderBottomWidth: 2,

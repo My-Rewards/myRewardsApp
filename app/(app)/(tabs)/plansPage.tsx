@@ -58,7 +58,7 @@ export default function plansPage() {
   const openShopPage = (org_id: string) => {
     router.push({
       pathname: "/shopPage",
-      params: { parentPage: "Plans", org_id },
+      params: { parentPage: "Plans", org_id:org_id },
     });
   };
 
@@ -114,7 +114,7 @@ const PlansPreview = React.memo(
               horizontal={false}
               renderItem={({ item }: { item: PreviewPlanProp }) => (
                 <TouchableOpacity
-                  onPress={() => openShop(item.organization_id)}
+                  onPress={() => openShop(item.org_id)}
                   key={item.id}
                   style={styles.card}
                 >
@@ -180,13 +180,23 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
   const [parentWidth, setParentWidth] = useState<number | null>(null);
   const [checkpoints, setCheckPoints] = useState<number[] | null>(null);
   const [liked, setLiked] = useState<boolean>(plan.favorite);
+  const tierStep = plan.reward_plan.rewards_loyalty?.tierStep||0
 
   useEffect(() => {
     if (plan.reward_plan.rewards_loyalty) {
-      setMilestonePlan(Object.entries(plan.reward_plan.rewards_loyalty));
+      const zeroPointReward: Tier = {
+        id: "start",
+        rewards: []
+      };
+
+      const milestones: [string, Tier][] = [
+        ["-1", zeroPointReward],
+        ...Object.entries(plan.reward_plan.rewards_loyalty.rewards || {})
+      ];
+      setMilestonePlan(milestones);
       setCheckPoints(
-        Object.entries(plan.reward_plan.rewards_loyalty).map(([checkpoint]) =>
-          parseInt(checkpoint, 10)
+        Object.entries(plan.reward_plan.rewards_loyalty.rewards).map(([checkpoint]) =>
+          (parseInt(checkpoint, 10)+1)*tierStep
         )
       );
     }
@@ -203,7 +213,7 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
     checkpoints,
   }) => {
     const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
-    const checkpoint = parseInt(milestone[0], 10);
+    const checkpoint = (parseInt(milestone[0], 10)+1)*tierStep;
     const lineWidth =
       ((parentWidth - numMilestones * 25) / (numMilestones - 1)) * 0.8;
 
@@ -211,13 +221,13 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
       .filter((findCheckpoint: number) => findCheckpoint < checkpoint)
       .pop();
 
-    const completion = prevCheckpoint
-      ? plan.visits < prevCheckpoint
-        ? 0
-        : plan.visits >= checkpoint
-        ? 1
-        : (plan.visits % checkpoint) / checkpoint
-      : 0;
+    let completion=0;
+    switch(true){
+      case plan.visits < prevCheckpoint! : completion = 0; break;
+      case plan.visits >= checkpoint : completion = 1; break;
+      case plan.visits % checkpoint != 0 : completion = checkpoint % plan.visits / checkpoint; break;
+      default : completion = 0; break;
+    }
 
     return (
       <View key={index} style={previewPlanStyle.stepContainer}>
@@ -240,7 +250,7 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
             </View>
           </View>
         )}
-        {plan.visits >= checkpoint && !rewardRedeemable ? (
+        {plan.visits >= checkpoint && !rewardRedeemable && checkpoint>0 ? (
           <View
             style={[
               previewPlanStyle.circle,
@@ -259,6 +269,7 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
               {
                 backgroundColor: color_pallete[2],
                 borderColor: color_pallete[2],
+                padding:2
               },
             ]}
           >
@@ -268,7 +279,7 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
           <View
             style={[
               previewPlanStyle.circle,
-              { borderColor: color_pallete[11] },
+              { borderColor: checkpoint===0?color_pallete[2]:color_pallete[11] },
             ]}
           >
             <Text style={previewPlanStyle.circleText}>{checkpoint}</Text>
@@ -499,8 +510,8 @@ const previewPlanStyle = StyleSheet.create({
     alignItems: "center",
   },
   circle: {
-    width: 22,
-    height: 22,
+    width: 24,
+    height: 24,
     borderRadius: 15,
     backgroundColor: "white",
     borderWidth: 2,
@@ -514,11 +525,11 @@ const previewPlanStyle = StyleSheet.create({
     fontSize: 12,
   },
   line: {
-    height: 4,
+    height: 6,
     backgroundColor: color_pallete[11],
   },
   completion: {
-    height: 4,
+    height: 6,
     backgroundColor: color_pallete[2],
   },
   bar: {
@@ -551,8 +562,8 @@ const previewPlanStyle = StyleSheet.create({
     position: "absolute",
     right: -10,
     bottom: -7,
-    width: 18,
-    height: 18,
+    width: 20,
+    height: 20,
     backgroundColor: color_pallete[2],
     borderRadius: 10,
     justifyContent: "center",

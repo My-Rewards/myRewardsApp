@@ -32,7 +32,6 @@ export default () => {
     ios: {
       bundleIdentifier: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
       icon: './assets/images/MyRewardsLogo1.png',
-      runtimeVersion: RUNTIMEVERSION,
       requireFullScreen: true,
       infoPlist: {
         UIBackgroundModes: [

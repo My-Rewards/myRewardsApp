@@ -42,7 +42,7 @@ import {
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
-import {PlanLoadingState} from "@/components/navigation/loadingState";
+import {PlanLoadingState, RewardsLoadingState} from "@/components/navigation/loadingState";
 
 const { width } = Dimensions.get("window");
 
@@ -237,7 +237,7 @@ export const ExpandedShop = ({
             )
           );
           setLiked(shopData.favorite);
-          const planData = await fetchPlan(shopData.organization_id);
+          const planData = await fetchPlan(shopData.org_id);
           setPlan(planData);
         } catch (error) {
           console.error("Error fetching shop details:", error);
@@ -334,7 +334,7 @@ export const ExpandedShop = ({
     } else {
       return (
         <View>
-          <ActivityIndicator />
+          <RewardsLoadingState />
         </View>
       );
     }
@@ -346,8 +346,6 @@ export const ExpandedShop = ({
         const supported = await Linking.canOpenURL(url);
         if (supported) {
           await Linking.openURL(url);
-        } else {
-          console.log(`Can't handle URL: ${url}`);
         }
       } catch (error) {
         console.error("Something went wrong", error);
@@ -576,12 +574,12 @@ export const ExpandedShop = ({
                       style={modalStyle.internalInfoRow}
                       activeOpacity={1}
                       onPress={() =>
-                        redirectWeb(`tel:${shopDetails.phoneNumber}`)
+                        redirectWeb(`tel:${shopDetails.phone_number}`)
                       }
                     >
                       <View style={{ flex: 1 }}>
                         <Text style={modalStyle.underline_infoText}>
-                          {shopDetails.phoneNumber}
+                          {shopDetails.phone_number}
                         </Text>
                       </View>
                       <Ionicons

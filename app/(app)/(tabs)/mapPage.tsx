@@ -335,11 +335,6 @@ export default function mapPage() {
           shopId={selectedPin.shop_id}
         />
       )}
-      {/* {(!mapLoaded || containerHeight === 1 || !pinsRendered) && (
-        <View style={styles.mapLoading}>
-          <ActivityIndicator />
-        </View>
-      )} */}
     </View>
   );
 }
