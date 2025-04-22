@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
@@ -54,7 +55,10 @@ export default function EditProfilePage() {
   };
 
   return (
-    <View
+    <ScrollView
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+      bounces={false}
       style={[
         styles.container,
         { height: Dimensions.get("window").height - 90 },
@@ -161,7 +165,7 @@ export default function EditProfilePage() {
           </Pressable>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -178,6 +182,11 @@ const styles = StyleSheet.create({
       width: 0,
     },
     borderBottomColor: color_pallete[2],
+  },
+  contentContainer: {
+    justifyContent: 'flex-start',
+    width: "100%",
+    paddingBottom: 20,
   },
   headerText: {
     fontSize: 30,

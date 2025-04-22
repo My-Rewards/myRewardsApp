@@ -34,152 +34,156 @@ const organizationIds=[
   '7e55caf9-9899-4621-b549-3796e31725d5'
 ]
 
-const rewardTemplates:RewardSystem[]=[
-  {
-    rewards_loyalty: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          "$5 off any menu item",
-          "10% off next meal",
-          "$5 dollars off",
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          "$10 off any menu item",
-          "15% off next meal",
-          "15% off next meal",
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          "$15 off any menu item" ,
-          "20% off next meal",
-          "$25 dollars off",
-        ],
-      },
-    },
-      rewards_milestone: {
-        expenditure: 150,
-        rewardsOptions: [
-          "$5 off menu item",
-          "5% off next meal",
-          "$5 dollars off",
-        ],
-      }
-},
- {
-  rewards_loyalty: {
-    3: {
-      id: "tier-1",
-      rewards: [
-        "$5 off any menu item",
-        "10% off next meal",
-        "$5 dollars off",
-      ],
-    },
-    6: {
-      id: "tier-2",
-      rewards: [
-        "$10 off any menu item",
-        "15% off next meal",
-        "$15 dollars off",
-      ],
-    },
-    9: {
-      id: "tier-3",
-      rewards: [
-        "$15 off any menu item",
-        "20% off next meal",
-        "$25 dollars off",
-      ],
-    },
-  },
-    rewards_milestone: {
-      expenditure: 150,
-      rewardsOptions: [
-        "$5 off menu item",
-        "5% off next meal",
-        "$5 dollars off",
-      ],
-    }
-},
-  {
-    rewards_loyalty: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          "$5 off any menu item",
-          "10% off next meal",
-          "$5 dollars off",
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          "$10 off any menu item",
-          "15% off next meal",
-          "$15 dollars off",
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          "$15 off any menu item",
-          "20% off next meal",
-          "$25 dollars off",
-        ],
-      },
-    },
-      rewards_milestone: {
-        expenditure: 150,
-        rewardsOptions: [
-          "$5 off menu item",
-          "5% off next meal",
-          "$5 dollars off",
-        ],
-      }
-  },
-  {
-    rewards_loyalty: {
-      3: {
-        id: "tier-1",
-        rewards: [
-          "$5 off any menu item",
-          "10% off next meal",
-          "$5 dollars off",
-        ],
-      },
-      6: {
-        id: "tier-2",
-        rewards: [
-          "$10 off any menu item",
-          "15% off next meal",
-          "15% off next meal",
-        ],
-      },
-      9: {
-        id: "tier-3",
-        rewards: [
-          "$15 off any menu item" ,
-          "20% off next meal",
-          "$25 dollars off",
-        ],
-      },
-    },
-      rewards_milestone: {
-        expenditure: 150,
-        rewardsOptions: [
-          "$5 off menu item",
-          "5% off next meal",
-          "$5 dollars off",
-        ],
-      }
-  },
-]
+// const rewardTemplates:RewardSystem[]=[
+//   {
+//     rewards_loyalty: {
+//       tierStep: 3,
+//       rewards: {
+//         0: {
+//           id: "tier-1",
+//           rewards: [
+//             "$5 off any menu item",
+//             "10% off next meal",
+//             "$5 dollars off",
+//           ],
+//         },
+//         1: {
+//           id: "tier-2",
+//           rewards: [
+//             "$10 off any menu item",
+//             "15% off next meal",
+//             "15% off next meal",
+//           ],
+//         },
+//         2: {
+//           id: "tier-3",
+//           rewards: [
+//             "$15 off any menu item",
+//             "20% off next meal",
+//             "$25 dollars off",
+//           ],
+//         },
+//       }
+//     }
+// },
+//  {
+//   rewards_loyalty: {
+//     tierStep:3,
+//     rewards:{
+//       0: {
+//         id: "tier-1",
+//         rewards: [
+//           "$5 off any menu item",
+//           "10% off next meal",
+//           "$5 dollars off",
+//         ],
+//       },
+//       1: {
+//         id: "tier-2",
+//         rewards: [
+//           "$10 off any menu item",
+//           "15% off next meal",
+//           "$15 dollars off",
+//         ],
+//       },
+//       2: {
+//         id: "tier-3",
+//         rewards: [
+//           "$15 off any menu item",
+//           "20% off next meal",
+//           "$25 dollars off",
+//         ],
+//       },
+//     }
+//   },
+//     rewards_milestone: {
+//       expenditure: 150,
+//       rewardsOptions: [
+//         "$5 off menu item",
+//         "5% off next meal",
+//         "$5 dollars off",
+//       ],
+//     }
+// },
+//   {
+//     rewards_loyalty: {
+//       tierStep: 3,
+//       rewards: {
+//         0: {
+//           id: "tier-1",
+//           rewards: [
+//             "$5 off any menu item",
+//             "10% off next meal",
+//             "$5 dollars off",
+//           ],
+//         },
+//         1: {
+//           id: "tier-2",
+//           rewards: [
+//             "$10 off any menu item",
+//             "15% off next meal",
+//             "$15 dollars off",
+//           ],
+//         },
+//         2: {
+//           id: "tier-3",
+//           rewards: [
+//             "$15 off any menu item",
+//             "20% off next meal",
+//             "$25 dollars off",
+//           ],
+//         },
+//       }
+//     },
+//       rewards_milestone: {
+//         expenditure: 150,
+//         rewardsOptions: [
+//           "$5 off menu item",
+//           "5% off next meal",
+//           "$5 dollars off",
+//         ],
+//       }
+//   },
+//   {
+//     rewards_loyalty: {
+//       tierStep:3,
+//       rewards:{
+//         0: {
+//           id: "tier-1",
+//           rewards: [
+//             "$5 off any menu item",
+//             "10% off next meal",
+//             "$5 dollars off",
+//           ],
+//         },
+//         1: {
+//           id: "tier-2",
+//           rewards: [
+//             "$10 off any menu item",
+//             "15% off next meal",
+//             "15% off next meal",
+//           ],
+//         },
+//         2: {
+//           id: "tier-3",
+//           rewards: [
+//             "$15 off any menu item" ,
+//             "20% off next meal",
+//             "$25 dollars off",
+//           ],
+//         },
+//       }
+//     },
+//       rewards_milestone: {
+//         expenditure: 150,
+//         rewardsOptions: [
+//           "$5 off menu item",
+//           "5% off next meal",
+//           "$5 dollars off",
+//         ],
+//       }
+//   },
+// ]
 
 const visits=[0,5,8,3]
 
@@ -198,7 +202,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           menu:undefined,
-          phoneNumber:'5614455304',
+          phone_number:'5614455304',
           description:orgDescription[0],
           favorite:true,
           location: {
@@ -224,7 +228,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           name: shopNames[1],
           shop_id,
           menu:'https://www.mock-menu-link.com',
-          phoneNumber:'5614936645',
+          phone_number:'5614936645',
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           description:orgDescription[1],
@@ -252,7 +256,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           latitude: 29.6569,
           longitude: -82.3214,
           menu:'https://www.mock-menu-link.com',
-          phoneNumber:'5612331223',
+          phone_number:'5612331223',
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           description:orgDescription[2],
@@ -280,7 +284,7 @@ export const mockShop = (shop_id:string, user_id:string): Promise<shop> => {
           latitude: 29.6569,
           longitude: -82.3214,
           menu:'https://www.mock-menu-link.com',
-          phoneNumber:'5612331223',
+          phone_number:'5612331223',
           banner: "https://picsum.photos/300/200",
           logo: 'https://picsum.photos/200',
           description:orgDescription[3],
@@ -435,142 +439,67 @@ export const mockShopRadius = (user_id: string): Promise<ShopPreviewProps[]> => 
 //     });
 // }
 
-export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
-  return new Promise((resolve) => {
-      setTimeout(() => {
-        const samplePlans: PreviewPlanProp[] = [
-          {
-            reward_plan: rewardTemplates[0],
-            visits: visits[0],
-            points: points[0],
-            redeemableRewards:[],
-            rl_active:true,
-            rm_active:false,
-            banner: "https://picsum.photos/300/200",
-            logo: "https://picsum.photos/300/200",
-            organization_id: organizationIds[0],
-            name:shopNames[0],
-            id:'24hHsk345m',
-            firstPlan:true,
-            activePlan:false,
-            active:true
-          },
-          {
-            reward_plan: rewardTemplates[1],
-            visits: visits[1],
-            points: points[1],
-            redeemableRewards:[],
-            rl_active:true,
-            rm_active:true,
-            banner: "https://picsum.photos/300/200",
-            logo: "https://picsum.photos/300/200",
-            organization_id: organizationIds[1],
-            name:shopNames[1],
-            id:'34nDi3',
-            firstPlan:false,
-            activePlan:true,
-            active:true
-          },
-          {
-            reward_plan: rewardTemplates[1],
-            visits: visits[2],
-            points: points[2],
-            redeemableRewards:['tier-2'],
-            rl_active:true,
-            rm_active:false,
-            banner: "https://picsum.photos/300/200",
-            logo: "https://picsum.photos/300/200",
-            organization_id: organizationIds[2],
-            name:shopNames[2],
-            id:'abcde',
-            firstPlan:true,
-            activePlan:false,
-            active:true
-          }
-        ];
-        resolve(samplePlans);
-      }, 500);
-    });
-}
+// export const mockPlans = (user_id:string): Promise<PreviewPlanProp[]> => {
+//   return new Promise((resolve) => {
+//       setTimeout(() => {
+//         const samplePlans: PreviewPlanProp[] = [
+//           {
+//             reward_plan: rewardTemplates[0],
+//             visits: visits[0],
+//             points: points[0],
+//             redeemableRewards:[],
+//             rl_active:true,
+//             rm_active:false,
+//             banner: "https://picsum.photos/300/200",
+//             logo: "https://picsum.photos/300/200",
+//             organization_id: organizationIds[0],
+//             name:shopNames[0],
+//             id:'24hHsk345m',
+//             firstPlan:true,
+//             activePlan:false,
+//             active:true,
+//             favorite:false
+//           },
+//           {
+//             reward_plan: rewardTemplates[1],
+//             visits: visits[1],
+//             points: points[1],
+//             redeemableRewards:[],
+//             rl_active:true,
+//             rm_active:true,
+//             banner: "https://picsum.photos/300/200",
+//             logo: "https://picsum.photos/300/200",
+//             organization_id: organizationIds[1],
+//             name:shopNames[1],
+//             id:'34nDi3',
+//             firstPlan:false,
+//             activePlan:true,
+//             active:true,
+//             favorite:false
+//           },
+//           {
+//             reward_plan: rewardTemplates[1],
+//             visits: visits[2],
+//             points: points[2],
+//             redeemableRewards:['tier-2'],
+//             rl_active:true,
+//             rm_active:false,
+//             banner: "https://picsum.photos/300/200",
+//             logo: "https://picsum.photos/300/200",
+//             organization_id: organizationIds[2],
+//             name:shopNames[2],
+//             id:'abcde',
+//             firstPlan:true,
+//             activePlan:false,
+//             active:true,
+//             favorite:false
+//           }
+//         ];
+//         resolve(samplePlans);
+//       }, 500);
+//     });
+// }
 
-export const mockPlan = (user_id:string, org_id:string): Promise<PlanProps> =>{
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const samplePlan1: PlanProps = 
-      {
-        reward_plan: rewardTemplates[0],
-        visits: visits[0],
-        points: points[0],
-        redeemableRewards: [],
-        rl_active: true,
-        rm_active: true,
-        firstPlan: false,
-        activePlan: false,
-        organization_id: organizationIds[0],
-        name: shopNames[0],
-        id: '341Dig',
-        active:true
-      };
-      const samplePlan2: PlanProps = 
-      {
-        reward_plan: rewardTemplates[1],
-        visits: visits[1],
-        points: points[1],
-        firstPlan: false,
-        redeemableRewards: [],
-        rl_active:true,
-        rm_active:true,
-        activePlan: true,
-        organization_id: organizationIds[1],
-        name: shopNames[1],
-        id: '341Dig',
-        active:true
-
-      };
-      const samplePlan3: PlanProps = 
-      {
-        reward_plan: rewardTemplates[2],
-        visits: visits[2],
-        points: points[2],
-        firstPlan:false,
-        activePlan:true,
-        redeemableRewards:['tier-2'],
-        rl_active:true,
-        rm_active:true,
-        organization_id: organizationIds[2],
-        name: shopNames[2],
-        id:'341Dig',
-        active:true
-      };
-      const samplePlan4: PlanProps = 
-      {
-        reward_plan: rewardTemplates[3],
-        visits: 0,
-        points: 0,
-        firstPlan:true,
-        activePlan:false,
-        redeemableRewards:[],
-        rl_active:true,
-        rm_active:true,
-        organization_id: organizationIds[3],
-        name: shopNames[3],
-        id:'341Dig',
-        active:true
-      };
-      if(org_id === organizationIds[0]){
-        resolve(samplePlan1)
-      }
-      else if (org_id === organizationIds[1]){
-        resolve(samplePlan2)
-      }else if (org_id === organizationIds[2]){
-        resolve(samplePlan3)
-      }
-      else{
-        resolve(samplePlan4)
-      }
-    }, 500);
-  });
-}
 
 export const mockOrg = (user_id:string, org_id:string): Promise<OrganizationProps> =>{
   return new Promise((resolve) => {

@@ -1,12 +1,11 @@
 import {
   mockDiscoverShops,
   mockFavoriteShops,
-  mockPlans,
   mockPopularShops,
   // mockProfile,
   mockShopRadius,
 } from "@/APIs/api";
-import {
+import React, {
   useContext,
   createContext,
   type PropsWithChildren,
@@ -29,6 +28,7 @@ import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
+import {fetchUserPlans} from "@/APIs/fetchUserPlans";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
@@ -104,7 +104,6 @@ export function AppData({
   const [profile, setProfile] = useState<Profile | null>();
   const [userLocation, setUserLocation] = useState<regionProp | null>(null);
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null);
-  // plans never gets updated (sort with filteredPlans)
   const [plans, setPlans] = useState<PreviewPlanProp[] | null>();
   const [favoritePlans, setFavoritePlans] = useState<
     PreviewPlanProp[] | null
@@ -185,7 +184,7 @@ export function AppData({
           setFetchingPage4(true);
           try {
             // Replace mock API with actual API
-            const plansData = await mockPlans(userSub);
+            const plansData = await fetchUserPlans();
             setPlans(plansData);
 
             // find favorites and set it
@@ -207,7 +206,10 @@ export function AppData({
   async function getCurrentLocation() {
     setFetchingPage2(true);
     try {
-      const location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        mayShowUserSettingsDialog: true
+      });
       const coords = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -242,16 +244,16 @@ export function AppData({
   }
 
   async function rebaseUserLocation(map: React.RefObject<Map>) {
-    getCurrentLocation();
-    if (userLocation && map.current) {
+    const coords = await getCurrentLocation();
+    if (coords && map.current) {
       map.current.animateToRegion(
         {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          latitudeDelta: userLocation.latitudeDelta,
-          longitudeDelta: userLocation.longitudeDelta,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          latitudeDelta: coords.latitudeDelta,
+          longitudeDelta: coords.longitudeDelta,
         },
-        0
+        300
       );
     }
   }
@@ -261,7 +263,9 @@ export function AppData({
     if (!coords) {
         const location = await getCurrentLocation();
         if (location) {
-            coords = location;
+          coords = location;
+          setUserLocation(location);
+          setRegion(location);
         }
     }
 
@@ -419,18 +423,16 @@ const setMapPageShops = async () => {
           }
         },
         fetchPlans: async () => {
-          // this will sort plans to show only the favorite
+          setFetchingPage3(true);
+
           try {
-            setFetchingPage3(true);
-            const fetchedPlans = await mockPlans(userSub);
+            const fetchedPlans = await fetchUserPlans();
             setPlans(fetchedPlans);
-            // Filter Plans again and set it
             setFavoritePlans(fetchedPlans);
-            setFetchingPage3(false);
           } catch (error) {
-            setFetchingPage3(false);
-            console.error("Error fetching shops:", error);
           }
+          setFetchingPage3(false);
+
         },
         fetchProfile: async () => {
           const profile = await fetchUser();
@@ -441,7 +443,7 @@ const setMapPageShops = async () => {
           setRegion(location);
         },
         locateMe: async (map: React.RefObject<Map>) => {
-          rebaseUserLocation(map);
+          await rebaseUserLocation(map);
         },
         radiusShops,
         discoverShopsFilter1,
