@@ -375,7 +375,7 @@ export const ExpandedShop = ({
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "flex-end" }}>
+    <View style={{ flex: 1, justifyContent: "flex-end"}}>
       <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
         {loading || !shopDetails || !distance ? (
             <PlanLoadingState />
@@ -650,17 +650,26 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
-                {plan && !plan.activePlan && (
+                {plan && !plan.active && (
                   <View
                     style={{
                       alignSelf: "center",
+                      justifyContent:'center',
                       marginBottom: "20%",
-                      width: "100%",
+                      width: "80%",
                     }}
                   >
-                    <TouchableOpacity style={styles.startPlanBttn}>
-                      <Text style={styles.startPlanBttnText}>Start Plan</Text>
-                    </TouchableOpacity>
+                    <Text style={{
+                      color: color_pallete[2],
+                      marginHorizontal:'auto',
+                      opacity:0.6, fontWeight:'500',
+                      fontFamily:'Avenir Next',
+                      textAlign:'center',
+                      fontSize:16,
+                      flexWrap:'wrap'
+                    }}>
+                      Visit a store and log a transaction to get started
+                    </Text>
                   </View>
                 )}
               </View>
