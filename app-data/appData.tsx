@@ -6,7 +6,7 @@ import {
   // mockProfile,
   mockShopRadius,
 } from "@/APIs/api";
-import {
+import React, {
   useContext,
   createContext,
   type PropsWithChildren,
@@ -246,16 +246,16 @@ export function AppData({
   }
 
   async function rebaseUserLocation(map: React.RefObject<Map>) {
-    getCurrentLocation();
-    if (userLocation && map.current) {
+    const coords = await getCurrentLocation();
+    if (coords && map.current) {
       map.current.animateToRegion(
         {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
-          latitudeDelta: userLocation.latitudeDelta,
-          longitudeDelta: userLocation.longitudeDelta,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          latitudeDelta: coords.latitudeDelta,
+          longitudeDelta: coords.longitudeDelta,
         },
-        0
+        300
       );
     }
   }
@@ -442,7 +442,7 @@ const setMapPageShops = async () => {
           setRegion(location);
         },
         locateMe: async (map: React.RefObject<Map>) => {
-          rebaseUserLocation(map);
+          await rebaseUserLocation(map);
         },
         radiusShops,
         discoverShopsFilter1,
