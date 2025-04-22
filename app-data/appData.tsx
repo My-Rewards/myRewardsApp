@@ -104,7 +104,6 @@ export function AppData({
   const [profile, setProfile] = useState<Profile | null>();
   const [userLocation, setUserLocation] = useState<regionProp | null>(null);
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null);
-  // plans never gets updated (sort with filteredPlans)
   const [plans, setPlans] = useState<PreviewPlanProp[] | null>();
   const [favoritePlans, setFavoritePlans] = useState<
     PreviewPlanProp[] | null
@@ -264,7 +263,9 @@ export function AppData({
     if (!coords) {
         const location = await getCurrentLocation();
         if (location) {
-            coords = location;
+          coords = location;
+          setUserLocation(location);
+          setRegion(location);
         }
     }
 
