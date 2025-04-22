@@ -32,17 +32,25 @@ export default function TabLayout() {
   const handleSearch = async (text: string) => {
     setSearchText(text);
 
-    if (searchText.trim() === "") {
+    if (text.trim() === "") {
       setSearchResults([]);
+      return;
     } else {
-      //Call on search API here with searchText
-      //const results = await (searchText);
-      const results = [
-        { id: "1", name: "abc" },
-        { id: "2", name: "def" },
-        { id: "3", name: "ghi" },
-      ];
-      setSearchResults(results);
+      try {
+        const results = await fetchSearchedShop(text);
+        if (results) {
+          const names = [];
+          for (let result of results) {
+            names.push({id: result.id, name: result.search_name});
+          }
+          setSearchResults(names);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setSearchResults([]);
+      }
     }
   };
   const handleResultClick = (result: string) => {
@@ -111,6 +119,13 @@ export default function TabLayout() {
                     )}
                     style={styles.searchResults}
                   />
+                )}
+                {searchResults.length === 0 && searchText && (
+                  <TouchableOpacity style={styles.searchResults} >
+                    <View style={styles.resultItem}>
+                      <Text style={styles.resultText}>No shops found</Text>
+                    </View>
+                  </TouchableOpacity>
                 )}
               </View>
             </TouchableWithoutFeedback>

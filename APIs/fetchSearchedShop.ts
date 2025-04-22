@@ -2,7 +2,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "/app/shops/filter/search";
+const url = apiPath + "/app/shops/search";
 
 export const fetchSearchedShop = async (shop: string) => {
   const { tokens } = await fetchAuthSession();
@@ -27,10 +27,10 @@ export const fetchSearchedShop = async (shop: string) => {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-            shop: shop,
+          q: shop,
         }
       });
-      // console.log(JSON.stringify(data));
+      console.log(JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
