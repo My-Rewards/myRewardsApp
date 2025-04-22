@@ -290,7 +290,7 @@ export default function index() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: "whitesmoke",
+      backgroundColor: color_pallete[10],
     elevation: 0,
     shadowOpacity: 0.1,
     borderBottomWidth: 2,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     borderBottomColor: color_pallete[2],
   },
   header2: {
-    backgroundColor: "whitesmoke",
+    backgroundColor: color_pallete[10],
     elevation: 0,
     borderBottomWidth: 2,
     borderBottomColor: color_pallete[0],
