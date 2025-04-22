@@ -1,7 +1,6 @@
 import {
   mockDiscoverShops,
   mockFavoriteShops,
-  mockPlans,
   mockPopularShops,
   // mockProfile,
   mockShopRadius,

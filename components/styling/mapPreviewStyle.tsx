@@ -160,11 +160,14 @@ export const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
-  startPlanBttnText: {
+  startPlanText: {
     fontFamily: "Avenir Next",
-    fontSize: 16,
+    marginHorizontal:'auto',
+    textAlign: "center",
+    opacity:0.6,
+    fontSize: 18,
     fontWeight: "600",
-    color: color_pallete[5],
+    color: color_pallete[2],
   },
 });
 

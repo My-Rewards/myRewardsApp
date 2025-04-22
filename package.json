@@ -11,7 +11,7 @@
     "ios": "npx expo run:ios --device",
     "cc": "rimraf node_modules/.cache/babel-loader/*,",
     "sync": "./sync.sh beta",
-    "internal-build-beta": "APP_ENV=beta && ./sync.sh beta && npx expo run:ios --device --configuration Release",
+    "internal-build-beta": "APP_ENV=beta &&  npx expo run:ios --device --configuration Release",
     "internal-build-prod": "APP_ENV=prod && ./sync.sh prod && npx expo run:ios --device --configuration Release",
     "android": "expo run:android"
   },
