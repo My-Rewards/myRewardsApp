@@ -244,9 +244,14 @@ export default function mapPage() {
           rotateEnabled={!isExpanded}
           animationEnabled={!isExpanded}
           onMapReady={() => {
+            setMapLoaded(true);
             locateMe(mapRef);
           }}
-          onMapLoaded={() => setMapLoaded(true)}
+          onMapLoaded={() => {
+            if (!mapLoaded) {
+              setMapLoaded(true);
+            }
+          }}
           clusterColor={color_pallete[2]}
           clusterFontFamily="Avenir Next"
           clusterTextColor="white"
@@ -335,6 +340,12 @@ export default function mapPage() {
           shopId={selectedPin.shop_id}
         />
       )}
+      {(!mapLoaded || containerHeight === 1 || !pinsRendered) && (
+        <View style={styles.mapLoading}>
+          <ActivityIndicator />
+          <Text style={styles.loadingText}>Fetching Nearby Shops</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -409,4 +420,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  loadingText: {
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    color: color_pallete[2],
+    fontSize: 13,
+    padding: 10,
+    textAlign: "center",
+  }
 });

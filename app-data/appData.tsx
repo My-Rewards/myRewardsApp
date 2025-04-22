@@ -365,6 +365,7 @@ const setMapPageShops = async () => {
           //     setFetchingPage2(false)
           //   },2000)
           // }
+          await setMapPageShops();
         },
         fetchDiscoverShops: async (
           filterOption: number,
