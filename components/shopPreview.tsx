@@ -650,17 +650,15 @@ export const ExpandedShop = ({
                   </TouchableOpacity>
                 </View>
                 {planSection()}
-                {plan && !plan.activePlan && (
+                {plan && !plan.active && (
                   <View
                     style={{
                       alignSelf: "center",
                       marginBottom: "20%",
-                      width: "100%",
+                      marginHorizontal:10
                     }}
                   >
-                    <TouchableOpacity style={styles.startPlanBttn}>
-                      <Text style={styles.startPlanBttnText}>Start Plan</Text>
-                    </TouchableOpacity>
+                    <Text style={styles.startPlanText}>Log your first visit to activate your plan!</Text>
                   </View>
                 )}
               </View>
