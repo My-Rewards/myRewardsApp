@@ -1,5 +1,5 @@
 import { fetchAuthSession } from "aws-amplify/auth";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const url = apiPath + "/app/visit";
@@ -13,32 +13,41 @@ export const toggleVisit = async (shop_id:string) => {
     }
 
     try {
-        const { data } = await axios.post(
-            url,
+        const timestamp = new Date().toISOString();
+
+        const { data } = await axios.post(url,
             {},
             {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${accessToken}`,
                 },
-                params: {
+                params:{
                     shop_id: shop_id,
-                    timestamp: Date.now()
+                    timestamp: timestamp
                 }
             }
         );
-
 
         return {
             visitId:data.visitId,
             success:data.success,
         };
-    } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-            console.error("Axios error:", error.response?.data || error.message);
+    } catch (error: any) {
+        if (error.isAxiosError) {
+            if (error.response?.status === 404) {
+                return {
+                    success:false
+                };
+            }
+            console.error(
+                "Axios error:",
+                error.response?.data || error.message
+            );
         } else {
             console.error("Unknown error:", error);
         }
+
         return {
             success:false,
         };
