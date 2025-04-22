@@ -86,23 +86,26 @@ export default function TabLayout() {
                 <Text style={[styles.headerText, { color: color_pallete[2] }]}>
                   Discover
                 </Text>
-                <View style={styles.searchBar}>
-                  <TextInput
-                    placeholder="Search"
-                    autoCapitalize="none"
-                    keyboardType="default"
-                    onChangeText={handleSearch}
-                    value={searchText}
-                    autoCorrect={false}
-                    style={styles.searchBarText}
-                    placeholderTextColor={color_pallete[4]}
-                    // onSubmitEditing={() => fetchSearchedShop(searchText)}
-                  />
-                  <TouchableOpacity
-                  // onPress={() => fetchSearchedShop(searchText)}
-                  >
-                    <TabBarIcon name={"search"} color={color_pallete[3]} />
-                  </TouchableOpacity>
+                <View style={{marginVertical:10, zIndex:15}}>
+                    <View style={styles.searchBar}>
+                        <TextInput
+                            placeholder="Search"
+                            autoCapitalize="none"
+                            keyboardType="default"
+                            onChangeText={handleSearch}
+                            value={searchText}
+                            autoCorrect={false}
+                            style={styles.searchBarText}
+                            placeholderTextColor={color_pallete[4]}
+                            // onSubmitEditing={() => fetchSearchedShop(searchText)}
+                        />
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            // onPress={() => fetchSearchedShop(searchText)}
+                        >
+                            <TabBarIcon name={"search"} color={color_pallete[3]} />
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 {searchText && searchResults.length > 0 && (
                   <FlatList
@@ -112,6 +115,7 @@ export default function TabLayout() {
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         style={styles.resultItem}
+                        activeOpacity={1}
                         onPress={() => handleResultClick(item.name)}
                       >
                         {/* Wrap the text inside a Text component */}
@@ -122,7 +126,7 @@ export default function TabLayout() {
                   />
                 )}
                 {searchResults.length === 0 && searchText && (
-                  <TouchableOpacity style={styles.searchResults} >
+                  <TouchableOpacity style={styles.searchResults} activeOpacity={1}>
                     <View style={styles.resultItem}>
                       <Text style={styles.resultText}>No shops found</Text>
                     </View>
@@ -324,7 +328,7 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: color_pallete[10],
+    backgroundColor:color_pallete[10],
     elevation: 0,
     shadowOpacity: 0.1,
     borderBottomWidth: 2,
@@ -337,7 +341,7 @@ const styles = StyleSheet.create({
     borderBottomColor: color_pallete[2],
   },
   header2: {
-    backgroundColor: "whitesmoke",
+      backgroundColor: color_pallete[10],
     elevation: 0,
     borderBottomWidth: 2,
     borderBottomColor: color_pallete[0],
@@ -365,14 +369,15 @@ const styles = StyleSheet.create({
   searchBar: {
     display: "flex",
     flexDirection: "row",
+    position:'relative',
     justifyContent: "space-between",
     padding: 8,
-    margin: 10,
     marginHorizontal: 15,
     borderColor: color_pallete[3],
     borderWidth: 2,
     borderRadius: 10,
     gap: 5,
+    backgroundColor:color_pallete[10],
   },
   searchBarText: {
     flex: 1,
@@ -393,18 +398,19 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     position: "absolute",
-    top: 145,
+    top:'100%',
     left: 15,
     right: 15,
+    marginTop:-15,
     maxHeight: 200,
-    backgroundColor: "whitesmoke",
-    borderRadius: 10,
+    backgroundColor:color_pallete[10],
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
     padding: 8,
-    marginTop: 10,
     zIndex: 10,
     shadowColor: "black",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
   },
   planHeader: {
