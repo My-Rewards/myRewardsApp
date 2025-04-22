@@ -108,7 +108,7 @@ export interface Plan{
   rl_active:boolean,
   rm_active:boolean,
   firstPlan:boolean,
-  activePlan:boolean,
+  active:boolean,
   redeemableRewards:string[],
 }
 
