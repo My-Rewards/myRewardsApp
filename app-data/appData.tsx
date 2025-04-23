@@ -475,8 +475,29 @@ const setMapPageShops = async () => {
             const location = await getCurrentLocation();
             if (location) {
               coords = location;
-              const response = await fetchSearchedShop(shop_name, location.latitude, location.longitude);
-              console.log(response);
+              setFetchingPage1(true);
+              const shop = await fetchSearchedShop(shop_name, location.latitude, location.longitude);
+              console.log(shop);
+              setFetchingPage1(false);
+              setPageNumber1(1);
+              const shopSchema: ShopPreviewProps = {
+                id: shop.id,
+                organization_id: shop.organization_id,
+                shop_id: shop.shop_id,
+                name: shop.name,
+                preview: shop.preview,
+                latitude:shop.latitude,
+                longitude:shop.longitude,
+                distance: shop.distance,
+                favorite: shop.favorite,
+                location: {
+                  city: shop.location.city,
+                  address: shop.location.address,
+                  state: shop.location.state,
+                },
+                shop_hours: shop.shop_hours,
+              };
+              setDiscoverShopsFilter1([shopSchema]);
             }
         }},
         appConfig,
