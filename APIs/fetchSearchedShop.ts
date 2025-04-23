@@ -2,22 +2,22 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "/app/shops/search";
+const url = apiPath + "/app/shops/nearest";
 
-export const fetchSearchedShop = async (shop: string) => {
+export const fetchSearchedShop = async (shop_name: string, lon: number, lat: number) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
-  if (!shop) {   
-    throw new Error("No shop defined");
+  if (!shop_name) {   
+    throw new Error("No shop_name defined");
+  }
+  if (!lon || !lat) {
+    throw new Error("No lon or lat defined");
   }
   if (!accessToken) {
     throw new Error("No access token available");
   }
   if (!url) {
-    throw new Error("fetchSearchedShops endpoint is not defined");
-  }
-  if(shop == ""){
-    return;
+    throw new Error("fetchNearestShop endpoint is not defined");
   }
 
   try {
@@ -27,7 +27,9 @@ export const fetchSearchedShop = async (shop: string) => {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          q: shop,
+          shop_name: shop_name,
+          lat: lat,
+          lon: lon,
         }
       });
       console.log(JSON.stringify(data));

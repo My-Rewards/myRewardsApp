@@ -18,8 +18,8 @@ import { whtieStar } from "@/assets/images/MR-logos";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
-
+import { fetchTypedShop } from "@/APIs/fetchTypedShop";
+import { localData } from "@/app-data/appData";
 export default function TabLayout() {
   // check if iphone is new era or old era iphone
   const insets = useSafeAreaInsets();
@@ -28,6 +28,7 @@ export default function TabLayout() {
   const [searchResults, setSearchResults] = useState<
     { id: string; name: string }[]
   >([]);
+  const {fetchNearestShopResult} = localData();
 
   const handleSearch = async (text: string) => {
     setSearchText(text);
@@ -37,7 +38,7 @@ export default function TabLayout() {
       return;
     } else {
       try {
-        const results = await fetchSearchedShop(text);
+        const results = await fetchTypedShop(text);
         if (results) {
           const names = [];
           for (let result of results) {
@@ -55,7 +56,6 @@ export default function TabLayout() {
   };
   const handleResultClick = (result: string) => {
     setSearchText(result);
-    //Call an api to get the shops data here
     setSearchResults([]);
   };
   return (
@@ -97,11 +97,11 @@ export default function TabLayout() {
                             autoCorrect={false}
                             style={styles.searchBarText}
                             placeholderTextColor={color_pallete[4]}
-                            // onSubmitEditing={() => fetchSearchedShop(searchText)}
+                            onSubmitEditing={() => fetchNearestShopResult(searchText)}
                         />
                         <TouchableOpacity
                             activeOpacity={1}
-                            // onPress={() => fetchSearchedShop(searchText)}
+                            onPress={() => fetchNearestShopResult(searchText)}
                         >
                             <TabBarIcon name={"search"} color={color_pallete[3]} />
                         </TouchableOpacity>

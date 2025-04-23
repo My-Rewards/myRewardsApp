@@ -29,10 +29,12 @@ import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
 import {fetchUserPlans} from "@/APIs/fetchUserPlans";
+import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
   fetchDiscoverShops: (filterOption: number, pagination: number) => void;
+  fetchNearestShopResult: (shop_name: string) => void;
   fetchPlans: () => void;
   fetchProfile: () => void;
   locateMe: (map: React.RefObject<Map>) => void;
@@ -58,6 +60,7 @@ const DataContext = createContext<{
   fetchShopsByRadius: async () => null,
   fetchDiscoverShops: async () => null,
   fetchPlans: async () => null,
+  fetchNearestShopResult: async () => null,
   fetchProfile: async () => null,
   locateMe: async () => null,
   setRegion: async () => null,
@@ -466,6 +469,16 @@ const setMapPageShops = async () => {
           setAppConfig(appConfig);
           return appConfig;
         },
+        fetchNearestShopResult: async (shop_name: string) => {
+            let coords = userLocation;
+            if (!coords) {
+            const location = await getCurrentLocation();
+            if (location) {
+              coords = location;
+              const response = await fetchSearchedShop(shop_name, location.latitude, location.longitude);
+              console.log(response);
+            }
+        }},
         appConfig,
         pageNumber1,
       }}
