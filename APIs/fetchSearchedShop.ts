@@ -32,7 +32,7 @@ export const fetchSearchedShop = async (shop_name: string, lon: number, lat: num
           lon: lon,
         }
       });
-      console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
