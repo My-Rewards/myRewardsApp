@@ -109,6 +109,7 @@ export default function TabLayout() {
                     <TouchableOpacity
                       activeOpacity={1}
                       onPress={fetchSearchResult}
+                      disabled={searchResults.length === 0 && searchText === ""}
                     >
                       <TabBarIcon name={"search"} color={color_pallete[3]} />
                     </TouchableOpacity>

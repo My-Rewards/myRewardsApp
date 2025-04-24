@@ -277,6 +277,7 @@ export function AppData({
     if (coords) {
       let currentShops = discoverShopsFilter1 || [];  
       if(isShopSearched){
+        setDiscoverShopsFilter1(null);
         setIsShopSearched(false);
         currentShops = [];
       }
@@ -494,7 +495,8 @@ export function AppData({
             }
           }
           if (coords) {
-            setFetchingPage1(true);
+            const prevShops = discoverShopsFilter1;
+            setDiscoverShopsFilter1(null);
             const result = await fetchSearchedShop(
               shop_name,
               coords.longitude,
@@ -504,6 +506,11 @@ export function AppData({
             setFetchingPage1(false);
             setPageNumber1(1);
             const shop = result.nearestShop;
+            if (!shop) {
+              alert("", "Invalid shop", "error");
+              setDiscoverShopsFilter1(prevShops);
+              return;
+            }
             const shopSchema: ShopPreviewProps = {
               id: shop.id,
               organization_id: shop.organization_id,
