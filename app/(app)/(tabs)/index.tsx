@@ -190,7 +190,7 @@ const ShopPreviews = React.memo(
             removeClippedSubviews={false}
             refreshing={isPage1Loading}
             onRefresh={() => {
-              fetchDiscoverShops(filterSelection, 0);
+              fetchDiscoverShops(filterSelection, 1);
             }}
             windowSize={2}
             onScrollEndDrag={handleScroll}

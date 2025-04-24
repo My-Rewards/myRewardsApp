@@ -28,11 +28,13 @@ import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
-import {fetchUserPlans} from "@/APIs/fetchUserPlans";
+import { fetchUserPlans } from "@/APIs/fetchUserPlans";
+import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
   fetchDiscoverShops: (filterOption: number, pagination: number) => void;
+  fetchNearestShopResult: (shop_name: string) => void;
   fetchPlans: () => void;
   fetchProfile: () => void;
   locateMe: (map: React.RefObject<Map>) => void;
@@ -54,10 +56,12 @@ const DataContext = createContext<{
   fetchAppConfig: () => Promise<AppConfig | null>;
   appConfig: AppConfig | null;
   pageNumber1: number;
+  isShopSearched: boolean;
 }>({
   fetchShopsByRadius: async () => null,
   fetchDiscoverShops: async () => null,
   fetchPlans: async () => null,
+  fetchNearestShopResult: async () => null,
   fetchProfile: async () => null,
   locateMe: async () => null,
   setRegion: async () => null,
@@ -83,6 +87,7 @@ const DataContext = createContext<{
   fetchAppConfig: async () => null,
   appConfig: null,
   pageNumber1: 1,
+  isShopSearched: false,
 });
 
 export function localData() {
@@ -121,7 +126,7 @@ export function AppData({
   const [fetchingPage2, setFetchingPage2] = useState(false);
   const [fetchingPage3, setFetchingPage3] = useState(false);
   const [fetchingPage4, setFetchingPage4] = useState(false);
-
+  const [isShopSearched, setIsShopSearched] = useState(false);
   const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<
     ShopPreviewProps[] | null
   >();
@@ -208,7 +213,7 @@ export function AppData({
     try {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
-        mayShowUserSettingsDialog: true
+        mayShowUserSettingsDialog: true,
       });
       const coords = {
         latitude: location.coords.latitude,
@@ -261,71 +266,37 @@ export function AppData({
   const setDiscoverShopsPage1 = async (page: number): Promise<void> => {
     let coords = userLocation;
     if (!coords) {
-        const location = await getCurrentLocation();
-        if (location) {
-          coords = location;
-          setUserLocation(location);
-          setRegion(location);
-        }
+      const location = await getCurrentLocation();
+      if (location) {
+        coords = location;
+        setUserLocation(location);
+        setRegion(location);
+      }
     }
 
     if (coords) {
-        const currentShops = discoverShopsFilter1 || [];
-        const response = await fetchNearbyShops(coords.longitude, coords.latitude, page);
-
-        if (!response || !Array.isArray(response.value)) {
-            console.error("Expected an array of shops in response.value, but got:", response);
-            return;
-        }
-        const shops = response.value;
-
-        const discoverShopsPage1Array = [];
-        for (const shop of shops) {
-            const shopSchema: ShopPreviewProps = {
-                id: shop.id,
-                organization_id: shop.organization_id,
-                shop_id: shop.shop_id,
-                name: shop.name,
-                preview: shop.preview,
-                latitude: shop.latitude,
-                longitude: shop.longitude,
-                distance: shop.distance,
-                favorite: shop.favorite,
-                location: {
-                    city: shop.location.city,
-                    address: shop.location.address,
-                    state: shop.location.state,
-                },
-                shop_hours: shop.shop_hours,
-            };
-            discoverShopsPage1Array.push(shopSchema);
-        }
-        const updatedShops = [...currentShops, ...discoverShopsPage1Array];
-        
-        setDiscoverShopsFilter1(updatedShops);
-
-        setPageNumber1(page + 1);
-    }
-}
-
-
-const setMapPageShops = async () => {
-  let coords = userLocation;
-  if (!coords) {
-    const location = await getCurrentLocation();
-    if (location) {
-      coords = location;
-    }
-    if (coords) {
-      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
+      let currentShops = discoverShopsFilter1 || [];  
+      if(isShopSearched){
+        setDiscoverShopsFilter1(null);
+        setIsShopSearched(false);
+        currentShops = [];
+      }
+      const response = await fetchNearbyShops(
+        coords.longitude,
+        coords.latitude,
+        page
+      );
 
       if (!response || !Array.isArray(response.value)) {
-        console.error("Expected an array of shops in response.value, but got:", response);
+        console.error(
+          "Expected an array of shops in response.value, but got:",
+          response
+        );
         return;
       }
       const shops = response.value;
 
-      const radiusShopsArray = [];
+      const discoverShopsPage1Array = [];
       for (const shop of shops) {
         const shopSchema: ShopPreviewProps = {
           id: shop.id,
@@ -333,8 +304,8 @@ const setMapPageShops = async () => {
           shop_id: shop.shop_id,
           name: shop.name,
           preview: shop.preview,
-          latitude:shop.latitude,
-          longitude:shop.longitude,
+          latitude: shop.latitude,
+          longitude: shop.longitude,
           distance: shop.distance,
           favorite: shop.favorite,
           location: {
@@ -344,12 +315,63 @@ const setMapPageShops = async () => {
           },
           shop_hours: shop.shop_hours,
         };
-        radiusShopsArray.push(shopSchema);
+        discoverShopsPage1Array.push(shopSchema);
       }
-      setRadiusShops(shops);
+      const updatedShops = [...currentShops, ...discoverShopsPage1Array];
+
+      setDiscoverShopsFilter1(updatedShops);
+
+      setPageNumber1(page + 1);
     }
-  }
-}
+  };
+
+  const setMapPageShops = async () => {
+    let coords = userLocation;
+    if (!coords) {
+      const location = await getCurrentLocation();
+      if (location) {
+        coords = location;
+      }
+      if (coords) {
+        const response = await fetchRadiusShops(
+          coords.longitude,
+          coords.latitude
+        );
+
+        if (!response || !Array.isArray(response.value)) {
+          console.error(
+            "Expected an array of shops in response.value, but got:",
+            response
+          );
+          return;
+        }
+        const shops = response.value;
+
+        const radiusShopsArray = [];
+        for (const shop of shops) {
+          const shopSchema: ShopPreviewProps = {
+            id: shop.id,
+            organization_id: shop.organization_id,
+            shop_id: shop.shop_id,
+            name: shop.name,
+            preview: shop.preview,
+            latitude: shop.latitude,
+            longitude: shop.longitude,
+            distance: shop.distance,
+            favorite: shop.favorite,
+            location: {
+              city: shop.location.city,
+              address: shop.location.address,
+              state: shop.location.state,
+            },
+            shop_hours: shop.shop_hours,
+          };
+          radiusShopsArray.push(shopSchema);
+        }
+        setRadiusShops(shops);
+      }
+    }
+  };
   return (
     <DataContext.Provider
       value={{
@@ -429,10 +451,8 @@ const setMapPageShops = async () => {
             const fetchedPlans = await fetchUserPlans();
             setPlans(fetchedPlans);
             setFavoritePlans(fetchedPlans);
-          } catch (error) {
-          }
+          } catch (error) {}
           setFetchingPage3(false);
-
         },
         fetchProfile: async () => {
           const profile = await fetchUser();
@@ -466,8 +486,55 @@ const setMapPageShops = async () => {
           setAppConfig(appConfig);
           return appConfig;
         },
+        fetchNearestShopResult: async (shop_name: string) => {
+          let coords = userLocation;
+          if (!coords) {
+            const location = await getCurrentLocation();
+            if (location) {
+              coords = location;
+            }
+          }
+          if (coords) {
+            const prevShops = discoverShopsFilter1;
+            setDiscoverShopsFilter1(null);
+            const result = await fetchSearchedShop(
+              shop_name,
+              coords.longitude,
+              coords.latitude
+            );
+            setIsShopSearched(true);
+            setFetchingPage1(false);
+            setPageNumber1(1);
+            const shop = result.nearestShop;
+            if (!shop) {
+              alert("", "Invalid shop", "error");
+              setDiscoverShopsFilter1(prevShops);
+              return;
+            }
+            const shopSchema: ShopPreviewProps = {
+              id: shop.id,
+              organization_id: shop.organization_id,
+              shop_id: shop.shop_id,
+              name: shop.name,
+              preview: shop.preview,
+              latitude: shop.latitude,
+              longitude: shop.longitude,
+              distance: shop.distance,
+              favorite: shop.favorite,
+              location: {
+                city: shop.location.city,
+                address: shop.location.address,
+                state: shop.location.state,
+              },
+              shop_hours: shop.shop_hours,
+            };
+
+            setDiscoverShopsFilter1([shopSchema]);
+          }
+        },
         appConfig,
         pageNumber1,
+        isShopSearched
       }}
     >
       {children}

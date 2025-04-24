@@ -18,8 +18,8 @@ import { whtieStar } from "@/assets/images/MR-logos";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
-
+import { fetchTypedShop } from "@/APIs/fetchTypedShop";
+import { localData } from "@/app-data/appData";
 export default function TabLayout() {
   // check if iphone is new era or old era iphone
   const insets = useSafeAreaInsets();
@@ -28,6 +28,7 @@ export default function TabLayout() {
   const [searchResults, setSearchResults] = useState<
     { id: string; name: string }[]
   >([]);
+  const { fetchNearestShopResult } = localData();
 
   const handleSearch = async (text: string) => {
     setSearchText(text);
@@ -37,11 +38,11 @@ export default function TabLayout() {
       return;
     } else {
       try {
-        const results = await fetchSearchedShop(text);
+        const results = await fetchTypedShop(text);
         if (results) {
           const names = [];
           for (let result of results) {
-            names.push({id: result.id, name: result.search_name});
+            names.push({ id: result.id, name: result.search_name });
           }
           setSearchResults(names);
         } else {
@@ -55,7 +56,13 @@ export default function TabLayout() {
   };
   const handleResultClick = (result: string) => {
     setSearchText(result);
-    //Call an api to get the shops data here
+    setSearchResults([]);
+  };
+
+  const fetchSearchResult = async () => {
+    console.log("fetching nearest shop");
+    fetchNearestShopResult(searchText);
+    setSearchText("");
     setSearchResults([]);
   };
   return (
@@ -86,26 +93,27 @@ export default function TabLayout() {
                 <Text style={[styles.headerText, { color: color_pallete[2] }]}>
                   Discover
                 </Text>
-                <View style={{marginVertical:10, zIndex:15}}>
-                    <View style={styles.searchBar}>
-                        <TextInput
-                            placeholder="Search"
-                            autoCapitalize="none"
-                            keyboardType="default"
-                            onChangeText={handleSearch}
-                            value={searchText}
-                            autoCorrect={false}
-                            style={styles.searchBarText}
-                            placeholderTextColor={color_pallete[4]}
-                            // onSubmitEditing={() => fetchSearchedShop(searchText)}
-                        />
-                        <TouchableOpacity
-                            activeOpacity={1}
-                            // onPress={() => fetchSearchedShop(searchText)}
-                        >
-                            <TabBarIcon name={"search"} color={color_pallete[3]} />
-                        </TouchableOpacity>
-                    </View>
+                <View style={{ marginVertical: 10, zIndex: 15 }}>
+                  <View style={styles.searchBar}>
+                    <TextInput
+                      placeholder="Search"
+                      autoCapitalize="none"
+                      keyboardType="default"
+                      onChangeText={handleSearch}
+                      value={searchText}
+                      autoCorrect={false}
+                      style={styles.searchBarText}
+                      placeholderTextColor={color_pallete[4]}
+                      onSubmitEditing={fetchSearchResult}
+                    />
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      onPress={fetchSearchResult}
+                      disabled={searchResults.length === 0 && searchText === ""}
+                    >
+                      <TabBarIcon name={"search"} color={color_pallete[3]} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
                 {searchText && searchResults.length > 0 && (
                   <FlatList
@@ -126,7 +134,10 @@ export default function TabLayout() {
                   />
                 )}
                 {searchResults.length === 0 && searchText && (
-                  <TouchableOpacity style={styles.searchResults} activeOpacity={1}>
+                  <TouchableOpacity
+                    style={styles.searchResults}
+                    activeOpacity={1}
+                  >
                     <View style={styles.resultItem}>
                       <Text style={styles.resultText}>No shops found</Text>
                     </View>
@@ -328,7 +339,7 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor:color_pallete[10],
+    backgroundColor: color_pallete[10],
     elevation: 0,
     shadowOpacity: 0.1,
     borderBottomWidth: 2,
@@ -341,7 +352,7 @@ const styles = StyleSheet.create({
     borderBottomColor: color_pallete[2],
   },
   header2: {
-      backgroundColor: color_pallete[10],
+    backgroundColor: color_pallete[10],
     elevation: 0,
     borderBottomWidth: 2,
     borderBottomColor: color_pallete[0],
@@ -369,7 +380,7 @@ const styles = StyleSheet.create({
   searchBar: {
     display: "flex",
     flexDirection: "row",
-    position:'relative',
+    position: "relative",
     justifyContent: "space-between",
     padding: 8,
     marginHorizontal: 15,
@@ -377,7 +388,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     gap: 5,
-    backgroundColor:color_pallete[10],
+    backgroundColor: color_pallete[10],
   },
   searchBarText: {
     flex: 1,
@@ -398,12 +409,12 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     position: "absolute",
-    top:'100%',
+    top: "100%",
     left: 15,
     right: 15,
-    marginTop:-15,
+    marginTop: -15,
     maxHeight: 200,
-    backgroundColor:color_pallete[10],
+    backgroundColor: color_pallete[10],
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
     padding: 8,
