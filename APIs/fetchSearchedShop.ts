@@ -7,7 +7,7 @@ const url = apiPath + "/app/shops/nearest";
 export const fetchSearchedShop = async (shop_name: string, lon: number, lat: number) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
-  if (!shop_name) {   
+  if (!shop_name) {
     throw new Error("No shop_name defined");
   }
   if (!lon || !lat) {

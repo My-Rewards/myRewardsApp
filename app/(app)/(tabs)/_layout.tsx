@@ -60,7 +60,6 @@ export default function TabLayout() {
   };
 
   const fetchSearchResult = async () => {
-    console.log("fetching nearest shop");
     fetchNearestShopResult(searchText);
     setSearchText("");
     setSearchResults([]);

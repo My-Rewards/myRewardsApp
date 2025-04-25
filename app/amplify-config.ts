@@ -28,3 +28,5 @@ export const amplifyConfiguration:ResourcesConfig = {
     }
   }
 }
+
+export default amplifyConfiguration;

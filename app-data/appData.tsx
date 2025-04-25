@@ -1,10 +1,3 @@
-import {
-  mockDiscoverShops,
-  mockFavoriteShops,
-  mockPopularShops,
-  // mockProfile,
-  mockShopRadius,
-} from "@/APIs/api";
 import React, {
   useContext,
   createContext,
@@ -28,14 +21,14 @@ import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
-import { fetchUserPlans } from "@/APIs/fetchUserPlans";
 import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
+import {fetchUserLikedPlans, fetchUserPlans} from "@/APIs/fetchUserPlans";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
-  fetchDiscoverShops: (filterOption: number, pagination: number) => void;
+  fetchDiscoverShops: (filterOption: number, refresh: boolean) => void;
   fetchNearestShopResult: (shop_name: string) => void;
-  fetchPlans: () => void;
+  fetchPlans: (filterOption: number, refresh: boolean) => void;
   fetchProfile: () => void;
   locateMe: (map: React.RefObject<Map>) => void;
   setRegion: (location: regionProp) => void;
@@ -55,7 +48,6 @@ const DataContext = createContext<{
   userLocation: regionProp | null;
   fetchAppConfig: () => Promise<AppConfig | null>;
   appConfig: AppConfig | null;
-  pageNumber1: number;
   isShopSearched: boolean;
 }>({
   fetchShopsByRadius: async () => null,
@@ -86,7 +78,6 @@ const DataContext = createContext<{
   userLocation: null,
   fetchAppConfig: async () => null,
   appConfig: null,
-  pageNumber1: 1,
   isShopSearched: false,
 });
 
@@ -102,7 +93,6 @@ export function localData() {
 
 export function AppData({
   children,
-  userSub,
 }: PropsWithChildren & { userSub: string }) {
   const { alert } = useProps();
   const [radiusShops, setRadiusShops] = useState<ShopPreviewProps[] | null>();
@@ -113,7 +103,14 @@ export function AppData({
   const [favoritePlans, setFavoritePlans] = useState<
     PreviewPlanProp[] | null
   >();
-  const [pageNumber1, setPageNumber1] = useState(1);
+
+  // Pagination attributes
+  const [discoverPage1, setDiscoverPage1] = useState(1);
+  const [discoverPage2, setDiscoverPage2] = useState(1);
+  const [discoverPage3, setDiscoverPage3] = useState(1);
+
+  const [plansPage1, setPlansPage1] = useState(1);
+  const [plansPage2, setPlansPage2] = useState(1);
 
   const [region, setRegion] = useState({
     latitude: 28.5384,
@@ -127,6 +124,7 @@ export function AppData({
   const [fetchingPage3, setFetchingPage3] = useState(false);
   const [fetchingPage4, setFetchingPage4] = useState(false);
   const [isShopSearched, setIsShopSearched] = useState(false);
+
   const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<
     ShopPreviewProps[] | null
   >();
@@ -137,76 +135,55 @@ export function AppData({
     ShopPreviewProps[] | null
   >();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!userLocation) {
-          await getCurrentLocation();
-        }
-
-        if (!profile) {
-          const fetchedProfile = await fetchUser();
-          setProfile(fetchedProfile);
-          setFetchingPage4(false);
-        }
-
-        if (!appConfig) {
-          // const appConfig = await fetchAppConfig();
-          // if (!appConfig) {
-          //   return null;
-          // }
-          setAppConfig(appConfig);
-        }
-
-        if (
-          !(
-            discoverShopsFilter1 ||
-            discoverShopsFilter2 ||
-            discoverShopsFilter3
-          )
-        ) {
-          setFetchingPage2(true);
-          try {
-            // Replace mock API with actual API
-            // set discover and maps to same value because theyre identical upon load until we figure more optimal method
-            // const shops1 = await mockDiscoverShops(userSub, region)
-            // setDiscoverShopsFilter1(shops1);
-            // setRadiusShops(shops1);
-            await setDiscoverShopsPage1(pageNumber1);
-            await setMapPageShops();
-            const shops2 = await mockPopularShops(userSub, 0, region);
-            setDiscoverShopsFilter2(shops2);
-            const shops3 = await mockFavoriteShops(userSub, 0, region);
-            setDiscoverShopsFilter3(shops3);
-          } catch (error) {
-            console.error("Error fetching discover shops:", error);
-          } finally {
-            setFetchingPage2(false);
-          }
-        }
-
-        if (!plans) {
-          setFetchingPage4(true);
-          try {
-            // Replace mock API with actual API
-            const plansData = await fetchUserPlans();
-            setPlans(plansData);
-
-            // find favorites and set it
-            setFavoritePlans([]);
-          } catch (error) {
-            console.error("Error fetching plans:", error);
-          } finally {
-            setFetchingPage4(false);
-          }
-        }
-      } catch (error) {
-        console.error("Error in fetchData sequence:", error);
+  const bootstrap = async () => {
+    try {
+      if (!profile) {
+        const fetchedProfile = await fetchUser();
+        setProfile(fetchedProfile);
+        setFetchingPage4(false);
       }
-    };
 
-    fetchData(); // Call the async function
-  }, []);
+      if (!appConfig) {
+        setAppConfig(appConfig);
+      }
+
+      if (
+          !(
+              discoverShopsFilter1 ||
+              discoverShopsFilter2 ||
+              discoverShopsFilter3
+          )
+      ) {
+        setFetchingPage2(true);
+
+        await fetchDiscoverPage1();
+        await fetchDiscoverPage2();
+        await fetchDiscoverPage3();
+        await setMapPageShops();
+
+        setFetchingPage2(false);
+      }
+
+      if (!plans) {
+        setFetchingPage4(true);
+
+        await fetchPlansPage1();
+        await fetchPlansPage2();
+
+        setFetchingPage4(false);
+      }
+    } catch (error) {
+      console.error("Error in fetchData sequence:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCurrentLocation().catch(console.error)
+  }, [])
+
+  useEffect(() => {
+    if(userLocation) bootstrap();
+  }, [userLocation]);
 
   async function getCurrentLocation() {
     setFetchingPage2(true);
@@ -215,25 +192,20 @@ export function AppData({
         accuracy: Location.Accuracy.High,
         mayShowUserSettingsDialog: true,
       });
-      const coords = {
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      });
+
+      return {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       };
-      setUserLocation({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      });
-      setRegion({
-        latitude: coords.longitude,
-        longitude: coords.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      });
-      return coords;
+
     } catch (error) {
       const { status } = await Location.getForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -249,7 +221,8 @@ export function AppData({
   }
 
   async function rebaseUserLocation(map: React.RefObject<Map>) {
-    const coords = await getCurrentLocation();
+    const coords = userLocation ? userLocation : await getCurrentLocation()
+
     if (coords && map.current) {
       map.current.animateToRegion(
         {
@@ -261,21 +234,17 @@ export function AppData({
         300
       );
     }
+
+    await getCurrentLocation();
   }
 
-  const setDiscoverShopsPage1 = async (page: number): Promise<void> => {
-    let coords = userLocation;
-    if (!coords) {
-      const location = await getCurrentLocation();
-      if (location) {
-        coords = location;
-        setUserLocation(location);
-        setRegion(location);
-      }
-    }
+  // Discover Shops requests
+  const fetchDiscoverPage1 = async (page: number = discoverPage1): Promise<void> => {
+    const coords = userLocation ? userLocation : await getCurrentLocation()
 
     if (coords) {
-      let currentShops = discoverShopsFilter1 || [];  
+      let currentShops = page>1? discoverShopsFilter1 || [] : [];
+
       if(isShopSearched){
         setDiscoverShopsFilter1(null);
         setIsShopSearched(false);
@@ -287,154 +256,145 @@ export function AppData({
         page
       );
 
+      if (!response || !Array.isArray(response.value)) return;
+
+      const shops = response.value;
+      const updatedShops = [...currentShops, ...shops];
+
+      setDiscoverShopsFilter1(updatedShops);
+      setDiscoverPage1(response.pagination.nextPage || page);
+    }
+  };
+
+  const fetchDiscoverPage2 = async (page: number = discoverPage2): Promise<void> => {
+    const coords = userLocation ? userLocation : await getCurrentLocation()
+
+    if (coords) {
+      let currentShops = page>1? discoverShopsFilter1 || [] : [];
+
+      if(isShopSearched){
+        setDiscoverShopsFilter2(null);
+        setIsShopSearched(false);
+        currentShops = [];
+      }
+      const response = await fetchNearbyShops(
+          coords.longitude,
+          coords.latitude,
+          page
+      );
+
+      if (!response || !Array.isArray(response.value)) return;
+
+      const shops = response.value;
+      const updatedShops = [...currentShops, ...shops];
+
+      setDiscoverShopsFilter2(updatedShops);
+      setDiscoverPage2(response.pagination.nextPage || page);
+    }
+  };
+
+  const fetchDiscoverPage3 = async (page: number = discoverPage3): Promise<void> => {
+    let coords = userLocation ? userLocation : await getCurrentLocation()
+
+    if (coords) {
+      let currentShops = page>1? discoverShopsFilter1 || [] : [];
+
+      if(isShopSearched){
+        setDiscoverShopsFilter3(null);
+        setIsShopSearched(false);
+        currentShops = [];
+      }
+      const response = await fetchNearbyShops(
+          coords.longitude,
+          coords.latitude,
+          page
+      );
+
+      if (!response || !Array.isArray(response.value)) return;
+
+      const shops = response.value;
+      const updatedShops = [...currentShops, ...shops];
+
+      setDiscoverShopsFilter3(updatedShops);
+      setDiscoverPage3(response.pagination.nextPage || page);
+    }
+  };
+
+  // Fetch Map Shops
+  const setMapPageShops = async () => {
+    let coords = userLocation ? userLocation : await getCurrentLocation()
+
+    if (coords) {
+      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
+
       if (!response || !Array.isArray(response.value)) {
-        console.error(
-          "Expected an array of shops in response.value, but got:",
-          response
-        );
+        console.error("Expected an array of shops in response.value, but got:", response);
         return;
       }
       const shops = response.value;
 
-      const discoverShopsPage1Array = [];
-      for (const shop of shops) {
-        const shopSchema: ShopPreviewProps = {
-          id: shop.id,
-          organization_id: shop.organization_id,
-          shop_id: shop.shop_id,
-          name: shop.name,
-          preview: shop.preview,
-          latitude: shop.latitude,
-          longitude: shop.longitude,
-          distance: shop.distance,
-          favorite: shop.favorite,
-          location: {
-            city: shop.location.city,
-            address: shop.location.address,
-            state: shop.location.state,
-          },
-          shop_hours: shop.shop_hours,
-        };
-        discoverShopsPage1Array.push(shopSchema);
-      }
-      const updatedShops = [...currentShops, ...discoverShopsPage1Array];
-
-      setDiscoverShopsFilter1(updatedShops);
-
-      setPageNumber1(page + 1);
+      setRadiusShops(shops);
     }
-  };
+}
 
-  const setMapPageShops = async () => {
-    let coords = userLocation;
-    if (!coords) {
-      const location = await getCurrentLocation();
-      if (location) {
-        coords = location;
-      }
-      if (coords) {
-        const response = await fetchRadiusShops(
-          coords.longitude,
-          coords.latitude
-        );
+  // Active plans Request
+  const fetchPlansPage1 = async (page: number = plansPage1): Promise<void> => {
+    let currPlans = page>1? plans || [] : [];
 
-        if (!response || !Array.isArray(response.value)) {
-          console.error(
-            "Expected an array of shops in response.value, but got:",
-            response
-          );
-          return;
-        }
-        const shops = response.value;
+    const response = await fetchUserPlans(
+        userLocation?.latitude,
+        userLocation?.longitude,
+        10,
+        page
+    );
 
-        const radiusShopsArray = [];
-        for (const shop of shops) {
-          const shopSchema: ShopPreviewProps = {
-            id: shop.id,
-            organization_id: shop.organization_id,
-            shop_id: shop.shop_id,
-            name: shop.name,
-            preview: shop.preview,
-            latitude: shop.latitude,
-            longitude: shop.longitude,
-            distance: shop.distance,
-            favorite: shop.favorite,
-            location: {
-              city: shop.location.city,
-              address: shop.location.address,
-              state: shop.location.state,
-            },
-            shop_hours: shop.shop_hours,
-          };
-          radiusShopsArray.push(shopSchema);
-        }
-        setRadiusShops(shops);
-      }
-    }
-  };
+    const updatedShops = [...currPlans, ...response.value];
+
+    setPlans(updatedShops)
+    setPlansPage1(response.pagination.nextPage || page)
+  }
+
+  const fetchPlansPage2 = async (page: number = plansPage2): Promise<void> => {
+    let currFavPlans = page>1? favoritePlans || [] : [];
+
+    const response = await fetchUserLikedPlans(
+        userLocation?.latitude,
+        userLocation?.longitude,
+        10,
+        page
+    );
+
+    const updatedShops = [...currFavPlans, ...response.value];
+
+    setFavoritePlans(updatedShops)
+    setPlansPage2(response.pagination.nextPage || page)
+  }
+
   return (
     <DataContext.Provider
       value={{
         fetchShopsByRadius: async (currRegion: regionProp) => {
-          // Fetch + Update shops radiusShops given location
-          // if(currRegion.latitudeDelta > furthestFetch.latitudeDelta*1.2
-          //   && currRegion.longitudeDelta > furthestFetch.longitudeDelta*1.2
-          //   && !fetchingPage2){
-          //   setFetchingPage2(true)
-          //   setFurthestFetch(currRegion)
-          //   console.log(currRegion)
-          //   setTimeout(()=>{
-          //     setFetchingPage2(false)
-          //   },2000)
-          // }
           await setMapPageShops();
         },
         fetchDiscoverShops: async (
           filterOption: number,
-          pagination: number
+          refresh: boolean
         ): Promise<void> => {
-          // Fetch + Update shops DiscoverShops given closet/popularity
-          // You NEED to filter by distance regardless (a shop 300 miles away is useless to a user)
+
           setFetchingPage1(true);
+
           try {
             switch (filterOption) {
               case 0:
-                // const shop1 = await mockDiscoverShops(userSub, region)
-                // setDiscoverShopsFilter1(shop1)
-                // setFetchingPage1(false)
-                await setDiscoverShopsPage1(pagination);
+                await fetchDiscoverPage1(refresh? 1 : undefined);
                 setFetchingPage1(false);
                 break;
               case 1:
-                const shops2 = await mockPopularShops(
-                  userSub,
-                  pagination,
-                  region
-                );
-                if (pagination > 0) {
-                  setDiscoverShopsFilter2((prevShops) => [
-                    ...(prevShops || []),
-                    ...shops2,
-                  ]);
-                } else {
-                  setDiscoverShopsFilter2(shops2);
-                }
+                await fetchDiscoverPage2(refresh? 1 : undefined);
                 setFetchingPage1(false);
                 break;
               case 2:
-                const shop3 = await mockFavoriteShops(
-                  userSub,
-                  pagination,
-                  region
-                );
-                if (pagination > 0) {
-                  setDiscoverShopsFilter3((prevShops) => [
-                    ...(prevShops || []),
-                    ...shop3,
-                  ]);
-                } else {
-                  setDiscoverShopsFilter3(shop3);
-                }
+                await fetchDiscoverPage3(refresh? 1 : undefined);
                 setFetchingPage1(false);
                 break;
               default:
@@ -443,17 +403,29 @@ export function AppData({
           } catch (error) {
             console.error("Error fetching shops:", error);
           }
+          setFetchingPage1(false);
         },
-        fetchPlans: async () => {
+        fetchPlans: async (filterOption:number, refresh:boolean): Promise<void> => {
           setFetchingPage3(true);
-
           try {
-            const fetchedPlans = await fetchUserPlans();
-            setPlans(fetchedPlans);
-            setFavoritePlans(fetchedPlans);
-          } catch (error) {}
+            switch (filterOption) {
+              case 0:
+                await fetchPlansPage1(refresh? 1 : undefined);
+                setFetchingPage1(false);
+                break;
+              case 1:
+                await fetchPlansPage2(refresh? 1 : undefined);
+                setFetchingPage1(false);
+                break;
+              default:
+                throw new Error("Invalid filter option");
+            }
+          } catch (error) {
+            console.error("Error fetching shops:", error);
+          }
           setFetchingPage3(false);
         },
+
         fetchProfile: async () => {
           const profile = await fetchUser();
           setProfile(profile);
@@ -479,10 +451,6 @@ export function AppData({
         isPage3Loading: fetchingPage3,
         isPage4Loading: fetchingPage4,
         fetchAppConfig: async () => {
-          // const appConfig = await fetchAppConfig();
-          // if (!appConfig) {
-          //   return null;
-          // }
           setAppConfig(appConfig);
           return appConfig;
         },
@@ -504,36 +472,17 @@ export function AppData({
             );
             setIsShopSearched(true);
             setFetchingPage1(false);
-            setPageNumber1(1);
+
             const shop = result.nearestShop;
             if (!shop) {
               alert("", "Invalid shop", "error");
               setDiscoverShopsFilter1(prevShops);
               return;
             }
-            const shopSchema: ShopPreviewProps = {
-              id: shop.id,
-              organization_id: shop.organization_id,
-              shop_id: shop.shop_id,
-              name: shop.name,
-              preview: shop.preview,
-              latitude: shop.latitude,
-              longitude: shop.longitude,
-              distance: shop.distance,
-              favorite: shop.favorite,
-              location: {
-                city: shop.location.city,
-                address: shop.location.address,
-                state: shop.location.state,
-              },
-              shop_hours: shop.shop_hours,
-            };
-
-            setDiscoverShopsFilter1([shopSchema]);
+            setDiscoverShopsFilter1([shop]);
           }
         },
         appConfig,
-        pageNumber1,
         isShopSearched
       }}
     >

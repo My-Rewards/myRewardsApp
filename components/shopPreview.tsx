@@ -43,6 +43,7 @@ import {
 import { useProps } from "@/app/LoadingProp/propsProvider";
 import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
 import {PlanLoadingState, RewardsLoadingState} from "@/components/navigation/loadingState";
+import {toggleLike} from "@/APIs/updateOrgLike";
 
 const { width } = Dimensions.get("window");
 
@@ -58,13 +59,6 @@ type PreviewPropShops = {
   type: number;
 };
 
-type PreviewPropPlans = {
-  orgId: string;
-  isExpanded: boolean;
-  setExpansion: Dispatch<SetStateAction<boolean>> | undefined;
-  type: number;
-};
-
 type OpenMapArgs = {
   lat: string | number;
   lng: string | number;
@@ -72,8 +66,8 @@ type OpenMapArgs = {
 };
 
 export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
-  const { userLocation } = localData();
   const shopStatus = getShopStatus(selectedPin.shop_hours);
+
   return (
     <View style={[type == 0 ? styles.mapsPreview : styles.discoverPreview]}>
       <View style={[type == 0 ? styles.modalContent1 : styles.modalContent2]}>
@@ -204,8 +198,8 @@ export const ExpandedShop = ({
   type,
   setExpansion,
 }: PreviewPropShops) => {
-  const { alert } = useProps();
   const { profile, userLocation } = localData();
+  const [busy, setBusy] = useState(false);
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
@@ -366,12 +360,15 @@ export const ExpandedShop = ({
     }
   };
 
-  const handleLike = () => {
-    if (!liked) {
-      alert("Saved to favorites! ", "", "success");
-    }
-    setLiked(!liked);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const handleLike = async () => {
+      if (busy || !shopDetails?.org_id) return;
+      setBusy(true);
+      setLiked(!liked);
+
+      const { status } = await toggleLike(shopDetails.org_id);
+      if(status != !liked) setLiked(status);
+
+      setBusy(false);
   };
 
   return (
@@ -642,7 +639,7 @@ export const ExpandedShop = ({
                     </View>
                     <Text style={styles.text1}>{shopDetails.name}</Text>
                   </View>
-                  <TouchableOpacity onPress={handleLike}>
+                  <TouchableOpacity onPress={handleLike} disabled={busy}>
                     <TabBarIcon
                       color={color_pallete[2]}
                       name={liked ? "heart" : "heart-outline"}

@@ -23,9 +23,7 @@ const { width } = Dimensions.get("window");
 
 type PlansPreviewProps = {
   plansData: PreviewPlanProp[] | null | undefined;
-  isLoading: boolean;
-  openShop: (shop_id: string) => void;
-  fetchPlans: (filterOption: number) => void;
+  filterOption:number,
 };
 
 type PlansVisitMap = {
@@ -37,9 +35,19 @@ type PlansVisitMap = {
 };
 
 export default function plansPage() {
+  const { plans, favoritePlans, isPage3Loading } = localData();
+
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { plans, favoritePlans, fetchPlans, isPage3Loading } = localData();
   const [filterOption, setFilterOption] = useState(0);
+
+  const sendShopOption = () => {
+    switch (filterOption) {
+      case 0:
+        return plans;
+      case 1:
+        return favoritePlans;
+    }
+  };
 
   const handlePress = (filterSelection: number) => {
     Animated.timing(slideAnim, {
@@ -55,27 +63,20 @@ export default function plansPage() {
     });
   };
 
-  const openShopPage = (org_id: string) => {
-    router.push({
-      pathname: "/shopPage",
-      params: { parentPage: "Plans", org_id:org_id },
-    });
-  };
-
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
-      <PlansPreview
-        plansData={filterOption === 0 ? plans : favoritePlans}
-        isLoading={isPage3Loading}
-        openShop={openShopPage}
-        fetchPlans={fetchPlans}
-      />
+      <View style={{flex:1, margin:'auto'}}>
+        <PlansPreview
+            plansData={sendShopOption()}
+            filterOption={filterOption}
+        />
+      </View>
     </View>
   );
 }
 
-const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
+const FilterBar = (({ slideAnim, handlePress }: any) => {
   return (
     <View style={styles.filterBar}>
       <Animated.View
@@ -97,29 +98,57 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => {
   );
 });
 
-const PlansPreview = React.memo(
-  ({ plansData, isLoading, openShop, fetchPlans }: PlansPreviewProps) => {
-    const [refreshing, setRefreshing] = useState(false);
+const PlansPreview = (
+  ({ plansData, filterOption,  }: PlansPreviewProps) => {
+    const { fetchPlans, isPage3Loading } = localData();
 
-    const onRefresh = () => {
-      fetchPlans(0);
+    const handleScroll = async (event: any) => {
+      const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+      if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage3Loading && contentOffset.y>0) {
+        fetchPlans(filterOption, false)
+      }
+    };
+
+    const openShopPage = (shop_id: string) => {
+      router.push({
+        pathname: "/shopPage",
+        params: { parentPage: "Plans", shop_id:shop_id },
+      });
     };
 
     if (plansData) {
       return (
-        <View style={{ flex: 1, width: "100%" }}>
-          {plansData && plansData.length !== 0 ? (
+        <View style={{ flex: 1, width: "100%", height: "100%", zIndex: 100 }}>
             <FlatList
               data={plansData}
+              extraData={plansData}
               horizontal={false}
-              renderItem={({ item }: { item: PreviewPlanProp }) => (
-                <TouchableOpacity
-                  onPress={() => openShop(item.org_id)}
-                  key={item.id}
-                  style={styles.card}
-                >
-                  <PlanPreviewCard plan={item} />
-                </TouchableOpacity>
+              renderItem={({ item }) => (
+                <View key={item.id}>
+                  <TouchableOpacity
+                      onPress={() => openShopPage(item.shop_id)}
+                      style={styles.card}
+                  >
+                    <PlanPreviewCard plan={item} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              ListEmptyComponent={() => (
+                  <View style={styles.empty}>
+                    <SvgXml
+                        xml={mediumLogo}
+                        height={width / 4}
+                        width={width * 0.7}
+                        color={color_pallete[1]}
+                    />
+                    <Text style={styles.txt1}>
+                      { filterOption == 0 ?
+                          'Start earning rewards today by creating your first custom plan!'
+                      :
+                          'Favorite a Shop for easy access later'
+                      }
+                    </Text>
+                  </View>
               )}
               showsVerticalScrollIndicator={false}
               style={{ flex: 1, width: "100%", height: "100%", paddingTop: 10 }}
@@ -128,40 +157,22 @@ const PlansPreview = React.memo(
               maxToRenderPerBatch={10}
               keyExtractor={(item) => item.id}
               removeClippedSubviews={false}
-              refreshing={isLoading}
-              onRefresh={() => {
-                onRefresh();
+              refreshing={isPage3Loading}
+              onRefresh={()=> {
+                fetchPlans(filterOption, true)
               }}
               windowSize={2}
               ListFooterComponent={() => (
+                filterOption == 0 &&
                 <TouchableOpacity
-                  style={styles.discoverButton}
+                  style={plansData?.length>0 ? styles.discoverButton:styles.discoverButton2}
                   onPress={() => router.navigate("/")}
                 >
                   <Text style={styles.btnText}>discover more</Text>
                 </TouchableOpacity>
               )}
+              onScrollEndDrag={handleScroll}
             />
-          ) : (
-            <View style={styles.empty}>
-              <SvgXml
-                xml={mediumLogo}
-                height={width / 4}
-                width={width * 0.7}
-                color={color_pallete[1]}
-              />
-              <Text style={styles.txt1}>
-                {" "}
-                Start earning rewards today by creating your first custom plan!{" "}
-              </Text>
-              <TouchableOpacity
-                style={styles.discoverButton2}
-                onPress={() => router.navigate("/")}
-              >
-                <Text style={styles.btnText2}>discover more</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
       );
     } else {
@@ -179,7 +190,6 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
   const [expenditurePlan, setExpenditurePlan] = useState<ExpentiureProps>();
   const [parentWidth, setParentWidth] = useState<number | null>(null);
   const [checkpoints, setCheckPoints] = useState<number[] | null>(null);
-  const [liked, setLiked] = useState<boolean>(plan.favorite);
   const tierStep = plan.reward_plan.rewards_loyalty?.tierStep||0
 
   useEffect(() => {
@@ -324,9 +334,9 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
           <View style={previewPlanStyle.orgContainer}>
             <Text style={previewPlanStyle.orgText}>{plan.name}</Text>
             <View>
-              {liked ? (
+              {plan.favorite && (
                 <Ionicons name="heart" color={color_pallete[2]} size={25} />
-              ) : null}
+              )}
             </View>
           </View>
           {milestonePlan && (
@@ -455,6 +465,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: color_pallete[3],
     width: "80%",
+    marginHorizontal:'auto',
     padding: 10,
   },
   btnText2: {
@@ -468,8 +479,9 @@ const styles = StyleSheet.create({
     color: color_pallete[2],
     fontFamily: "Avenir Next",
     fontWeight: "600",
+    flexWrap: "wrap",
     textAlign: "center",
-    width: "70%",
+    width: "80%",
     marginBottom: "8%",
   },
   card: {

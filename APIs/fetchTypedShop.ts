@@ -30,8 +30,9 @@ export const fetchTypedShop = async (shop: string) => {
           q: shop,
         }
       });
-      console.log(JSON.stringify(data));
+
       return data;
+
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.response?.data || error.message);

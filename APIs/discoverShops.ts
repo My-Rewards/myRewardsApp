@@ -30,7 +30,9 @@ export const fetchNearbyShops = async (longitude: number | undefined, latitude: 
             limit: 4,
         }
       });
+
       return data;
+
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.response?.data || error.message);
