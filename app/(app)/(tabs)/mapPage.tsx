@@ -213,7 +213,7 @@ export default function mapPage() {
     },
   });
 
-  function handleMapUpdate(region: regionProp) {
+    function handleMapUpdate(region: regionProp) {
     fetchShopsByRadius(region);
   }
 
@@ -427,5 +427,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     padding: 10,
     textAlign: "center",
-  }
+},
 });

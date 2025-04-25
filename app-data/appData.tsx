@@ -240,6 +240,8 @@ export function AppData({
 
   // Discover Shops requests
   const fetchDiscoverPage1 = async (page: number = discoverPage1): Promise<void> => {
+    if(page === -1) return;
+
     const coords = userLocation ? userLocation : await getCurrentLocation()
 
     if (coords) {
@@ -262,7 +264,11 @@ export function AppData({
       const updatedShops = [...currentShops, ...shops];
 
       setDiscoverShopsFilter1(updatedShops);
-      setDiscoverPage1(response.pagination.nextPage || page);
+      if(response.pagination.hasMore) {
+        setDiscoverPage1(response.pagination.nextPage);
+      } else {
+        setDiscoverPage1(-1);
+      }
     }
   };
 
@@ -322,10 +328,9 @@ export function AppData({
 
   // Fetch Map Shops
   const setMapPageShops = async () => {
-    let coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
+    if (region) {
+      //console.log(region.longitude, region.latitude);
+      const response = await fetchRadiusShops(region.longitude, region.latitude);
 
       if (!response || !Array.isArray(response.value)) {
         console.error("Expected an array of shops in response.value, but got:", response);
@@ -374,6 +379,7 @@ export function AppData({
     <DataContext.Provider
       value={{
         fetchShopsByRadius: async (currRegion: regionProp) => {
+          setRegion(currRegion);
           await setMapPageShops();
         },
         fetchDiscoverShops: async (
