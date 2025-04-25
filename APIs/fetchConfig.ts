@@ -35,7 +35,6 @@ export const fetchAppConfig = async() => {
 
         return JSON.parse(new TextDecoder().decode(config.Configuration));
     } catch (e) {
-        console.log(`Error fetching AppConfig: ${e}`)
         return null;
     }
 }

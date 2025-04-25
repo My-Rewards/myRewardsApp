@@ -7,8 +7,10 @@ import { PropsProvider } from "./LoadingProp/propsProvider";
 import { StatusBar } from "expo-status-bar";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as SplashScreen from 'expo-splash-screen';
 
-console.warn = () => {};
+SplashScreen.preventAutoHideAsync();
+
 Amplify.configure(amplifyConfiguration);
 ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
 

@@ -26,7 +26,6 @@ export default function index() {
     discoverShopsFilter1,
     discoverShopsFilter2,
     discoverShopsFilter3,
-    pageNumber1,
   } = localData();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -66,14 +65,11 @@ export default function index() {
     }
   };
 
-  // TBD on wheter/when this will be implemented
-
   const loadMoreData = async () => {
     if (!loadingMore) {
       try {
-        console.log("Loading more data...");
         setLoadingMore(true);
-        fetchDiscoverShops(savedFilterSelection, pageNumber1);
+        fetchDiscoverShops(savedFilterSelection, false);
       } catch (error) {
         console.error("Error fetching more shops:", error);
       } finally {
@@ -81,7 +77,6 @@ export default function index() {
       }
     }
   };
-
 
   return (
     <View style={styles.page}>
@@ -137,7 +132,7 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
   </View>
 ));
 
-const ShopPreviews = React.memo(
+const ShopPreviews = (
   ({
     discoverShops,
     filterSelection,
@@ -149,17 +144,15 @@ const ShopPreviews = React.memo(
     loadMoreData: () => Promise<void>;
     loadingMore: boolean;
   }) => {
-    // loadMoreData:() => Promise<void>
 
     const { isPage1Loading, fetchDiscoverShops } = localData();
 
     const handleScroll = async (event: any) => {
       const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
       if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
-        loadMoreData();
+        await loadMoreData();
       }
     };
-
 
     const openShopPage = (shop_id: string) => {
       router.push({
@@ -173,9 +166,10 @@ const ShopPreviews = React.memo(
         <View style={{ flex: 1, width: "100%", height: "100%", zIndex: 100 }}>
           <FlatList
             data={discoverShops}
+            extraData={discoverShops}
             horizontal={false}
             renderItem={({ item }) => (
-              <View key={item.id} style={{ marginHorizontal: 15 }}>
+              <View key={item.shop_id} style={{ marginHorizontal: 15 }}>
                 <TouchableOpacity onPress={() => openShopPage(item.shop_id)}>
                   <ShopPreview selectedPin={item} type={1} />
                 </TouchableOpacity>
@@ -186,11 +180,11 @@ const ShopPreviews = React.memo(
             scrollEventThrottle={20}
             initialNumToRender={10}
             maxToRenderPerBatch={10}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.shop_id}
             removeClippedSubviews={false}
             refreshing={isPage1Loading}
             onRefresh={() => {
-              fetchDiscoverShops(filterSelection, 1);
+              fetchDiscoverShops(filterSelection, true);
             }}
             windowSize={2}
             onScrollEndDrag={handleScroll}

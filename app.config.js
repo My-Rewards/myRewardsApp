@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 export default () => {
   const isProd = process.env.APP_ENV == 'prod';
@@ -27,10 +27,26 @@ export default () => {
           "initialOrientation": "DEFAULT"
         }
       ],
-      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fffbf6",
+          "image": './assets/images/logo-orange.png',
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow MyRewards to use your location.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      "expo-router"
     ],
     ios: {
-      bundleIdentifier: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
+      bundleIdentifier: 'com.myrewards.app',
       icon: './assets/images/MyRewardsLogo1.png',
       requireFullScreen: true,
       infoPlist: {
@@ -39,7 +55,7 @@ export default () => {
           "fetch",
           "remote-notification"
         ],
-        "NSLocationWhenInUseUsageDescription": "MyRewards needs access to you location when using the app.",
+        "NSLocationWhenInUseUsageDescription": "This app requires access to your location when open.",
         "LSApplicationQueriesSchemes": ["tel"],
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationDefaultAccuracyReduced": false

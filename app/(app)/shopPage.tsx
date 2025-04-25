@@ -42,7 +42,7 @@ export default function shopPage() {
   return (
     <View style={{ flex: 1 }}>
       <View>
-        <SafeAreaView style={{ backgroundColor: 'whitesmoke' }}/>
+        <SafeAreaView style={{ backgroundColor: color_pallete[10] }}/>
         <View style={[styles.header, { paddingBottom: 5 }]}>
           <SafeAreaView />
           <TouchableOpacity

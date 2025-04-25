@@ -157,8 +157,8 @@ export default function mapPage() {
           {
             latitude: radiusShops[newPos].latitude,
             longitude: radiusShops[newPos].longitude,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta,
+            latitudeDelta: 0.05,
+            longitudeDelta:0.05,
           },
           300
         );
@@ -268,19 +268,19 @@ export default function mapPage() {
                 longitude: shop.longitude,
               }}
               onPress={() => openModal(shop, index)}
-              key={shop.id}
+              key={shop.shop_id}
             >
               <View style={styles.marker}>
                 <View
                   style={
-                    selectedPin?.id == shop.id
+                    selectedPin?.shop_id == shop.shop_id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      selectedPin?.id == shop.id ? color_pallete[1] : "white"
+                      selectedPin?.shop_id == shop.shop_id ? color_pallete[1] : "white"
                     }
                     xml={handStar}
                     width="62%"
@@ -316,7 +316,7 @@ export default function mapPage() {
           data={radiusShops}
           horizontal
           style={{ backgroundColor: "transparent" }}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.shop_id.toString()}
           renderItem={({ item }) => (
             <ShopPreview key={item.id} selectedPin={item} type={0} />
           )}

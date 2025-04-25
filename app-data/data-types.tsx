@@ -12,8 +12,7 @@ export interface ShopHour {
 }
 
 export interface ShopPreviewProps {
-  id: string; 
-  organization_id: string; 
+  org_id: string;
   shop_id: string;
   preview:string;
   name:string;
@@ -38,7 +37,7 @@ export interface OrganizationProps{
 
 export interface shop {
   shop_id: string; 
-  organization_id: string; 
+  org_id: string;
   name:string;
   banner: string;
   logo:string;
@@ -104,7 +103,7 @@ export interface Plan{
   reward_plan:RewardSystem,
   visits:number,
   points:number,
-  organization_id:string
+  org_id:string
   rl_active:boolean,
   rm_active:boolean,
   firstPlan:boolean,
@@ -114,6 +113,7 @@ export interface Plan{
 
 export interface PlanProps{
   id:string,
+  shop_id:string;
   reward_plan:RewardSystem,
   visits:number,
   points:number,
