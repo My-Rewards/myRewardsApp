@@ -26,7 +26,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 const { width } = Dimensions.get("window");
 
 export default function mapPage() {
-  const { radiusShops, region, locateMe, fetchShopsByRadius } = localData();
+  const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading } = localData();
   const [containerHeight, setContainerHeight] = useState<number>(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
@@ -214,6 +214,9 @@ export default function mapPage() {
   });
 
     function handleMapUpdate(region: regionProp) {
+    if (isPage2Loading) {
+      return;
+    }
     fetchShopsByRadius(region);
   }
 

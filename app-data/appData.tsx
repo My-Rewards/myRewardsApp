@@ -329,9 +329,9 @@ export function AppData({
   // Fetch Map Shops
   const setMapPageShops = async () => {
     if (region) {
-      //console.log(region.longitude, region.latitude);
+      setFetchingPage2(true);
       const response = await fetchRadiusShops(region.longitude, region.latitude);
-
+      setFetchingPage2(false);
       if (!response || !Array.isArray(response.value)) {
         console.error("Expected an array of shops in response.value, but got:", response);
         return;
