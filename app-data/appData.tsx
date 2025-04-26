@@ -112,11 +112,11 @@ export function AppData({
   const [plansPage1, setPlansPage1] = useState(1);
   const [plansPage2, setPlansPage2] = useState(1);
 
-  const [region, setRegion] = useState({
+  const [region, setRegion] = useState<regionProp>({
     latitude: 28.5384,
     longitude: -81.3789,
-    latitudeDelta: 0.005,
-    longitudeDelta: 0.005,
+    latitudeDelta: userLocation?.latitudeDelta || 0.008,
+    longitudeDelta: userLocation?.longitudeDelta || 0.008,
   });
 
   const [fetchingPage1, setFetchingPage1] = useState(false);
@@ -193,6 +193,12 @@ export function AppData({
         mayShowUserSettingsDialog: true,
       });
       setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      });
+      setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: 0.05,

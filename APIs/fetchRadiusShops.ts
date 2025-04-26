@@ -7,6 +7,7 @@ const url = apiPath + "/app/shops/filter/radius";
 export const fetchRadiusShops = async (longitude: number | undefined, latitude: number | undefined) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
+  console.log(latitude, longitude);
   if (!longitude && !latitude) {   
     throw new Error("No longitude or latitude available");
   }

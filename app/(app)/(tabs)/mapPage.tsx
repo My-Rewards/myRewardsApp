@@ -32,7 +32,7 @@ export default function mapPage() {
   const [containerHeight, setContainerHeight] = useState<number>(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-  const [initPin, setInitPin] = useState<mapPinProps | null>(null);
+  const [initalizedPins, setInitializedPins] = useState<mapPinProps | null>(null);
   const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -53,18 +53,22 @@ export default function mapPage() {
   }, [containerHeight]);
 
   const fetchSelectedPinDetails = async (
-    selectedPin: mapPinProps,
+    initializedPin: mapPinProps,
     pos: number
   ) => {
+    console.log("Selected pin: ", initializedPin.shop_id);
+    console.log("Selected pin pos: ", pos);
     if (selectedPin && pos !== undefined) {
-      setInitPin(selectedPin);
-      const details = await fetchPinnedShop(
-        selectedPin.shop_id,
-        userLocation?.longitude,
-        userLocation?.latitude
-      );
-      setSelectedPin(details);
-      openModal();
+      setInitializedPins(initializedPin);
+      if(userLocation) {
+        const details = await fetchPinnedShop(
+          selectedPin.shop_id,
+          userLocation.longitude,
+          userLocation.latitude
+        );
+        setSelectedPin(details);
+        openModal();
+      }
     }
   };
   const openModal = () => {
@@ -198,14 +202,14 @@ export default function mapPage() {
               <View style={styles.marker}>
                 <View
                   style={
-                    initPin?.shop_id == shop.shop_id
+                    initalizedPins?.shop_id == shop.shop_id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      initPin?.shop_id == shop.shop_id
+                      initalizedPins?.shop_id == shop.shop_id
                         ? color_pallete[1]
                         : "white"
                     }
@@ -219,7 +223,7 @@ export default function mapPage() {
             </Marker>
           ))}
         </MapView>
-        {!isExpanded && !initPin && (
+        {!isExpanded && !initalizedPins && (
           <View style={styles.crossHairButton}>
             <TouchableOpacity
               onPress={() => {
