@@ -33,6 +33,7 @@ export default function mapPage() {
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
   const [initalizedPins, setInitializedPins] = useState<mapPinProps | null>(null);
+  const [prevPin, setPrevPin] = useState<mapPinProps | null>(null);
   const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
@@ -54,21 +55,22 @@ export default function mapPage() {
 
   const fetchSelectedPinDetails = async (
     initializedPin: mapPinProps,
-    pos: number
   ) => {
-    console.log("Selected pin: ", initializedPin.shop_id);
-    console.log("Selected pin pos: ", pos);
-    if (selectedPin && pos !== undefined) {
+    //Grab user location to fetch by distance
+    if (initializedPin?.shop_id === prevPin?.shop_id) {
+      openModal();
+      return;
+    }
+    if (initializedPin && userLocation){
       setInitializedPins(initializedPin);
-      if(userLocation) {
+      setPrevPin(initializedPin);
         const details = await fetchPinnedShop(
-          selectedPin.shop_id,
+          initalizedPins?.shop_id,
           userLocation.longitude,
           userLocation.latitude
         );
         setSelectedPin(details);
         openModal();
-      }
     }
   };
   const openModal = () => {
@@ -190,13 +192,13 @@ export default function mapPage() {
             handleMapUpdate(region);
           }}
         >
-          {radiusShops?.map((shop, index) => (
+          {radiusShops?.map((shop) => (
             <Marker
               coordinate={{
                 latitude: shop.latitude,
                 longitude: shop.longitude,
               }}
-              onPress={() => fetchSelectedPinDetails(shop, index)}
+              onPress={() => fetchSelectedPinDetails(shop)}
               key={shop.shop_id}
             >
               <View style={styles.marker}>

@@ -203,7 +203,7 @@ export function AppData({
         longitude: location.coords.longitude,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
-      });
+      })
 
       return {
         latitude: location.coords.latitude,
@@ -334,19 +334,18 @@ export function AppData({
 
   // Fetch Map Shops
   const setMapPageShops = async () => {
-    if (region) {
       setFetchingPage2(true);
       const response = await fetchRadiusShops(region.longitude, region.latitude);
       setFetchingPage2(false);
-      if (!response || !Array.isArray(response.value)) {
-        console.error("Expected an array of shops in response.value, but got:", response);
+      if (!response) {
+        console.error("Invalid response: ", response);
         return;
       }
       const shops = response.value;
 
       setRadiusShops(shops);
-    }
-}
+   }
+
 
   // Active plans Request
   const fetchPlansPage1 = async (page: number = plansPage1): Promise<void> => {
