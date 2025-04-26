@@ -133,8 +133,14 @@ export interface PreviewPlanProp extends PlanProps{
   logo:string
 }
 
-export type AppConfig = { 
+export interface AppConfig { 
   CUSTOMER_GET_ENDPOINT: string;
   CUSTOMER_UPDATE_ENDPOINT: string;
   CUSTOMER_DELETE_ENDPOINT: string;
+}
+
+export interface mapPinProps {
+  shop_id: string;
+  longitude: number;
+  latitude: number;
 }

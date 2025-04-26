@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const url = apiPath + "/app/shops/pinned";
 
-export const fetchPinnedShop = async (shop_id: string | undefined, longitude: number, latiude: number) => {
+export const fetchPinnedShop = async (shop_id: string | undefined, longitude: number | undefined, latiude: number | undefined) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
     if (!longitude && !latiude) {   

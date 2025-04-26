@@ -6,7 +6,6 @@ import {
   Animated,
   PanResponder,
   TouchableOpacity,
-  FlatList,
   Text,
   ActivityIndicator,
 } from "react-native";
@@ -20,30 +19,27 @@ import { SvgXml } from "react-native-svg";
 import { handStar } from "@/assets/images/MR-logos";
 import { localData } from "@/app-data/appData";
 import {
+  mapPinProps,
   regionProp,
   ShopPreviewProps,
-  mapPinProps,
 } from "@/app-data/data-types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { fetchPinnedShop } from "@/APIs/fetchPinnedShop";
 
 export default function mapPage() {
-  const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading } =
+  const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
     localData();
   const [containerHeight, setContainerHeight] = useState<number>(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-
+  const [initPin, setInitPin] = useState<mapPinProps | null>(null);
   const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isFlatListScrolling, setIsFlatListScrolling] = useState(true);
 
   const mapRef = React.useRef<Map>(null);
-  const flatListRef = useRef<FlatList>(null);
-  const currentScrollX = useRef(0);
 
 
   useEffect(() => {
@@ -57,17 +53,17 @@ export default function mapPage() {
   }, [containerHeight]);
 
   const fetchSelectedPinDetails = async (
-    selectedPin: ShopPreviewProps,
+    selectedPin: mapPinProps,
     pos: number
   ) => {
     if (selectedPin && pos !== undefined) {
-      setSelectedPin(selectedPin);
-      // const details = await fetchPinnedShop(
-      //   selectedPin.shop_id,
-      //   selectedPin.longitude,
-      //   selectedPin.longitude,
-      // );
-     // setSelectedPinDetails(details);
+      setInitPin(selectedPin);
+      const details = await fetchPinnedShop(
+        selectedPin.shop_id,
+        userLocation?.longitude,
+        userLocation?.latitude
+      );
+      setSelectedPin(details);
       openModal();
     }
   };
@@ -96,7 +92,6 @@ export default function mapPage() {
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: (_, gestureState) => {
       return (
-        !isFlatListScrolling &&
         Math.abs(gestureState.dy) > Math.abs(gestureState.dx)
       );
     },
@@ -203,14 +198,14 @@ export default function mapPage() {
               <View style={styles.marker}>
                 <View
                   style={
-                    selectedPin?.shop_id == shop.shop_id
+                    initPin?.shop_id == shop.shop_id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      selectedPin?.shop_id == shop.shop_id
+                      initPin?.shop_id == shop.shop_id
                         ? color_pallete[1]
                         : "white"
                     }
@@ -224,7 +219,7 @@ export default function mapPage() {
             </Marker>
           ))}
         </MapView>
-        {!isExpanded && !selectedPin && (
+        {!isExpanded && !initPin && (
           <View style={styles.crossHairButton}>
             <TouchableOpacity
               onPress={() => {
