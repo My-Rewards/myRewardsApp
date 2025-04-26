@@ -2,13 +2,16 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import axios from "axios";
 import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
-const url = apiPath + "/app/shops/filter/radius";
+const url = apiPath + "/app/shops/pinned";
 
-export const fetchRadiusShops = async (longitude: number | undefined, latitude: number | undefined) => {
+export const fetchPinnedShop = async (shop_id: string | undefined, longitude: number, latiude: number) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
-  if (!longitude && !latitude) {   
-    throw new Error("No longitude or latitude available");
+    if (!longitude && !latiude) {   
+        throw new Error("No longitude or latitude available");
+    }
+  if (!shop_id) {   
+    throw new Error("No shop_id");
   }
   if (!accessToken) {
     throw new Error("No access token available");
@@ -24,11 +27,12 @@ export const fetchRadiusShops = async (longitude: number | undefined, latitude: 
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
+            shop_id: shop_id,
             lon: longitude,
-            lat: latitude,
+            lat: latiude,
         }
       });
-      console.log("Maps shops: ", JSON.stringify(data));
+      console.log("Pinned shop: ", JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
