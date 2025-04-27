@@ -16,6 +16,7 @@ import {
   ExpandedModalShop,
   ShopPreview,
 } from "../../../components/shopPreview";
+import { ShopPreviewLoading } from "@/components/loading-states/ShopPreviewLoadingState";
 import { SvgXml } from "react-native-svg";
 import { handStar } from "@/assets/images/MR-logos";
 import { localData } from "@/app-data/appData";
@@ -38,6 +39,7 @@ export default function mapPage() {
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
+  const [loadingShop, setLoadingShop] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const currentScrollX = useRef(0);
   const mapRef = React.useRef<Map>(null);
@@ -62,11 +64,13 @@ export default function mapPage() {
     }
     if (pin && userLocation){
         setCurrentPin(pin);
+        setLoadingShop(true);
         const details = await fetchPinnedShop(
           pin.id,
           userLocation.longitude,
           userLocation.latitude
         );
+        setLoadingShop(false);
         setSelectedShop(details);
         openModal();
     }
@@ -311,13 +315,13 @@ export default function mapPage() {
         ]}
         {...panResponder.panHandlers}
       >
-        {selectedShop && (
+        {selectedShop && !loadingShop ? (
           <ShopPreview
             key={selectedShop.shop_id}
             selectedPin={selectedShop}
             type={0}
           />
-        )}
+        ) : <ShopPreviewLoading/>}
       </Animated.View>
       {isExpanded && currentPin && (
         <ExpandedModalShop

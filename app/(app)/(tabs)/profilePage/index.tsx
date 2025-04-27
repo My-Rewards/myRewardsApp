@@ -24,7 +24,7 @@ import {
   legalSvg,
   privacySvg,
 } from "@/constants/profileSvgs";
-import { ProfileLoadingState } from "@/components/navigation/loadingState";
+import { ProfileLoadingState } from "@/components/loading-states/ProfileLoadingState";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 
 export default function ProfilePage() {
@@ -85,7 +85,8 @@ export default function ProfilePage() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
         bounces={false}
-        style={[styles.container, { height: windowHeight - 90 }]}>
+        style={[styles.container, { height: windowHeight - 90 }]}
+      >
         <View style={styles.content}>
           <View style={styles.topSection}>
             {/* User Icon */}
@@ -237,11 +238,11 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fffbf7"
+    backgroundColor: "#fffbf7",
   },
   contentContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   content: {
     flex: 1,
