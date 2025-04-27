@@ -32,9 +32,8 @@ export default function mapPage() {
   const [containerHeight, setContainerHeight] = useState<number>(1);
 
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-  const [initalizedPins, setInitializedPins] = useState<mapPinProps | null>(null);
+  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
   const [prevPin, setPrevPin] = useState<mapPinProps | null>(null);
-  const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
@@ -54,22 +53,22 @@ export default function mapPage() {
   }, [containerHeight]);
 
   const fetchSelectedPinDetails = async (
-    initializedPin: mapPinProps,
+    pin: mapPinProps,
   ) => {
+    console.log("Selected pin: ", pin);
     //Grab user location to fetch by distance
-    if (initializedPin?.shop_id === prevPin?.shop_id) {
+    if (pin?.id === prevPin?.id) {
       openModal();
       return;
     }
-    if (initializedPin && userLocation){
-      setInitializedPins(initializedPin);
-      setPrevPin(initializedPin);
+    if (pin && userLocation){
+        setPrevPin(pin);
         const details = await fetchPinnedShop(
-          initalizedPins?.shop_id,
+          pin.id,
           userLocation.longitude,
           userLocation.latitude
         );
-        setSelectedPin(details);
+        setSelectedShop(details);
         openModal();
     }
   };
@@ -90,7 +89,7 @@ export default function mapPage() {
       useNativeDriver: true,
     }).start(() => {
       setIsExpanded(false);
-      setSelectedPin(null);
+      setSelectedShop(null);
     });
   };
 
@@ -199,19 +198,19 @@ export default function mapPage() {
                 longitude: shop.longitude,
               }}
               onPress={() => fetchSelectedPinDetails(shop)}
-              key={shop.shop_id}
+              key={shop.id}
             >
               <View style={styles.marker}>
                 <View
                   style={
-                    initalizedPins?.shop_id == shop.shop_id
+                    prevPin?.id == shop.id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      initalizedPins?.shop_id == shop.shop_id
+                      prevPin?.id == shop.id
                         ? color_pallete[1]
                         : "white"
                     }
@@ -225,7 +224,7 @@ export default function mapPage() {
             </Marker>
           ))}
         </MapView>
-        {!isExpanded && !initalizedPins && (
+        {!isExpanded && !prevPin && (
           <View style={styles.crossHairButton}>
             <TouchableOpacity
               onPress={() => {
@@ -244,20 +243,20 @@ export default function mapPage() {
         ]}
         {...panResponder.panHandlers}
       >
-        {selectedPin && (
+        {selectedShop && (
           <ShopPreview
-            key={selectedPin.shop_id}
-            selectedPin={selectedPin}
+            key={selectedShop.shop_id}
+            selectedPin={selectedShop}
             type={0}
           />
         )}
       </Animated.View>
-      {isExpanded && selectedPin && (
+      {isExpanded && prevPin && (
         <ExpandedModalShop
           isExpanded={isExpanded}
           setExpansion={setIsExpanded}
           type={0}
-          shopId={selectedPin.shop_id}
+          shopId={prevPin.id}
         />
       )}
       {(!mapLoaded || containerHeight === 1 || !pinsRendered) && (

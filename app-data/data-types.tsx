@@ -140,7 +140,7 @@ export interface AppConfig {
 }
 
 export interface mapPinProps {
-  shop_id: string;
+  id: string;
   longitude: number;
   latitude: number;
 }

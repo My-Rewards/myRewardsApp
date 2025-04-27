@@ -14,6 +14,7 @@ import {
   regionProp,
   ShopPreviewProps,
   AppConfig,
+  mapPinProps,
 } from "./data-types";
 import Map from "react-native-maps";
 import fetchUser from "@/APIs/fetchUser";
@@ -33,7 +34,7 @@ const DataContext = createContext<{
   locateMe: (map: React.RefObject<Map>) => void;
   setRegion: (location: regionProp) => void;
   region: regionProp;
-  radiusShops?: ShopPreviewProps[] | null;
+  radiusShops?: mapPinProps[] | null;
   discoverShopsFilter1?: ShopPreviewProps[] | null;
   discoverShopsFilter2?: ShopPreviewProps[] | null;
   discoverShopsFilter3?: ShopPreviewProps[] | null;
@@ -95,7 +96,7 @@ export function AppData({
   children,
 }: PropsWithChildren & { userSub: string }) {
   const { alert } = useProps();
-  const [radiusShops, setRadiusShops] = useState<ShopPreviewProps[] | null>();
+  const [radiusShops, setRadiusShops] = useState<mapPinProps[] | null>();
   const [profile, setProfile] = useState<Profile | null>();
   const [userLocation, setUserLocation] = useState<regionProp | null>(null);
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null);
