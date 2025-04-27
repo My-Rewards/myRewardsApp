@@ -7,6 +7,7 @@ import {
   PanResponder,
   TouchableOpacity,
   Text,
+  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import Map, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
@@ -30,15 +31,15 @@ export default function mapPage() {
   const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
     localData();
   const [containerHeight, setContainerHeight] = useState<number>(1);
-
+  const { width } = Dimensions.get("window");
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
   const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
-  const [prevPin, setPrevPin] = useState<mapPinProps | null>(null);
+  const [currentPin, setCurrentPin] = useState<mapPinProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-
+  const currentScrollX = useRef(0);
   const mapRef = React.useRef<Map>(null);
 
 
@@ -55,14 +56,12 @@ export default function mapPage() {
   const fetchSelectedPinDetails = async (
     pin: mapPinProps,
   ) => {
-    console.log("Selected pin: ", pin);
-    //Grab user location to fetch by distance
-    if (pin?.id === prevPin?.id) {
+    if (pin?.id === currentPin?.id) {
       openModal();
       return;
     }
     if (pin && userLocation){
-        setPrevPin(pin);
+        setCurrentPin(pin);
         const details = await fetchPinnedShop(
           pin.id,
           userLocation.longitude,
@@ -89,22 +88,18 @@ export default function mapPage() {
       useNativeDriver: true,
     }).start(() => {
       setIsExpanded(false);
-      setSelectedShop(null);
+      setCurrentPin(null);
     });
   };
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: (_, gestureState) => {
-      return (
-        Math.abs(gestureState.dy) > Math.abs(gestureState.dx)
-      );
-    },
     onPanResponderMove: (_, gestureState) => {
       if (
         !isExpanded &&
         gestureState.dy > 20 &&
-        gestureState.dy < MODAL_COLLAPSED_HEIGHT - 10
+        gestureState.dy < MODAL_COLLAPSED_HEIGHT - 10 &&
+        Math.abs(gestureState.dx) < 20
       ) {
         translateY.setValue(
           containerHeight - MODAL_COLLAPSED_HEIGHT + gestureState.dy
@@ -112,11 +107,12 @@ export default function mapPage() {
       } else if (
         !isExpanded &&
         gestureState.dy > 20 &&
-        gestureState.dy >= MODAL_COLLAPSED_HEIGHT - 10
+        gestureState.dy >= MODAL_COLLAPSED_HEIGHT - 10 &&
+        Math.abs(gestureState.dx) < 20
       ) {
         translateY.setValue(containerHeight);
       }
-  },
+    },
     onPanResponderRelease: (_, gestureState) => {
       const isPress =
         Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
@@ -127,7 +123,43 @@ export default function mapPage() {
       } else if (!isExpanded) {
         openModal();
       }
-  },
+
+      // if (
+      //   Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+      //   radiusShops
+      // ) {
+      //   let move = 0;
+
+      //   if (gestureState.dx > 0) {
+      //     move = Math.round((gestureState.dx + width / 4) / width);
+      //   } else {
+      //     move = Math.round((gestureState.dx - width / 4) / width);
+      //   }
+
+      //   let currPos = currentScrollX.current / width;
+      //   let newPos = currentScrollX.current / width;
+
+      //   if (move > 0 && currPos > 0) {
+      //     newPos = currPos - 1;
+      //   } else if (move < 0 && currPos < radiusShops.length - 1) {
+      //     newPos = currPos + 1;
+      //   }
+
+      //   currentScrollX.current = newPos * width;
+      //   setSelectedPin(radiusShops[newPos]);
+
+      //   flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
+      //   mapRef.current?.animateToRegion(
+      //     {
+      //       latitude: radiusShops[newPos].latitude,
+      //       longitude: radiusShops[newPos].longitude,
+      //       latitudeDelta: region.latitudeDelta,
+      //       longitudeDelta: region.longitudeDelta,
+      //     },
+      //     300
+      //   );
+      // }
+    },
     onPanResponderTerminate: (_, gestureState) => {
       const isPress =
         Math.abs(gestureState.dx) < 10 && Math.abs(gestureState.dy) < 10;
@@ -138,7 +170,43 @@ export default function mapPage() {
       } else if (!isExpanded) {
         openModal();
       }
-   },
+
+      if (
+        Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+        radiusShops
+      ) {
+        let move = 0;
+
+        if (gestureState.dx > 0) {
+          move = Math.round((gestureState.dx + width / 4) / width);
+        } else {
+          move = Math.round((gestureState.dx - width / 4) / width);
+        }
+
+        let currPos = currentScrollX.current / width;
+        let newPos = currentScrollX.current / width;
+
+        if (move > 0 && currPos > 0) {
+          newPos = currPos - 1;
+        } else if (move < 0 && currPos < radiusShops.length - 1) {
+          newPos = currPos + 1;
+        }
+
+        // flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
+        // mapRef.current?.animateToRegion(
+        //   {
+        //     latitude: radiusShops[newPos].latitude,
+        //     longitude: radiusShops[newPos].longitude,
+        //     latitudeDelta: region.latitudeDelta,
+        //     longitudeDelta: region.longitudeDelta,
+        //   },
+        //   300
+        // );
+
+        currentScrollX.current = newPos * width;
+       // setSelectedPin(radiusShops[newPos]);
+      }
+    },
   });
 
   function handleMapUpdate(region: regionProp) {
@@ -191,7 +259,7 @@ export default function mapPage() {
             handleMapUpdate(region);
           }}
         >
-          {radiusShops?.map((shop) => (
+          {radiusShops && radiusShops.map((shop) => (
             <Marker
               coordinate={{
                 latitude: shop.latitude,
@@ -203,14 +271,14 @@ export default function mapPage() {
               <View style={styles.marker}>
                 <View
                   style={
-                    prevPin?.id == shop.id
+                    currentPin?.id == shop.id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      prevPin?.id == shop.id
+                      currentPin?.id == shop.id
                         ? color_pallete[1]
                         : "white"
                     }
@@ -224,7 +292,7 @@ export default function mapPage() {
             </Marker>
           ))}
         </MapView>
-        {!isExpanded && !prevPin && (
+        {!isExpanded && (
           <View style={styles.crossHairButton}>
             <TouchableOpacity
               onPress={() => {
@@ -251,12 +319,12 @@ export default function mapPage() {
           />
         )}
       </Animated.View>
-      {isExpanded && prevPin && (
+      {isExpanded && currentPin && (
         <ExpandedModalShop
           isExpanded={isExpanded}
           setExpansion={setIsExpanded}
           type={0}
-          shopId={prevPin.id}
+          shopId={currentPin.id}
         />
       )}
       {(!mapLoaded || containerHeight === 1 || !pinsRendered) && (

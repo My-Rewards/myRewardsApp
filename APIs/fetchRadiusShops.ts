@@ -28,7 +28,6 @@ export const fetchRadiusShops = async (longitude: number | undefined, latitude: 
             lat: latitude,
         }
       });
-      console.log("Maps shops: ", JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {

@@ -32,7 +32,6 @@ export const fetchPinnedShop = async (shop_id: string | undefined, longitude: nu
             lat: latiude,
         }
       });
-      console.log("Pinned shop: ", JSON.stringify(data));
       return data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
