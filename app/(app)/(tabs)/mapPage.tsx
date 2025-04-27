@@ -5,10 +5,9 @@ import {
   View,
   Animated,
   PanResponder,
-  Dimensions,
   TouchableOpacity,
-  FlatList,
   Text,
+  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import Map, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
@@ -20,31 +19,32 @@ import {
 import { SvgXml } from "react-native-svg";
 import { handStar } from "@/assets/images/MR-logos";
 import { localData } from "@/app-data/appData";
-import { regionProp, ShopPreviewProps } from "@/app-data/data-types";
+import {
+  mapPinProps,
+  regionProp,
+  ShopPreviewProps,
+} from "@/app-data/data-types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-const { width } = Dimensions.get("window");
+import { fetchPinnedShop } from "@/APIs/fetchPinnedShop";
 
 export default function mapPage() {
-  const { radiusShops, region, locateMe, fetchShopsByRadius } = localData();
+  const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
+    localData();
   const [containerHeight, setContainerHeight] = useState<number>(1);
-
+  const { width } = Dimensions.get("window");
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-
-  const [selectedPin, setSelectedPin] = useState<ShopPreviewProps | null>(null);
+  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
+  const [currentPin, setCurrentPin] = useState<mapPinProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isFlatListScrolling, setIsFlatListScrolling] = useState(true);
-
-  const mapRef = React.useRef<Map>(null);
-  const flatListRef = useRef<FlatList>(null);
   const currentScrollX = useRef(0);
-  const memoizedPins = React.useMemo(() => radiusShops, [radiusShops]);
+  const mapRef = React.useRef<Map>(null);
+
 
   useEffect(() => {
-    if (radiusShops) {
+    if (radiusShops && radiusShops.length > 0) {
       setPinsRendered(true);
     }
   }, [radiusShops]);
@@ -53,13 +53,25 @@ export default function mapPage() {
     translateY.setValue(containerHeight);
   }, [containerHeight]);
 
-  const openModal = (selectedPin?: ShopPreviewProps, pos?: number) => {
-    if (selectedPin && pos !== undefined) {
-      setSelectedPin(selectedPin);
-      flatListRef.current?.scrollToIndex({ index: pos, animated: false });
-      currentScrollX.current = pos * width;
+  const fetchSelectedPinDetails = async (
+    pin: mapPinProps,
+  ) => {
+    if (pin?.id === currentPin?.id) {
+      openModal();
+      return;
     }
-
+    if (pin && userLocation){
+        setCurrentPin(pin);
+        const details = await fetchPinnedShop(
+          pin.id,
+          userLocation.longitude,
+          userLocation.latitude
+        );
+        setSelectedShop(details);
+        openModal();
+    }
+  };
+  const openModal = () => {
     Animated.parallel([
       Animated.timing(translateY, {
         toValue: containerHeight - MODAL_COLLAPSED_HEIGHT,
@@ -76,18 +88,12 @@ export default function mapPage() {
       useNativeDriver: true,
     }).start(() => {
       setIsExpanded(false);
-      setSelectedPin(null);
+      setCurrentPin(null);
     });
   };
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: (_, gestureState) => {
-      return (
-        !isFlatListScrolling &&
-        Math.abs(gestureState.dy) > Math.abs(gestureState.dx)
-      );
-    },
     onPanResponderMove: (_, gestureState) => {
       if (
         !isExpanded &&
@@ -106,16 +112,6 @@ export default function mapPage() {
       ) {
         translateY.setValue(containerHeight);
       }
-      if (
-        !isExpanded &&
-        Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
-      ) {
-        const offsetX = currentScrollX.current - gestureState.dx;
-        flatListRef.current?.scrollToOffset({
-          offset: offsetX,
-          animated: false,
-        });
-      }
     },
     onPanResponderRelease: (_, gestureState) => {
       const isPress =
@@ -128,41 +124,41 @@ export default function mapPage() {
         openModal();
       }
 
-      if (
-        Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
-        radiusShops
-      ) {
-        let move = 0;
+      // if (
+      //   Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+      //   radiusShops
+      // ) {
+      //   let move = 0;
 
-        if (gestureState.dx > 0) {
-          move = Math.round((gestureState.dx + width / 4) / width);
-        } else {
-          move = Math.round((gestureState.dx - width / 4) / width);
-        }
+      //   if (gestureState.dx > 0) {
+      //     move = Math.round((gestureState.dx + width / 4) / width);
+      //   } else {
+      //     move = Math.round((gestureState.dx - width / 4) / width);
+      //   }
 
-        let currPos = currentScrollX.current / width;
-        let newPos = currentScrollX.current / width;
+      //   let currPos = currentScrollX.current / width;
+      //   let newPos = currentScrollX.current / width;
 
-        if (move > 0 && currPos > 0) {
-          newPos = currPos - 1;
-        } else if (move < 0 && currPos < radiusShops.length - 1) {
-          newPos = currPos + 1;
-        }
+      //   if (move > 0 && currPos > 0) {
+      //     newPos = currPos - 1;
+      //   } else if (move < 0 && currPos < radiusShops.length - 1) {
+      //     newPos = currPos + 1;
+      //   }
 
-        currentScrollX.current = newPos * width;
-        setSelectedPin(radiusShops[newPos]);
+      //   currentScrollX.current = newPos * width;
+      //   setSelectedPin(radiusShops[newPos]);
 
-        flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
-        mapRef.current?.animateToRegion(
-          {
-            latitude: radiusShops[newPos].latitude,
-            longitude: radiusShops[newPos].longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta:0.05,
-          },
-          300
-        );
-      }
+      //   flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
+      //   mapRef.current?.animateToRegion(
+      //     {
+      //       latitude: radiusShops[newPos].latitude,
+      //       longitude: radiusShops[newPos].longitude,
+      //       latitudeDelta: region.latitudeDelta,
+      //       longitudeDelta: region.longitudeDelta,
+      //     },
+      //     300
+      //   );
+      // }
     },
     onPanResponderTerminate: (_, gestureState) => {
       const isPress =
@@ -196,24 +192,27 @@ export default function mapPage() {
           newPos = currPos + 1;
         }
 
-        flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
-        mapRef.current?.animateToRegion(
-          {
-            latitude: radiusShops[newPos].latitude,
-            longitude: radiusShops[newPos].longitude,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta,
-          },
-          300
-        );
+        // flatListRef.current?.scrollToIndex({ index: newPos, animated: true });
+        // mapRef.current?.animateToRegion(
+        //   {
+        //     latitude: radiusShops[newPos].latitude,
+        //     longitude: radiusShops[newPos].longitude,
+        //     latitudeDelta: region.latitudeDelta,
+        //     longitudeDelta: region.longitudeDelta,
+        //   },
+        //   300
+        // );
 
         currentScrollX.current = newPos * width;
-        setSelectedPin(radiusShops[newPos]);
+       // setSelectedPin(radiusShops[newPos]);
       }
     },
   });
 
   function handleMapUpdate(region: regionProp) {
+    if (isPage2Loading) {
+      return;
+    }
     fetchShopsByRadius(region);
   }
 
@@ -228,8 +227,7 @@ export default function mapPage() {
         setContainerHeight(newHeight);
       }}
     >
-      <View
-      >
+      <View>
         <MapView
           style={styles.map}
           region={region}
@@ -261,26 +259,28 @@ export default function mapPage() {
             handleMapUpdate(region);
           }}
         >
-          {memoizedPins?.map((shop, index) => (
+          {radiusShops && radiusShops.map((shop) => (
             <Marker
               coordinate={{
                 latitude: shop.latitude,
                 longitude: shop.longitude,
               }}
-              onPress={() => openModal(shop, index)}
-              key={shop.shop_id}
+              onPress={() => fetchSelectedPinDetails(shop)}
+              key={shop.id}
             >
               <View style={styles.marker}>
                 <View
                   style={
-                    selectedPin?.shop_id == shop.shop_id
+                    currentPin?.id == shop.id
                       ? styles.circleSelected
                       : styles.circle
                   }
                 >
                   <SvgXml
                     color={
-                      selectedPin?.shop_id == shop.shop_id ? color_pallete[1] : "white"
+                      currentPin?.id == shop.id
+                        ? color_pallete[1]
+                        : "white"
                     }
                     xml={handStar}
                     width="62%"
@@ -292,7 +292,7 @@ export default function mapPage() {
             </Marker>
           ))}
         </MapView>
-        {!isExpanded && !selectedPin && (
+        {!isExpanded && (
           <View style={styles.crossHairButton}>
             <TouchableOpacity
               onPress={() => {
@@ -311,33 +311,20 @@ export default function mapPage() {
         ]}
         {...panResponder.panHandlers}
       >
-        <FlatList
-          ref={flatListRef}
-          data={radiusShops}
-          horizontal
-          style={{ backgroundColor: "transparent" }}
-          keyExtractor={(item) => item.shop_id.toString()}
-          renderItem={({ item }) => (
-            <ShopPreview key={item.id} selectedPin={item} type={0} />
-          )}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={width}
-          snapToAlignment="center"
-          decelerationRate="fast"
-          onScrollBeginDrag={() => setIsFlatListScrolling(true)}
-          onScrollEndDrag={() => setIsFlatListScrolling(false)}
-          onMomentumScrollEnd={() => setIsFlatListScrolling(false)}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          onEndReachedThreshold={0.8}
-        />
+        {selectedShop && (
+          <ShopPreview
+            key={selectedShop.shop_id}
+            selectedPin={selectedShop}
+            type={0}
+          />
+        )}
       </Animated.View>
-      {isExpanded && selectedPin && (
+      {isExpanded && currentPin && (
         <ExpandedModalShop
           isExpanded={isExpanded}
           setExpansion={setIsExpanded}
           type={0}
-          shopId={selectedPin.shop_id}
+          shopId={currentPin.id}
         />
       )}
       {(!mapLoaded || containerHeight === 1 || !pinsRendered) && (
@@ -427,5 +414,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     padding: 10,
     textAlign: "center",
-  }
+  },
 });

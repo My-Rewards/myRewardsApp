@@ -148,8 +148,8 @@ const ShopPreviews = (
     const { isPage1Loading, fetchDiscoverShops } = localData();
 
     const handleScroll = async (event: any) => {
-      const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-      if ((contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) && !isPage1Loading && contentOffset.y>0) {
+     // const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+      if (!isPage1Loading) {
         await loadMoreData();
       }
     };
@@ -187,7 +187,9 @@ const ShopPreviews = (
               fetchDiscoverShops(filterSelection, true);
             }}
             windowSize={2}
-            onScrollEndDrag={handleScroll}
+           // onScrollEndDrag={handleScroll}
+            onEndReachedThreshold={0.8}
+            onEndReached={handleScroll}
           />
         </View>
       );

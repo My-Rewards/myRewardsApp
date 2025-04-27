@@ -14,6 +14,7 @@ import {
   regionProp,
   ShopPreviewProps,
   AppConfig,
+  mapPinProps,
 } from "./data-types";
 import Map from "react-native-maps";
 import fetchUser from "@/APIs/fetchUser";
@@ -33,7 +34,7 @@ const DataContext = createContext<{
   locateMe: (map: React.RefObject<Map>) => void;
   setRegion: (location: regionProp) => void;
   region: regionProp;
-  radiusShops?: ShopPreviewProps[] | null;
+  radiusShops?: mapPinProps[] | null;
   discoverShopsFilter1?: ShopPreviewProps[] | null;
   discoverShopsFilter2?: ShopPreviewProps[] | null;
   discoverShopsFilter3?: ShopPreviewProps[] | null;
@@ -95,7 +96,7 @@ export function AppData({
   children,
 }: PropsWithChildren & { userSub: string }) {
   const { alert } = useProps();
-  const [radiusShops, setRadiusShops] = useState<ShopPreviewProps[] | null>();
+  const [radiusShops, setRadiusShops] = useState<mapPinProps[] | null>();
   const [profile, setProfile] = useState<Profile | null>();
   const [userLocation, setUserLocation] = useState<regionProp | null>(null);
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null);
@@ -112,11 +113,11 @@ export function AppData({
   const [plansPage1, setPlansPage1] = useState(1);
   const [plansPage2, setPlansPage2] = useState(1);
 
-  const [region, setRegion] = useState({
+  const [region, setRegion] = useState<regionProp>({
     latitude: 28.5384,
     longitude: -81.3789,
-    latitudeDelta: 0.005,
-    longitudeDelta: 0.005,
+    latitudeDelta: userLocation?.latitudeDelta || 0.008,
+    longitudeDelta: userLocation?.longitudeDelta || 0.008,
   });
 
   const [fetchingPage1, setFetchingPage1] = useState(false);
@@ -198,6 +199,12 @@ export function AppData({
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       });
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      })
 
       return {
         latitude: location.coords.latitude,
@@ -240,6 +247,8 @@ export function AppData({
 
   // Discover Shops requests
   const fetchDiscoverPage1 = async (page: number = discoverPage1): Promise<void> => {
+    if(page === -1) return;
+
     const coords = userLocation ? userLocation : await getCurrentLocation()
 
     if (coords) {
@@ -262,7 +271,11 @@ export function AppData({
       const updatedShops = [...currentShops, ...shops];
 
       setDiscoverShopsFilter1(updatedShops);
-      setDiscoverPage1(response.pagination.nextPage || page);
+      if(response.pagination.hasMore) {
+        setDiscoverPage1(response.pagination.nextPage);
+      } else {
+        setDiscoverPage1(-1);
+      }
     }
   };
 
@@ -322,20 +335,18 @@ export function AppData({
 
   // Fetch Map Shops
   const setMapPageShops = async () => {
-    let coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      const response = await fetchRadiusShops(coords.longitude, coords.latitude);
-
-      if (!response || !Array.isArray(response.value)) {
-        console.error("Expected an array of shops in response.value, but got:", response);
+      setFetchingPage2(true);
+      const response = await fetchRadiusShops(region.longitude, region.latitude);
+      setFetchingPage2(false);
+      if (!response) {
+        console.error("Invalid response: ", response);
         return;
       }
       const shops = response.value;
 
       setRadiusShops(shops);
-    }
-}
+   }
+
 
   // Active plans Request
   const fetchPlansPage1 = async (page: number = plansPage1): Promise<void> => {
@@ -374,6 +385,7 @@ export function AppData({
     <DataContext.Provider
       value={{
         fetchShopsByRadius: async (currRegion: regionProp) => {
+          setRegion(currRegion);
           await setMapPageShops();
         },
         fetchDiscoverShops: async (
