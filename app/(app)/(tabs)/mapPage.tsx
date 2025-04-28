@@ -27,6 +27,7 @@ import {
 } from "@/app-data/data-types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { fetchPinnedShop } from "@/APIs/fetchPinnedShop";
+import { FetchMapToast, NoShopsToast } from "@/components/loading-states/FetchMapToast";
 
 export default function mapPage() {
   const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
@@ -34,13 +35,13 @@ export default function mapPage() {
   const [containerHeight, setContainerHeight] = useState<number>(1);
   const { width } = Dimensions.get("window");
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
   const [currentPin, setCurrentPin] = useState<mapPinProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
-  const [loadingShop, setLoadingShop] = useState(true);
+  const [loadingShop, setLoadingShop] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
   const currentScrollX = useRef(0);
   const mapRef = React.useRef<Map>(null);
 
@@ -65,6 +66,7 @@ export default function mapPage() {
     if (pin && userLocation){
         setCurrentPin(pin);
         setLoadingShop(true);
+        openModal();
         const details = await fetchPinnedShop(
           pin.id,
           userLocation.longitude,
@@ -72,7 +74,6 @@ export default function mapPage() {
         );
         setLoadingShop(false);
         setSelectedShop(details);
-        openModal();
     }
   };
   const openModal = () => {
@@ -217,6 +218,7 @@ export default function mapPage() {
     if (isPage2Loading) {
       return;
     }
+    closeModal();
     fetchShopsByRadius(region);
   }
 
@@ -323,6 +325,14 @@ export default function mapPage() {
           />
         ) : <ShopPreviewLoading/>}
       </Animated.View>
+      {isPage2Loading && 
+        <FetchMapToast/>
+      }
+      {
+        radiusShops && radiusShops.length === 0 && (
+          <NoShopsToast/>
+        )
+      }
       {isExpanded && currentPin && (
         <ExpandedModalShop
           isExpanded={isExpanded}
