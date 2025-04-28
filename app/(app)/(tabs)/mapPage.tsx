@@ -67,13 +67,18 @@ export default function mapPage() {
         setCurrentPin(pin);
         setLoadingShop(true);
         openModal();
-        const details = await fetchPinnedShop(
-          pin.id,
-          userLocation.longitude,
-          userLocation.latitude
-        );
-        setLoadingShop(false);
-        setSelectedShop(details);
+        try {
+          const details = await fetchPinnedShop(
+            pin.id,
+            userLocation.longitude,
+            userLocation.latitude
+          );
+          setSelectedShop(details);
+        } catch (error) {
+          console.error("Error fetching shop details:", error);
+        } finally {
+          setLoadingShop(false);
+        }
     }
   };
   const openModal = () => {
