@@ -155,16 +155,15 @@ export function AppData({
               discoverShopsFilter3
           )
       ) {
-        setFetchingPage2(true);
 
         await fetchDiscoverPage1();
         await fetchDiscoverPage2();
         await fetchDiscoverPage3();
-        await setMapPageShops();
-
-        setFetchingPage2(false);
       }
 
+      if (!radiusShops) {
+        await setMapPageShops();
+      }
       if (!plans) {
         setFetchingPage4(true);
 
@@ -187,7 +186,6 @@ export function AppData({
   }, [userLocation]);
 
   async function getCurrentLocation() {
-    setFetchingPage2(true);
     try {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
@@ -222,9 +220,7 @@ export function AppData({
           return;
         }
       }
-    } finally {
-      setFetchingPage2(false);
-    }
+    } 
   }
 
   async function rebaseUserLocation(map: React.RefObject<Map>) {

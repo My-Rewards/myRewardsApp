@@ -41,9 +41,10 @@ import {
   getShopStatus,
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
-import {fetchShop, fetchPlan} from "@/APIs/fetchShopPlan";
-import {PlanLoadingState, RewardsLoadingState} from "@/components/navigation/loadingState";
-import {toggleLike} from "@/APIs/updateOrgLike";
+import { fetchShop, fetchPlan } from "@/APIs/fetchShopPlan";
+import { PlanLoadingState } from "./loading-states/PlanLoadingState";
+import { RewardsLoadingState } from "./loading-states/RewardsLoadingState";
+import { toggleLike } from "@/APIs/updateOrgLike";
 
 const { width } = Dimensions.get("window");
 
@@ -149,9 +150,9 @@ export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
                       : { color: color_pallete[2] },
                   ]}
                 >
-                {selectedPin.distance != null
-                  ? `${selectedPin.distance} miles away`
-                  : "location unavailable"}
+                  {selectedPin.distance != null
+                    ? `${selectedPin.distance} miles away`
+                    : "location unavailable"}
                 </Text>
               </View>
               <View>
@@ -243,7 +244,6 @@ export const ExpandedShop = ({
     fetchShopDetails();
   }, [shopId]);
 
-
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
     currentScreen.current = -index;
@@ -308,9 +308,7 @@ export const ExpandedShop = ({
                 : { width: width },
               { transform: [{ translateX }] },
             ]}
-            {...(plan.rl_active &&
-              plan.rm_active &&
-              panResponder.panHandlers)}
+            {...(plan.rl_active && plan.rm_active && panResponder.panHandlers)}
           >
             {plan.rl_active && (
               <View style={{ width }}>
@@ -361,21 +359,21 @@ export const ExpandedShop = ({
   };
 
   const handleLike = async () => {
-      if (busy || !shopDetails?.org_id) return;
-      setBusy(true);
-      setLiked(!liked);
+    if (busy || !shopDetails?.org_id) return;
+    setBusy(true);
+    setLiked(!liked);
 
-      const { status } = await toggleLike(shopDetails.org_id);
-      if(status != !liked) setLiked(status);
+    const { status } = await toggleLike(shopDetails.org_id);
+    if (status != !liked) setLiked(status);
 
-      setBusy(false);
+    setBusy(false);
   };
 
   return (
     <View style={{ flex: 1, justifyContent: "flex-end" }}>
       <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
         {loading || !shopDetails || !distance ? (
-            <PlanLoadingState />
+          <PlanLoadingState />
         ) : (
           <ShopScrollView
             headerBackgroundColor={{
@@ -652,10 +650,12 @@ export const ExpandedShop = ({
                     style={{
                       alignSelf: "center",
                       marginBottom: "20%",
-                      marginHorizontal:10
+                      marginHorizontal: 10,
                     }}
                   >
-                    <Text style={styles.startPlanText}>Log your first visit to activate your plan!</Text>
+                    <Text style={styles.startPlanText}>
+                      Log your first visit to activate your plan!
+                    </Text>
                   </View>
                 )}
               </View>

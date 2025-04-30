@@ -16,6 +16,7 @@ import {
   ExpandedModalShop,
   ShopPreview,
 } from "../../../components/shopPreview";
+import { ShopPreviewLoading } from "@/components/loading-states/ShopPreviewLoadingState";
 import { SvgXml } from "react-native-svg";
 import { handStar } from "@/assets/images/MR-logos";
 import { localData } from "@/app-data/appData";
@@ -26,6 +27,7 @@ import {
 } from "@/app-data/data-types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { fetchPinnedShop } from "@/APIs/fetchPinnedShop";
+import { FetchMapToast, NoShopsToast } from "@/components/loading-states/FetchMapToast";
 
 export default function mapPage() {
   const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
@@ -33,12 +35,13 @@ export default function mapPage() {
   const [containerHeight, setContainerHeight] = useState<number>(1);
   const { width } = Dimensions.get("window");
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
-  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
   const [currentPin, setCurrentPin] = useState<mapPinProps | null>(null);
   const translateY = useRef(new Animated.Value(containerHeight)).current;
   const [isExpanded, setIsExpanded] = useState(false);
   const [pinsRendered, setPinsRendered] = useState(false);
+  const [loadingShop, setLoadingShop] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [selectedShop, setSelectedShop] = useState<ShopPreviewProps | null>(null);
   const currentScrollX = useRef(0);
   const mapRef = React.useRef<Map>(null);
 
@@ -62,13 +65,20 @@ export default function mapPage() {
     }
     if (pin && userLocation){
         setCurrentPin(pin);
-        const details = await fetchPinnedShop(
-          pin.id,
-          userLocation.longitude,
-          userLocation.latitude
-        );
-        setSelectedShop(details);
+        setLoadingShop(true);
         openModal();
+        try {
+          const details = await fetchPinnedShop(
+            pin.id,
+            userLocation.longitude,
+            userLocation.latitude
+          );
+          setSelectedShop(details);
+        } catch (error) {
+          console.error("Error fetching shop details:", error);
+        } finally {
+          setLoadingShop(false);
+        }
     }
   };
   const openModal = () => {
@@ -213,6 +223,7 @@ export default function mapPage() {
     if (isPage2Loading) {
       return;
     }
+    closeModal();
     fetchShopsByRadius(region);
   }
 
@@ -311,14 +322,22 @@ export default function mapPage() {
         ]}
         {...panResponder.panHandlers}
       >
-        {selectedShop && (
+        {selectedShop && !loadingShop ? (
           <ShopPreview
             key={selectedShop.shop_id}
             selectedPin={selectedShop}
             type={0}
           />
-        )}
+        ) : <ShopPreviewLoading/>}
       </Animated.View>
+      {isPage2Loading && 
+        <FetchMapToast/>
+      }
+      {
+        radiusShops && radiusShops.length === 0 && (
+          <NoShopsToast/>
+        )
+      }
       {isExpanded && currentPin && (
         <ExpandedModalShop
           isExpanded={isExpanded}
