@@ -5,7 +5,7 @@ export default function Root() {
   return (
           <Stack>
             <Stack.Screen
-              name={"sign-in"}
+              name={"index"}
               options={{
                 headerShown: false,
                 animation: "none",

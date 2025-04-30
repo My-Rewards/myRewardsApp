@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useRef, useState } from "react";
 import {
   Animated,
   Text,
@@ -8,7 +8,6 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
-  ScrollView,
   FlatList,
 } from "react-native";
 import { color_pallete } from "@/constants/Colors";
@@ -78,6 +77,12 @@ export default function index() {
     }
   };
 
+  const resetToNearby = () => {
+    setSavedFilterSelection(0);
+    runAnimation(0);           
+    fetchDiscoverShops(0, true);
+  };
+  
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
@@ -87,6 +92,7 @@ export default function index() {
           filterSelection={savedFilterSelection}
           loadMoreData={loadMoreData}
           loadingMore={loadingMore}
+          onRefreshToNearby={resetToNearby}
         />
       ) : (
         <View style={{ flex: 1 }}>
@@ -138,21 +144,21 @@ const ShopPreviews = (
     filterSelection,
     loadMoreData,
     loadingMore,
+    onRefreshToNearby
   }: {
     discoverShops: ShopPreviewProps[] | null | undefined;
     filterSelection: number;
     loadMoreData: () => Promise<void>;
     loadingMore: boolean;
+    onRefreshToNearby: () => void;
   }) => {
 
     const { isPage1Loading, fetchDiscoverShops } = localData();
 
-    const handleScroll = async (event: any) => {
-     // const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-      if (!isPage1Loading) {
+    const handleScroll = async () => {
         await loadMoreData();
-      }
     };
+    
 
     const openShopPage = (shop_id: string) => {
       router.push({
@@ -184,12 +190,12 @@ const ShopPreviews = (
             removeClippedSubviews={false}
             refreshing={isPage1Loading}
             onRefresh={() => {
-              fetchDiscoverShops(filterSelection, true);
+              onRefreshToNearby();
             }}
             windowSize={2}
-           // onScrollEndDrag={handleScroll}
-            onEndReachedThreshold={0.8}
+            onEndReachedThreshold={0.5}
             onEndReached={handleScroll}
+            ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
           />
         </View>
       );
