@@ -54,6 +54,8 @@ export const LoadingScreenDefault = () =>{
     )
 }
 
+export default LoadingScreenDefault;
+
 const styles = StyleSheet.create({
     loadingContainer: {
         ...StyleSheet.absoluteFillObject,

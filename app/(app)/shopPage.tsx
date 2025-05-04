@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import {fetchNearestShop} from "@/APIs/fetchShopPlan";
+import {RewardModalProvider} from "@/app/(app)/Reward/redeem";
 
 export default function shopPage() {
   const { parentPage, shop_id, org_id } = useLocalSearchParams<{
@@ -62,12 +63,12 @@ export default function shopPage() {
       </View>
       {shopId ? (
         <View style={{ flex: 1 }}>
-          <ExpandedShop
-            shopId={shopId}
-            isExpanded={true}
-            setExpansion={undefined}
-            type={1}
-          />
+            <ExpandedShop
+              shopId={shopId}
+              isExpanded={true}
+              setExpansion={undefined}
+              type={1}
+            />
         </View>
       ) : (
         <View

@@ -17,13 +17,14 @@ import {
   mapPinProps,
 } from "./data-types";
 import Map from "react-native-maps";
-import fetchUser from "@/APIs/fetchUser";
+import fetchUser from "@/APIs/user/fetchUser";
 import { fetchAppConfig } from "@/APIs/fetchConfig";
 import { set } from "zod";
 import { fetchNearbyShops } from "@/APIs/discoverShops";
 import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
 import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
 import {fetchUserLikedPlans, fetchUserPlans} from "@/APIs/fetchUserPlans";
+import {AppState} from "react-native";
 
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
@@ -42,6 +43,7 @@ const DataContext = createContext<{
   profile?: Profile | null;
   plans?: PreviewPlanProp[] | null;
   favoritePlans?: PreviewPlanProp[] | null;
+  updateShopFavorite: (shop_id: string, isFav: boolean) => void;
   isPage1Loading: boolean;
   isPage2Loading: boolean;
   isPage3Loading: boolean;
@@ -72,6 +74,7 @@ const DataContext = createContext<{
   profile: null,
   plans: null,
   favoritePlans: null,
+  updateShopFavorite: () => null,
   isPage1Loading: false,
   isPage2Loading: false,
   isPage3Loading: false,
@@ -83,13 +86,7 @@ const DataContext = createContext<{
 });
 
 export function localData() {
-  const value = useContext(DataContext);
-  if (process.env.NODE_ENV !== "production") {
-    if (!value) {
-      throw new Error("appData must be wrapped in a <localData />");
-    }
-  }
-  return value;
+  return useContext(DataContext);
 }
 
 export function AppData({
@@ -178,8 +175,16 @@ export function AppData({
   };
 
   useEffect(() => {
-    getCurrentLocation().catch(console.error)
-  }, [])
+    getCurrentLocation().catch(console.error);
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        getCurrentLocation().catch(console.error);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if(userLocation) bootstrap();
@@ -377,6 +382,36 @@ export function AppData({
     setPlansPage2(response.pagination.nextPage || page)
   }
 
+  const updateShopFavorite = (shop_id: string, isFav: boolean) => {
+    setDiscoverShopsFilter1(prev =>
+        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
+    );
+    setDiscoverShopsFilter2(prev =>
+        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
+    );
+    setDiscoverShopsFilter3(prev =>
+        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
+    );
+    setPlans(prev =>
+        prev
+            ? prev.map(p =>
+                p.shop_id === shop_id
+                    ? { ...p, favorite: isFav }
+                    : p
+            )
+            : prev
+    );
+    setFavoritePlans(prev => {
+      if (!prev) return prev;
+      if (isFav) {
+        const newlyFav = plans?.find(p => p.shop_id === shop_id ? { ...p, favorite: isFav } : p);
+        return newlyFav ? [...prev.filter(p => p.shop_id !== shop_id ? { ...p, favorite: isFav } : p), newlyFav] : prev;
+      } else {
+        return prev.filter(p => p.shop_id !== shop_id);
+      }
+    });
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -451,6 +486,7 @@ export function AppData({
         discoverShopsFilter3,
         plans: plans,
         favoritePlans: favoritePlans,
+        updateShopFavorite: async (shop_id, isFav) => updateShopFavorite(shop_id, isFav),
         region,
         profile,
         userLocation,

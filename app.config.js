@@ -32,7 +32,7 @@ export default () => {
         {
           "backgroundColor": "#fffbf6",
           "image": './assets/images/logo-orange.png',
-          "imageWidth": 200
+          "imageWidth": 100
         }
       ],
       [
@@ -65,7 +65,7 @@ export default () => {
       },
     },
     android: {
-      package: isProd ? 'com.myrewards.app':'com.myrewards.app.dev',
+      package: 'com.myrewards.app',
       icon: './assets/images/MyRewardsLogo1.png',
       runtimeVersion: RUNTIMEVERSION
     },

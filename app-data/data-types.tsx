@@ -36,10 +36,11 @@ export interface OrganizationProps{
 }
 
 export interface shop {
-  shop_id: string; 
+  id: string;
   org_id: string;
   name:string;
   banner: string;
+  preview:string;
   logo:string;
   favorite:boolean;
   menu:string|undefined;
@@ -98,6 +99,11 @@ export interface RewardSystem {
   rewards_milestone?: ExpentiureProps
 }
 
+export interface RewardProp{
+  id:string,
+  reward_id:string
+}
+
 export interface Plan{
   id:string,
   reward_plan:RewardSystem,
@@ -108,7 +114,7 @@ export interface Plan{
   rm_active:boolean,
   firstPlan:boolean,
   active:boolean,
-  redeemableRewards:string[],
+  redeemableRewards:RewardProp[],
 }
 
 export interface PlanProps{
@@ -123,7 +129,7 @@ export interface PlanProps{
   name:string,
   firstPlan:boolean,
   activePlan:boolean,
-  redeemableRewards:string[],
+  redeemableRewards:RewardProp[] | undefined,
   active:boolean,
   favorite:boolean,
 }
@@ -131,6 +137,7 @@ export interface PlanProps{
 export interface PreviewPlanProp extends PlanProps{
   banner: string,
   logo:string
+  activeRewards:boolean;
 }
 
 export interface AppConfig { 

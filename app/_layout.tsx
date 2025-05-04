@@ -7,9 +7,6 @@ import { PropsProvider } from "./LoadingProp/propsProvider";
 import { StatusBar } from "expo-status-bar";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import * as SplashScreen from 'expo-splash-screen';
-
-SplashScreen.preventAutoHideAsync();
 
 Amplify.configure(amplifyConfiguration);
 ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
@@ -32,12 +29,6 @@ export default function Root() {
               name={"forgot-password"}
               options={{
                 headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name={"Success Scan"}
-              options={{
-                  headerShown: false,
               }}
             />
             <Stack.Screen

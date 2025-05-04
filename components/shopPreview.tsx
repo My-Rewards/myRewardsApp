@@ -22,7 +22,7 @@ import {
   Plan,
   OrganizationProps,
   shop,
-  ShopPreviewProps,
+  ShopPreviewProps, RewardProp,
 } from "@/app-data/data-types";
 import ShopScrollView from "./ShopScrollView";
 import { localData } from "@/app-data/appData";
@@ -45,6 +45,7 @@ import { fetchShop, fetchPlan } from "@/APIs/fetchShopPlan";
 import { PlanLoadingState } from "./loading-states/PlanLoadingState";
 import { RewardsLoadingState } from "./loading-states/RewardsLoadingState";
 import { toggleLike } from "@/APIs/updateOrgLike";
+import {RewardModalProvider, useRewardModal} from "@/app/(app)/Reward/redeem";
 
 const { width } = Dimensions.get("window");
 
@@ -150,9 +151,9 @@ export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
                       : { color: color_pallete[2] },
                   ]}
                 >
-                  {selectedPin.distance != null
-                    ? `${selectedPin.distance} miles away`
-                    : "location unavailable"}
+                {selectedPin.distance != null
+                  ? `${selectedPin.distance} miles away`
+                  : "location unavailable"}
                 </Text>
               </View>
               <View>
@@ -199,7 +200,9 @@ export const ExpandedShop = ({
   type,
   setExpansion,
 }: PreviewPropShops) => {
-  const { profile, userLocation } = localData();
+  const { redeemReward } = useRewardModal();
+
+  const { profile, userLocation, updateShopFavorite } = localData();
   const [busy, setBusy] = useState(false);
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
@@ -219,9 +222,7 @@ export const ExpandedShop = ({
       if (profile) {
         setLoading(true);
         try {
-          if (!profile.id) {
-            throw new Error("No profile id found");
-          }
+          if (!profile.id) throw new Error("No profile id found");
           const shopData = await fetchShop(shopId);
           setShopDetails(shopData);
           setDistance(
@@ -243,6 +244,7 @@ export const ExpandedShop = ({
     };
     fetchShopDetails();
   }, [shopId]);
+
 
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
@@ -296,6 +298,11 @@ export const ExpandedShop = ({
     },
   });
 
+  const toggleReward = (reward_id:string, rewardString:string) =>{
+    if (!shopDetails) return;
+    redeemReward(reward_id, shopDetails.org_id, shopDetails.preview, rewardString, shopDetails.name, {lng:shopDetails.longitude, lat:shopDetails.latitude}, setPlan);
+  }
+
   const planSection = () => {
     if (plan) {
       return (
@@ -308,16 +315,18 @@ export const ExpandedShop = ({
                 : { width: width },
               { transform: [{ translateX }] },
             ]}
-            {...(plan.rl_active && plan.rm_active && panResponder.panHandlers)}
+            {...(plan.rl_active &&
+              plan.rm_active &&
+              panResponder.panHandlers)}
           >
             {plan.rl_active && (
               <View style={{ width }}>
-                <RoadMap plan={plan} />
+                <RoadMap plan={plan} redeem={toggleReward} />
               </View>
             )}
             {plan.rm_active && (
               <View style={{ width }}>
-                <ExpendatureMap plan={plan} />
+                <ExpendatureMap plan={plan} redeem={toggleReward} />
               </View>
             )}
           </Animated.View>
@@ -364,305 +373,305 @@ export const ExpandedShop = ({
     setLiked(!liked);
 
     const { status } = await toggleLike(shopDetails.org_id);
-    if (status != !liked) setLiked(status);
+
+    if(status != !liked) setLiked(status)
+    updateShopFavorite(shopDetails.id, status)
 
     setBusy(false);
   };
 
   return (
     <View style={{ flex: 1, justifyContent: "flex-end" }}>
-      <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
-        {loading || !shopDetails || !distance ? (
-          <PlanLoadingState />
-        ) : (
-          <ShopScrollView
-            headerBackgroundColor={{
-              light: "rgba(64, 124, 156, 1)",
-              dark: "rgba(64, 124, 156, 1)",
-            }}
-            headerImage={
-              <Image
-                source={{ uri: shopDetails.banner }}
-                style={modalStyle.image}
-                resizeMode="contain"
-              />
-            }
-            name={shopDetails.name}
-            description={shopDetails.description}
-            setExpansion={setExpansion}
-          >
-            <View>
-              <View
-                style={{
-                  backgroundColor: color_pallete[5],
-                  paddingVertical: 10,
-                }}
-              >
-                <View>
-                  <View style={modalStyle.infoRow}>
-                    <Ionicons
-                      name={"location-outline"}
-                      color={"white"}
-                      size={25}
+        <View style={type == 0 ? modalStyle.container : styles.expandedContainer}>
+              {loading || !shopDetails || !distance ? (
+                  <PlanLoadingState />
+              ) : (
+                <ShopScrollView
+                  headerBackgroundColor={{
+                    light: "rgba(64, 124, 156, 1)",
+                    dark: "rgba(64, 124, 156, 1)",
+                  }}
+                  headerImage={
+                    <Image
+                      source={{ uri: shopDetails.banner }}
+                      style={modalStyle.image}
+                      resizeMode='contain'
                     />
-                    <TouchableOpacity
-                      style={modalStyle.internalInfoRow}
-                      activeOpacity={1}
-                      onPress={() => {
-                        openMap({
-                          lat: shopDetails.latitude,
-                          lng: shopDetails.longitude,
-                          label: "Open maps",
-                        });
-                      }}
-                    >
-                      <View style={{ flex: 1 }}>
-                        <Text style={modalStyle.underline_infoText}>
-                          {shopDetails.location.city},{" "}
-                          {shopDetails.location.state}
-                        </Text>
-                        <Text style={modalStyle.sub_infoText}>
-                          {distance} miles away
-                        </Text>
-                      </View>
-                      <Ionicons
-                        name="arrow-forward"
-                        style={{
-                          transform: [{ rotate: "-45deg" }],
-                          marginRight: 10,
-                        }}
-                        color={"white"}
-                        size={25}
-                      />
-                      <View style={modalStyle.underline} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={modalStyle.infoRow}>
-                  <View
-                    style={{ position: "relative", height: "100%", width: 25 }}
-                  >
-                    <AntDesign
-                      name={"clockcircleo"}
-                      color={"white"}
-                      size={25}
-                      style={{
-                        position: "absolute",
-                        alignSelf: "center",
-                        top: 15,
-                      }}
-                    />
-                  </View>
-                  <View style={{ flexDirection: "column", flex: 1 }}>
-                    <TouchableOpacity
-                      style={modalStyle.internalInfoRow}
-                      activeOpacity={1}
-                      onPress={() => {
-                        setExpandHours(!expandHours);
-                      }}
-                    >
-                      <Text
-                        style={
-                          getShopStatus(shopDetails.shop_hours).status == "Open"
-                            ? modalStyle.openText
-                            : modalStyle.closedText
-                        }
-                      >
-                        {getShopStatus(shopDetails.shop_hours).status}
-                      </Text>
-                      <Ionicons
-                        name="chevron-up"
-                        size={25}
-                        color={"white"}
-                        style={{
-                          transform: [
-                            { rotate: !expandHours ? "90deg" : "180deg" },
-                          ],
-                          marginRight: 10,
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <View>
-                      <Collapsible collapsed={!expandHours}>
-                        <View style={{ marginBottom: 10, gap: 2 }}>
-                          {shopDetails.shop_hours.map((shopDay, index) => {
-                            if (shopDay.open && shopDay.close) {
-                              return (
-                                <View
-                                  style={modalStyle.hoursContainer}
-                                  key={index}
-                                >
-                                  <Text style={modalStyle.infoText1}>
-                                    {shopDay.day}
-                                  </Text>
-                                  <View>
-                                    <Text style={modalStyle.infoText1}>
-                                      {convertTo12HourFormat(shopDay.open)} -{" "}
-                                      {convertTo12HourFormat(shopDay.close)}
-                                    </Text>
-                                  </View>
-                                </View>
-                              );
-                            } else {
-                              return (
-                                <View
-                                  style={modalStyle.hoursContainer}
-                                  key={index}
-                                >
-                                  <Text style={modalStyle.infoText1}>
-                                    {shopDay.day}
-                                  </Text>
-                                  <Text style={modalStyle.infoText1}>
-                                    Closed
-                                  </Text>
-                                </View>
-                              );
-                            }
-                          })}
-                        </View>
-                      </Collapsible>
-                    </View>
-                    <View style={modalStyle.underline} />
-                  </View>
-                </View>
-                {shopDetails.menu && (
+                  }
+                  name={shopDetails.name}
+                  description={shopDetails.description}
+                  setExpansion={setExpansion}
+                >
                   <View>
-                    <View style={modalStyle.infoRow}>
-                      <MaterialIcons
-                        name={"restaurant"}
-                        color={"white"}
-                        size={25}
-                      />
-                      <TouchableOpacity
-                        style={modalStyle.internalInfoRow}
-                        activeOpacity={1}
-                        onPress={() => redirectWeb(shopDetails.menu)}
-                      >
-                        <View style={{ flex: 1 }}>
-                          <Text style={modalStyle.underline_infoText}>
-                            Menu
-                          </Text>
-                        </View>
-                        <Ionicons
-                          name="arrow-forward"
-                          style={{
-                            transform: [{ rotate: "-45deg" }],
-                            marginRight: 10,
-                          }}
-                          color={"white"}
-                          size={25}
-                        />
-                        <View style={modalStyle.underline} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-                <View>
-                  <View style={modalStyle.infoRow}>
-                    <AntDesign
-                      name={"phone"}
-                      style={{ transform: [{ scaleX: -1 }] }}
-                      color={"white"}
-                      size={25}
-                    />
-                    <TouchableOpacity
-                      style={modalStyle.internalInfoRow}
-                      activeOpacity={1}
-                      onPress={() =>
-                        redirectWeb(`tel:${shopDetails.phone_number}`)
-                      }
+                    <View
+                      style={{
+                        backgroundColor: color_pallete[5],
+                        paddingVertical: 10,
+                      }}
                     >
-                      <View style={{ flex: 1 }}>
-                        <Text style={modalStyle.underline_infoText}>
-                          {shopDetails.phone_number}
-                        </Text>
+                      <View>
+                        <View style={modalStyle.infoRow}>
+                          <Ionicons
+                            name={"location-outline"}
+                            color={"white"}
+                            size={25}
+                          />
+                          <TouchableOpacity
+                            style={modalStyle.internalInfoRow}
+                            activeOpacity={1}
+                            onPress={() => {
+                              openMap({
+                                lat: shopDetails.latitude,
+                                lng: shopDetails.longitude,
+                                label: "Open maps",
+                              });
+                            }}
+                          >
+                            <View style={{ flex: 1 }}>
+                              <Text style={modalStyle.underline_infoText}>
+                                {shopDetails.location.city},{" "}
+                                {shopDetails.location.state}
+                              </Text>
+                              <Text style={modalStyle.sub_infoText}>
+                                {distance} miles away
+                              </Text>
+                            </View>
+                            <Ionicons
+                              name="arrow-forward"
+                              style={{
+                                transform: [{ rotate: "-45deg" }],
+                                marginRight: 10,
+                              }}
+                              color={"white"}
+                              size={25}
+                            />
+                            <View style={modalStyle.underline} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                      <Ionicons
-                        name="arrow-forward"
-                        style={{
-                          transform: [{ rotate: "-45deg" }],
-                          marginRight: 10,
-                        }}
-                        color={"white"}
-                        size={25}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              {plan?.rm_active && plan?.rl_active && (
-                <View style={{ width: "100%", backgroundColor: "white" }}>
-                  <Animated.View
-                    style={[
-                      { left: highlightPosition },
-                      modalStyle.toggleHighlight,
-                    ]}
-                  />
-                  <View style={modalStyle.toggleSection}>
-                    <TouchableOpacity onPress={() => handleToggle(0)}>
-                      <Text
-                        style={[
-                          modalStyle.toggleText,
-                          selectedIndex === 0
-                            ? { opacity: 1 }
-                            : { opacity: 0.6 },
-                        ]}
-                      >
-                        Loyalty Rewards
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleToggle(1)}>
-                      <Text
-                        style={[
-                          modalStyle.toggleText,
-                          selectedIndex === 1
-                            ? { opacity: 1 }
-                            : { opacity: 0.6 },
-                        ]}
-                      >
-                        Milestone Rewards
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-              <View>
-                <View style={styles.subHeader}>
-                  <View style={styles.titleContainer}>
-                    <View style={styles.logo}>
-                      <Image
-                        style={{ flex: 1, backgroundColor: "gray" }}
-                        source={{ uri: shopDetails.logo }}
-                      />
+                      <View style={modalStyle.infoRow}>
+                        <View
+                          style={{ position: "relative", height: "100%", width: 25 }}
+                        >
+                          <AntDesign
+                            name={"clockcircleo"}
+                            color={"white"}
+                            size={25}
+                            style={{
+                              position: "absolute",
+                              alignSelf: "center",
+                              top: 15,
+                            }}
+                          />
+                        </View>
+                        <View style={{ flexDirection: "column", flex: 1 }}>
+                          <TouchableOpacity
+                            style={modalStyle.internalInfoRow}
+                            activeOpacity={1}
+                            onPress={() => {
+                              setExpandHours(!expandHours);
+                            }}
+                          >
+                            <Text
+                              style={
+                                getShopStatus(shopDetails.shop_hours).status == "Open"
+                                  ? modalStyle.openText
+                                  : modalStyle.closedText
+                              }
+                            >
+                              {getShopStatus(shopDetails.shop_hours).status}
+                            </Text>
+                            <Ionicons
+                              name="chevron-up"
+                              size={25}
+                              color={"white"}
+                              style={{
+                                transform: [
+                                  { rotate: !expandHours ? "90deg" : "180deg" },
+                                ],
+                                marginRight: 10,
+                              }}
+                            />
+                          </TouchableOpacity>
+                          <View>
+                            <Collapsible collapsed={!expandHours}>
+                              <View style={{ marginBottom: 10, gap: 2 }}>
+                                {shopDetails.shop_hours.map((shopDay, index) => {
+                                  if (shopDay.open && shopDay.close) {
+                                    return (
+                                      <View
+                                        style={modalStyle.hoursContainer}
+                                        key={index}
+                                      >
+                                        <Text style={modalStyle.infoText1}>
+                                          {shopDay.day}
+                                        </Text>
+                                        <View>
+                                          <Text style={modalStyle.infoText1}>
+                                            {convertTo12HourFormat(shopDay.open)} -{" "}
+                                            {convertTo12HourFormat(shopDay.close)}
+                                          </Text>
+                                        </View>
+                                      </View>
+                                    );
+                                  } else {
+                                    return (
+                                      <View
+                                        style={modalStyle.hoursContainer}
+                                        key={index}
+                                      >
+                                        <Text style={modalStyle.infoText1}>
+                                          {shopDay.day}
+                                        </Text>
+                                        <Text style={modalStyle.infoText1}>
+                                          Closed
+                                        </Text>
+                                      </View>
+                                    );
+                                  }
+                                })}
+                              </View>
+                            </Collapsible>
+                          </View>
+                          <View style={modalStyle.underline} />
+                        </View>
+                      </View>
+                      {shopDetails.menu && (
+                        <View>
+                          <View style={modalStyle.infoRow}>
+                            <MaterialIcons
+                              name={"restaurant"}
+                              color={"white"}
+                              size={25}
+                            />
+                            <TouchableOpacity
+                              style={modalStyle.internalInfoRow}
+                              activeOpacity={1}
+                              onPress={() => redirectWeb(shopDetails.menu)}
+                            >
+                              <View style={{ flex: 1 }}>
+                                <Text style={modalStyle.underline_infoText}>
+                                  Menu
+                                </Text>
+                              </View>
+                              <Ionicons
+                                name="arrow-forward"
+                                style={{
+                                  transform: [{ rotate: "-45deg" }],
+                                  marginRight: 10,
+                                }}
+                                color={"white"}
+                                size={25}
+                              />
+                              <View style={modalStyle.underline} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      )}
+                      <View>
+                        <View style={modalStyle.infoRow}>
+                          <AntDesign
+                            name={"phone"}
+                            style={{ transform: [{ scaleX: -1 }] }}
+                            color={"white"}
+                            size={25}
+                          />
+                          <TouchableOpacity
+                            style={modalStyle.internalInfoRow}
+                            activeOpacity={1}
+                            onPress={() =>
+                              redirectWeb(`tel:${shopDetails.phone_number}`)
+                            }
+                          >
+                            <View style={{ flex: 1 }}>
+                              <Text style={modalStyle.underline_infoText}>
+                                {shopDetails.phone_number}
+                              </Text>
+                            </View>
+                            <Ionicons
+                              name="arrow-forward"
+                              style={{
+                                transform: [{ rotate: "-45deg" }],
+                                marginRight: 10,
+                              }}
+                              color={"white"}
+                              size={25}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     </View>
-                    <Text style={styles.text1}>{shopDetails.name}</Text>
+                    {plan?.rm_active && plan?.rl_active && (
+                      <View style={{ width: "100%", backgroundColor: "white" }}>
+                        <Animated.View
+                          style={[
+                            { left: highlightPosition },
+                            modalStyle.toggleHighlight,
+                          ]}
+                        />
+                        <View style={modalStyle.toggleSection}>
+                          <TouchableOpacity onPress={() => handleToggle(0)}>
+                            <Text
+                              style={[
+                                modalStyle.toggleText,
+                                selectedIndex === 0
+                                  ? { opacity: 1 }
+                                  : { opacity: 0.6 },
+                              ]}
+                            >
+                              Loyalty Rewards
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => handleToggle(1)}>
+                            <Text
+                              style={[
+                                modalStyle.toggleText,
+                                selectedIndex === 1
+                                  ? { opacity: 1 }
+                                  : { opacity: 0.6 },
+                              ]}
+                            >
+                              Milestone Rewards
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+                    <View>
+                      <View style={styles.subHeader}>
+                        <View style={styles.titleContainer}>
+                          <View style={styles.logo}>
+                            <Image
+                              style={{ flex: 1, backgroundColor: "gray" }}
+                              source={{ uri: shopDetails.logo }}
+                            />
+                          </View>
+                          <Text style={styles.text1}>{shopDetails.name}</Text>
+                        </View>
+                        <TouchableOpacity onPress={handleLike} disabled={busy}>
+                          <TabBarIcon
+                            color={color_pallete[2]}
+                            name={liked ? "heart" : "heart-outline"}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      {planSection()}
+                      {plan && !plan.active && (
+                        <View
+                          style={{
+                            alignSelf: "center",
+                            marginBottom: "20%",
+                            marginHorizontal:10
+                          }}
+                        >
+                          <Text style={styles.startPlanText}>Log your first visit to activate your plan!</Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                  <TouchableOpacity onPress={handleLike} disabled={busy}>
-                    <TabBarIcon
-                      color={color_pallete[2]}
-                      name={liked ? "heart" : "heart-outline"}
-                    />
-                  </TouchableOpacity>
-                </View>
-                {planSection()}
-                {plan && !plan.active && (
-                  <View
-                    style={{
-                      alignSelf: "center",
-                      marginBottom: "20%",
-                      marginHorizontal: 10,
-                    }}
-                  >
-                    <Text style={styles.startPlanText}>
-                      Log your first visit to activate your plan!
-                    </Text>
-                  </View>
-                )}
-              </View>
+                </ShopScrollView>
+              )}
             </View>
-          </ShopScrollView>
-        )}
-      </View>
     </View>
   );
 };
@@ -682,12 +691,12 @@ export const ExpandedModalShop = ({
       onRequestClose={() => setExpansion && setExpansion(false)}
     >
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
-        <ExpandedShop
-          shopId={shopId}
-          type={type}
-          setExpansion={setExpansion}
-          isExpanded={isExpanded}
-        />
+          <ExpandedShop
+            shopId={shopId}
+            type={type}
+            setExpansion={setExpansion}
+            isExpanded={isExpanded}
+          />
       </View>
     </Modal>
   );
