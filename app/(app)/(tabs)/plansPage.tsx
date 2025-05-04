@@ -129,7 +129,9 @@ const PlansPreview = (
                       onPress={() => openShopPage(item.shop_id)}
                       style={styles.card}
                   >
-                    <PlanPreviewCard plan={item} />
+                    <PlanPreviewCard
+                        plan={item}
+                    />
                   </TouchableOpacity>
                 </View>
               )}
@@ -222,7 +224,6 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
     parentWidth,
     checkpoints,
   }) => {
-    const rewardRedeemable = plan.redeemableRewards.includes(milestone[1].id);
     const checkpoint = (parseInt(milestone[0], 10)+1)*tierStep;
     const lineWidth =
       ((parentWidth - numMilestones * 25) / (numMilestones - 1)) * 0.8;
@@ -260,7 +261,7 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
             </View>
           </View>
         )}
-        {plan.visits >= checkpoint && !rewardRedeemable && checkpoint>0 ? (
+        {plan.visits >= checkpoint && checkpoint>0 ? (
           <View
             style={[
               previewPlanStyle.circle,
@@ -272,29 +273,15 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
           >
             <Ionicons name="checkmark" color={"white"} />
           </View>
-        ) : rewardRedeemable ? (
-          <View
-            style={[
-              previewPlanStyle.circle,
-              {
-                backgroundColor: color_pallete[2],
-                borderColor: color_pallete[2],
-                padding:2
-              },
-            ]}
-          >
-            <Ionicons name="star" color={"white"} />
-          </View>
-        ) : (
-          <View
-            style={[
-              previewPlanStyle.circle,
-              { borderColor: checkpoint===0?color_pallete[2]:color_pallete[11] },
-            ]}
-          >
+        ) : <View
+              style={[
+                previewPlanStyle.circle,
+                { borderColor: checkpoint===0?color_pallete[2]:color_pallete[11] },
+              ]}
+              >
             <Text style={previewPlanStyle.circleText}>{checkpoint}</Text>
           </View>
-        )}
+        }
       </View>
     );
   };
@@ -302,6 +289,11 @@ const PlanPreviewCard = ({ plan }: { plan: PreviewPlanProp }) => {
   return (
     <View style={{ marginVertical: 10 }}>
       <View style={previewPlanStyle.imageContainer}>
+        {plan.activeRewards &&
+            <View style={previewPlanStyle.reward}>
+              <Text style={previewPlanStyle.rewardText}>Redeem Reward</Text>
+            </View>
+        }
         <Image
           style={previewPlanStyle.image}
           source={{ uri: plan.banner }}
@@ -518,6 +510,7 @@ const previewPlanStyle = StyleSheet.create({
     alignItems: "center",
   },
   stepContainer: {
+    position:'relative',
     flexDirection: "row",
     alignItems: "center",
   },
@@ -595,7 +588,9 @@ const previewPlanStyle = StyleSheet.create({
     shadowOpacity: 0,
   },
   imageContainer: {
+    position:'relative',
     justifyContent: "flex-start",
+    zIndex:5,
     width: "100%",
     backgroundColor: "#f0f0f0",
     borderTopRightRadius: 10,
@@ -631,6 +626,7 @@ const previewPlanStyle = StyleSheet.create({
   },
   orgContainer: {
     marginHorizontal: 20,
+    position:'relative',
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -641,4 +637,21 @@ const previewPlanStyle = StyleSheet.create({
     fontWeight: "700",
     fontSize: 20,
   },
+  reward:{
+    zIndex:10,
+    position:'absolute',
+    bottom:0,
+    right:0,
+    margin:6,
+    padding:2,
+    paddingHorizontal:4,
+    backgroundColor: color_pallete[3],
+    borderRadius:10,
+  },
+  rewardText:{
+    fontFamily: "Avenir Next",
+    fontWeight:'600',
+    fontSize:12,
+    color:'white'
+  }
 });

@@ -15,7 +15,7 @@ import { useRef, useState, useEffect } from "react";
 import BottomPopUp from "@/components/bottomPopUp";
 import BottomSheet from "@gorhom/bottom-sheet";
 import formatDate from "@/constants/formatDate";
-import deleteUser from "@/APIs/deleteUser";
+import deleteUser from "@/APIs/user/deleteUser";
 import { localData } from "@/app-data/appData";
 import {
   editProfileSvg,

@@ -206,7 +206,7 @@ export const modalStyle = StyleSheet.create({
   image: {
     width: "100%",
     height: undefined,
-    aspectRatio: 3 / 2,
+    aspectRatio: 4 / 3,
     backgroundColor: "gray",
   },
   modalTitle: {

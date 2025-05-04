@@ -29,7 +29,7 @@ export const useAlert = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const alert = useMemo(
-    () => (title: string, description: string, status: string) => {
+    () => (title: string, description: string, status: 'success' | 'error') => {
       setAlertData({ title, description, status });
       setAlertVisible(true);
 

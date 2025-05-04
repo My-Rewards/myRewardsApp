@@ -4,6 +4,7 @@ import { LoadingScreenDefault } from '../loadingScreen';
 import {AppData} from '../../app-data/appData'
 import React from 'react';
 import NfcManager from 'react-native-nfc-manager';
+import {RewardModalProvider} from "@/app/(app)/Reward/redeem";
 
 NfcManager.start();
 
@@ -20,15 +21,16 @@ export default function AppLayout() {
 
   return (
     <AppData userSub={userSub}>
-      <Stack
-      screenOptions={{
-        gestureDirection:'horizontal',
-        headerShown:false
-      }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="shopPage" options={{ headerShown: false }} />
-        <Stack.Screen name="planPage" options={{ headerShown: false }} />
-      </Stack>
+      <RewardModalProvider>
+        <Stack
+        screenOptions={{
+          gestureDirection:'horizontal',
+          headerShown:false
+        }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="shopPage" options={{ headerShown: false }} />
+        </Stack>
+      </RewardModalProvider>
     </AppData>
   );
 }
