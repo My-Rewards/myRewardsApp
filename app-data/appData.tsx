@@ -282,14 +282,20 @@ export function AppData({
 
   const fetchDiscoverPage2 = async (page: number = discoverPage2): Promise<void> => {
     if(page === -1) return;
-    let currentShops = page>1? discoverShopsFilter1 || [] : [];
+
+    const coords = userLocation ? userLocation : await getCurrentLocation()
+
+    if (coords) {
+      let currentShops = page>1? discoverShopsFilter2 || [] : [];
 
       if(isShopSearched){
         setIsShopSearched(false);
         currentShops = [];
       }
       const response = await fetchPopularShops(
-          page
+        coords.longitude,
+        coords.latitude,
+        page
       );
 
       if (!response || !Array.isArray(response.value)) return;
@@ -303,6 +309,7 @@ export function AppData({
       } else {
         setDiscoverPage2(-1);
       }
+    }
   };
 
   const fetchDiscoverPage3 = async (page: number = discoverPage3): Promise<void> => {
@@ -310,7 +317,7 @@ export function AppData({
     let coords = userLocation ? userLocation : await getCurrentLocation()
 
     if (coords) {
-      let currentShops = page>1? discoverShopsFilter1 || [] : [];
+      let currentShops = page>1? discoverShopsFilter3 || [] : [];
 
       if(isShopSearched){
         setIsShopSearched(false);

@@ -4,9 +4,12 @@ import Constants from "expo-constants";
 const { apiPath } = Constants.expoConfig?.extra || {};
 const url = apiPath + "/app/shops/popular";
 
-export const fetchPopularShops = async (page: number) => {
+export const fetchPopularShops = async (longitude: number | undefined, latitude: number | undefined, page: number) => {
   const { tokens } = await fetchAuthSession();
   const accessToken = tokens?.idToken;
+  if (!longitude && !latitude) {   
+    throw new Error("No longitude or latitude available");
+  }
   if (!accessToken) {
     throw new Error("No access token available");
   }
@@ -21,7 +24,9 @@ export const fetchPopularShops = async (page: number) => {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-            page: page,
+          lon: longitude,
+          lat: latitude,
+          page: page,
         }
       });
 

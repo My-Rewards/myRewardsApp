@@ -1,4 +1,4 @@
-import React, {useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Animated,
   Text,
@@ -16,7 +16,8 @@ import { ShopPreview } from "@/components/shopPreview";
 import { ShopPreviewProps, shop } from "@/app-data/data-types";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-
+import { mediumLogo } from "@/assets/images/MR-logos";
+import { SvgXml } from "react-native-svg";
 const { width } = Dimensions.get("window");
 
 export default function index() {
@@ -77,12 +78,12 @@ export default function index() {
     }
   };
 
-  const resetToNearby = () => {
-    setSavedFilterSelection(0);
-    runAnimation(0);           
+  const resetShops = () => {
     fetchDiscoverShops(0, true);
+    fetchDiscoverShops(1, true);
+    fetchDiscoverShops(2, true);
   };
-  
+
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
@@ -92,7 +93,7 @@ export default function index() {
           filterSelection={savedFilterSelection}
           loadMoreData={loadMoreData}
           loadingMore={loadingMore}
-          onRefreshToNearby={resetToNearby}
+          resetShops={resetShops}
         />
       ) : (
         <View style={{ flex: 1 }}>
@@ -138,76 +139,87 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
   </View>
 ));
 
-const ShopPreviews = (
-  ({
-    discoverShops,
-    filterSelection,
-    loadMoreData,
-    loadingMore,
-    onRefreshToNearby
-  }: {
-    discoverShops: ShopPreviewProps[] | null | undefined;
-    filterSelection: number;
-    loadMoreData: () => Promise<void>;
-    loadingMore: boolean;
-    onRefreshToNearby: () => void;
-  }) => {
+const ShopPreviews = ({
+  discoverShops,
+  filterSelection,
+  loadMoreData,
+  loadingMore,
+  resetShops,
+}: {
+  discoverShops: ShopPreviewProps[] | null | undefined;
+  filterSelection: number;
+  loadMoreData: () => Promise<void>;
+  loadingMore: boolean;
+  resetShops: () => void;
+}) => {
+  const { isPage1Loading, fetchDiscoverShops } = localData();
 
-    const { isPage1Loading, fetchDiscoverShops } = localData();
+  const handleScroll = async () => {
+    await loadMoreData();
+  };
 
-    const handleScroll = async () => {
-        await loadMoreData();
-    };
-    
+  const openShopPage = (shop_id: string) => {
+    router.push({
+      pathname: "/shopPage",
+      params: { parentPage: "Discover", shop_id },
+    });
+  };
 
-    const openShopPage = (shop_id: string) => {
-      router.push({
-        pathname: "/shopPage",
-        params: { parentPage: "Discover", shop_id },
-      });
-    };
-
-    if (discoverShops) {
-      return (
-        <View style={{ flex: 1, width: "100%", height: "100%", zIndex: 100 }}>
-          <FlatList
-            data={discoverShops}
-            extraData={discoverShops}
-            horizontal={false}
-            renderItem={({ item }) => (
-              <View key={item.shop_id} style={{ marginHorizontal: 15 }}>
-                <TouchableOpacity onPress={() => openShopPage(item.shop_id)}>
-                  <ShopPreview selectedPin={item} type={1} />
-                </TouchableOpacity>
-              </View>
-            )}
-            showsVerticalScrollIndicator={false}
-            style={{ flex: 1, width: "100%", height: "100%" }}
-            scrollEventThrottle={20}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
-            keyExtractor={(item) => item.shop_id}
-            removeClippedSubviews={false}
-            refreshing={isPage1Loading}
-            onRefresh={() => {
-              onRefreshToNearby();
-            }}
-            windowSize={2}
-            onEndReachedThreshold={0.5}
-            onEndReached={handleScroll}
-            ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
-          />
-        </View>
-      );
-    } else {
-      return (
-        <View style={styles.loading}>
-          <ActivityIndicator />
-        </View>
-      );
-    }
+  if (discoverShops) {
+    return (
+      <View style={{ flex: 1, width: "100%", height: "100%", zIndex: 100 }}>
+        <FlatList
+          data={discoverShops}
+          extraData={discoverShops}
+          horizontal={false}
+          renderItem={({ item }) => (
+            <View key={item.shop_id} style={{ marginHorizontal: 15 }}>
+              <TouchableOpacity onPress={() => openShopPage(item.shop_id)}>
+                <ShopPreview selectedPin={item} type={1} />
+              </TouchableOpacity>
+            </View>
+          )}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, width: "100%", height: "100%" }}
+          scrollEventThrottle={20}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          keyExtractor={(item) => item.shop_id}
+          removeClippedSubviews={false}
+          refreshing={isPage1Loading}
+          onRefresh={() => {
+            resetShops();
+          }}
+          windowSize={2}
+          onEndReachedThreshold={0.5}
+          onEndReached={handleScroll}
+          ListEmptyComponent={
+            filterSelection === 2 ? (
+                <View style={styles.empty}>
+                  <SvgXml
+                    xml={mediumLogo}
+                    height={width / 4}
+                    width={width * 0.7}
+                    color={color_pallete[1]}
+                  />
+                  <Text style={styles.emptyText}>
+                    Favorited Shops Will Appear Here
+                  </Text>
+                </View>
+            ) : null
+          }          
+          ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
+        />
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator />
+      </View>
+    );
   }
-);
+};
 
 const styles = StyleSheet.create({
   loading: {
@@ -262,5 +274,21 @@ const styles = StyleSheet.create({
     color: color_pallete[2],
     fontSize: 16,
     fontWeight: "bold",
+  },
+  empty: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center", 
+    paddingHorizontal: 20,
+  },
+  emptyText: {
+    color: color_pallete[2],
+    fontFamily: "Avenir Next",
+    fontWeight: "600",
+    flexWrap: "wrap",
+    textAlign: "center",
+    width: "80%",
+    marginBottom: "8%",
   },
 });
