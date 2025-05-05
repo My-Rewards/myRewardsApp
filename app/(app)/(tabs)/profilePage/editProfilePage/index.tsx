@@ -14,7 +14,7 @@ import {
 import { useRouter } from "expo-router";
 import { color_pallete } from "@/constants/Colors";
 import formatDate from "@/constants/formatDate";
-import updateUser from "@/APIs/user/updateUser";
+import updateUser from "@/APIs/ProfileAPIs/updateUser";
 import { localData } from "@/app-data/appData";
 import { useProps } from "@/app/LoadingProp/propsProvider";
 export default function EditProfilePage() {

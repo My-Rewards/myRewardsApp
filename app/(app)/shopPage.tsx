@@ -13,7 +13,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import {fetchNearestShop} from "@/APIs/fetchShopPlan";
+import { fetchNearestShop } from "@/APIs/PlanAPIs/fetchShopPlan";
 import {RewardModalProvider} from "@/app/(app)/Reward/redeem";
 
 export default function shopPage() {
@@ -28,9 +28,12 @@ export default function shopPage() {
 
   useEffect(() => {
     const fetchShop = async () => {
-
       if (org_id && userLocation) {
-        const shop = await fetchNearestShop(userLocation.latitude, userLocation.longitude, org_id);
+        const shop = await fetchNearestShop(
+          userLocation.latitude,
+          userLocation.longitude,
+          org_id
+        );
         if (shop) {
           setShopId(shop);
         }
@@ -39,11 +42,10 @@ export default function shopPage() {
     fetchShop();
   }, [org_id]);
 
-
   return (
     <View style={{ flex: 1 }}>
       <View>
-        <SafeAreaView style={{ backgroundColor: color_pallete[10] }}/>
+        <SafeAreaView style={{ backgroundColor: color_pallete[10] }} />
         <View style={[styles.header, { paddingBottom: 5 }]}>
           <SafeAreaView />
           <TouchableOpacity

@@ -26,7 +26,7 @@ import {
   ShopPreviewProps,
 } from "@/app-data/data-types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { fetchPinnedShop } from "@/APIs/fetchPinnedShop";
+import { fetchPinnedShop } from "@/APIs/MapAPIs/fetchPinnedShop";
 import { FetchMapToast, NoShopsToast } from "@/components/loading-states/FetchMapToast";
 
 export default function mapPage() {

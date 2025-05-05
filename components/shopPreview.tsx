@@ -41,12 +41,13 @@ import {
   getShopStatus,
 } from "@/constants/functions";
 import { useProps } from "@/app/LoadingProp/propsProvider";
-import { fetchShop, fetchPlan } from "@/APIs/fetchShopPlan";
-import { PlanLoadingState } from "./loading-states/PlanLoadingState";
+import { fetchShop, fetchPlan } from "@/APIs/PlanAPIs/fetchShopPlan";
+import {
+  PlanLoadingState,
+} from "./loading-states/PlanLoadingState";
 import { RewardsLoadingState } from "./loading-states/RewardsLoadingState";
-import { toggleLike } from "@/APIs/updateOrgLike";
-import {RewardModalProvider, useRewardModal} from "@/app/(app)/Reward/redeem";
-
+import { toggleLike } from "@/APIs/DiscoverAPIs/updateOrgLike";
+import { RewardModalProvider, useRewardModal } from "@/app/(app)/Reward/redeem";
 const { width } = Dimensions.get("window");
 
 type MiniPreviewPropShops = {
@@ -151,9 +152,9 @@ export const ShopPreview = ({ selectedPin, type }: MiniPreviewPropShops) => {
                       : { color: color_pallete[2] },
                   ]}
                 >
-                {selectedPin.distance != null
-                  ? `${selectedPin.distance} miles away`
-                  : "location unavailable"}
+                  {selectedPin.distance != null
+                    ? `${selectedPin.distance} miles away`
+                    : "location unavailable"}
                 </Text>
               </View>
               <View>
@@ -245,7 +246,6 @@ export const ExpandedShop = ({
     fetchShopDetails();
   }, [shopId]);
 
-
   const handleToggle = (index: number) => {
     setSelectedIndex(index);
     currentScreen.current = -index;
@@ -315,9 +315,7 @@ export const ExpandedShop = ({
                 : { width: width },
               { transform: [{ translateX }] },
             ]}
-            {...(plan.rl_active &&
-              plan.rm_active &&
-              panResponder.panHandlers)}
+            {...(plan.rl_active && plan.rm_active && panResponder.panHandlers)}
           >
             {plan.rl_active && (
               <View style={{ width }}>

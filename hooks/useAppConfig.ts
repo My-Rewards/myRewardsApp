@@ -1,4 +1,4 @@
-import { fetchAppConfig } from "@/APIs/fetchConfig";
+import { fetchAppConfig } from "@/APIs/ExternalAPIs/fetchConfig";
 
 export const useAppConfig = async () => {
   const data = await fetchAppConfig();

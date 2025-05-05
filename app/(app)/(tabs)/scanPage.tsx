@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import NfcManager, { NfcTech } from "react-native-nfc-manager";
 import { SvgXml } from "react-native-svg";
-import { toggleVisit } from "@/APIs/toggleVisit";
+import { toggleVisit } from "@/APIs/PlanAPIs/toggleVisit";
 
 const { width } = Dimensions.get("window");
 

@@ -17,15 +17,16 @@ import {
   mapPinProps,
 } from "./data-types";
 import Map from "react-native-maps";
-import fetchUser from "@/APIs/user/fetchUser";
-import { fetchAppConfig } from "@/APIs/fetchConfig";
+import fetchUser from "@/APIs/ProfileAPIs/fetchUser";
+import { fetchAppConfig } from "@/APIs/ExternalAPIs/fetchConfig";
 import { set } from "zod";
-import { fetchNearbyShops } from "@/APIs/discoverShops";
-import { fetchRadiusShops } from "@/APIs/fetchRadiusShops";
-import { fetchSearchedShop } from "@/APIs/fetchSearchedShop";
-import {fetchUserLikedPlans, fetchUserPlans} from "@/APIs/fetchUserPlans";
+import { fetchNearbyShops } from "@/APIs/DiscoverAPIs/discoverShops";
+import { fetchRadiusShops } from "@/APIs/MapAPIs/fetchRadiusShops";
+import { fetchSearchedShop } from "@/APIs/DiscoverAPIs/fetchSearchedShop";
+import {fetchUserLikedPlans, fetchUserPlans} from "@/APIs/PlanAPIs/fetchUserPlans";
+import { fetchPopularShops } from "@/APIs/DiscoverAPIs/fetchPopularShops";
+import { fetchFavoriteShops } from "@/APIs/DiscoverAPIs/fetchFavoriteShops";
 import {AppState} from "react-native";
-
 const DataContext = createContext<{
   fetchShopsByRadius: (currRegion: regionProp) => void;
   fetchDiscoverShops: (filterOption: number, refresh: boolean) => void;
@@ -256,7 +257,6 @@ export function AppData({
       let currentShops = page>1? discoverShopsFilter1 || [] : [];
 
       if(isShopSearched){
-        setDiscoverShopsFilter1(null);
         setIsShopSearched(false);
         currentShops = [];
       }
@@ -269,7 +269,7 @@ export function AppData({
       if (!response || !Array.isArray(response.value)) return;
 
       const shops = response.value;
-      const updatedShops = [...currentShops, ...shops];
+      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
 
       setDiscoverShopsFilter1(updatedShops);
       if(response.pagination.hasMore) {
@@ -281,44 +281,42 @@ export function AppData({
   };
 
   const fetchDiscoverPage2 = async (page: number = discoverPage2): Promise<void> => {
-    const coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      let currentShops = page>1? discoverShopsFilter1 || [] : [];
+    if(page === -1) return;
+    let currentShops = page>1? discoverShopsFilter1 || [] : [];
 
       if(isShopSearched){
-        setDiscoverShopsFilter2(null);
         setIsShopSearched(false);
         currentShops = [];
       }
-      const response = await fetchNearbyShops(
-          coords.longitude,
-          coords.latitude,
+      const response = await fetchPopularShops(
           page
       );
 
       if (!response || !Array.isArray(response.value)) return;
 
       const shops = response.value;
-      const updatedShops = [...currentShops, ...shops];
+      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
 
       setDiscoverShopsFilter2(updatedShops);
-      setDiscoverPage2(response.pagination.nextPage || page);
-    }
+      if(response.pagination.hasMore) {
+        setDiscoverPage2(response.pagination.nextPage);
+      } else {
+        setDiscoverPage2(-1);
+      }
   };
 
   const fetchDiscoverPage3 = async (page: number = discoverPage3): Promise<void> => {
+    if(page === -1) return;
     let coords = userLocation ? userLocation : await getCurrentLocation()
 
     if (coords) {
       let currentShops = page>1? discoverShopsFilter1 || [] : [];
 
       if(isShopSearched){
-        setDiscoverShopsFilter3(null);
         setIsShopSearched(false);
         currentShops = [];
       }
-      const response = await fetchNearbyShops(
+      const response = await fetchFavoriteShops(
           coords.longitude,
           coords.latitude,
           page
@@ -327,10 +325,14 @@ export function AppData({
       if (!response || !Array.isArray(response.value)) return;
 
       const shops = response.value;
-      const updatedShops = [...currentShops, ...shops];
+      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
 
       setDiscoverShopsFilter3(updatedShops);
-      setDiscoverPage3(response.pagination.nextPage || page);
+      if(response.pagination.hasMore) {
+        setDiscoverPage3(response.pagination.nextPage);
+      } else {
+        setDiscoverPage3(-1);
+      }
     }
   };
 
@@ -434,11 +436,11 @@ export function AppData({
                 break;
               case 1:
                 await fetchDiscoverPage2(refresh? 1 : undefined);
-                setFetchingPage1(false);
+                setFetchingPage2(false);
                 break;
               case 2:
                 await fetchDiscoverPage3(refresh? 1 : undefined);
-                setFetchingPage1(false);
+                setFetchingPage3(false);
                 break;
               default:
                 throw new Error("Invalid filter option");
@@ -507,8 +509,9 @@ export function AppData({
             }
           }
           if (coords) {
+            setFetchingPage1(true);
             const prevShops = discoverShopsFilter1;
-            setDiscoverShopsFilter1(null);
+            setDiscoverShopsFilter1([]);
             const result = await fetchSearchedShop(
               shop_name,
               coords.longitude,
