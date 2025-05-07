@@ -29,41 +29,6 @@ import {
   fetchUserLikedPlans,
 } from "@/APIs/PlanAPIs/fetchUserPlans";
 
-type AppDataContextType = {
-  profile: Profile | null;
-  appConfig: AppConfig | null;
-  userLocation: regionProp | null;
-  region: regionProp;
-  radiusShops: mapPinProps[];
-  discoverNearby: ShopPreviewProps[];
-  discoverPopular: ShopPreviewProps[];
-  discoverFavorite: ShopPreviewProps[];
-  plans: PreviewPlanProp[];
-  favoritePlans: PreviewPlanProp[];
-  isShopSearched: boolean;
-  isLoadingProfile: boolean;
-  isLoadingDiscover: boolean;
-  setIsLoadingDiscover: (loading: boolean) => void;
-  isLoadingMap: boolean;
-  isLoadingPlans: boolean;
-  locateMe: (mapRef: React.RefObject<MapView>) => Promise<void>;
-  setRegion: (location: regionProp) => void;
-  fetchProfile: () => Promise<Profile>;
-  fetchAppConfig: () => Promise<AppConfig>;
-  fetchDiscover: (
-    filter: "nearby" | "popular" | "favorite",
-    refresh?: boolean
-  ) => Promise<void>;
-  searchShop: (shopName: string) => Promise<void>;
-  fetchMapShops: () => Promise<void>;
-  fetchPlans: (refresh?: boolean) => Promise<void>;
-  fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
-  setSavedFilterSelection: (filter:  "nearby" | "popular" | "favorite") => void;
-  savedFilterSelection: "nearby" | "popular" | "favorite";
-  setFilterNumber: (filter: 0 | 1 | 2) => void;
-  filterNumber: number;
-};
-
 const DataContext = createContext<AppDataContextType | undefined>(undefined);
 
 export function localData() {
@@ -352,3 +317,38 @@ export function AppData({
     </DataContext.Provider>
   );
 }
+
+type AppDataContextType = {
+  profile: Profile | null;
+  appConfig: AppConfig | null;
+  userLocation: regionProp | null;
+  region: regionProp;
+  radiusShops: mapPinProps[];
+  discoverNearby: ShopPreviewProps[];
+  discoverPopular: ShopPreviewProps[];
+  discoverFavorite: ShopPreviewProps[];
+  plans: PreviewPlanProp[];
+  favoritePlans: PreviewPlanProp[];
+  isShopSearched: boolean;
+  isLoadingProfile: boolean;
+  isLoadingDiscover: boolean;
+  setIsLoadingDiscover: (loading: boolean) => void;
+  isLoadingMap: boolean;
+  isLoadingPlans: boolean;
+  locateMe: (mapRef: React.RefObject<MapView>) => Promise<void>;
+  setRegion: (location: regionProp) => void;
+  fetchProfile: () => Promise<Profile>;
+  fetchAppConfig: () => Promise<AppConfig>;
+  fetchDiscover: (
+    filter: "nearby" | "popular" | "favorite",
+    refresh?: boolean
+  ) => Promise<void>;
+  searchShop: (shopName: string) => Promise<void>;
+  fetchMapShops: () => Promise<void>;
+  fetchPlans: (refresh?: boolean) => Promise<void>;
+  fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
+  setSavedFilterSelection: (filter:  "nearby" | "popular" | "favorite") => void;
+  savedFilterSelection: "nearby" | "popular" | "favorite";
+  setFilterNumber: (filter: 0 | 1 | 2) => void;
+  filterNumber: number;
+};
