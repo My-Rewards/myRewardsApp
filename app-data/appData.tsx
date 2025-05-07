@@ -57,6 +57,8 @@ type AppDataContextType = {
   fetchMapShops: () => Promise<void>;
   fetchPlans: (refresh?: boolean) => Promise<void>;
   fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
+  setSavedFilterSelection: (filter:  "nearby" | "popular" | "favorite") => void;
+  savedFilterSelection: "nearby" | "popular" | "favorite";
 };
 
 const DataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -91,6 +93,7 @@ export function AppDataProvider({
   const [discoverFavorite, setDiscoverFavorite] = useState<ShopPreviewProps[]>(
     []
   );
+  const [savedFilterSelection, setSavedFilterSelection] = useState<"nearby" | "popular" | "favorite">("nearby");
   const [plans, setPlans] = useState<PreviewPlanProp[]>([]);
   const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]>([]);
   const [isShopSearched, setIsShopSearched] = useState(false);
@@ -315,6 +318,8 @@ export function AppDataProvider({
         fetchMapShops,
         fetchPlans,
         fetchFavoritePlans,
+        setSavedFilterSelection,
+        savedFilterSelection,
       }}
     >
       {children}
