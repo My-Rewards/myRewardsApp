@@ -30,12 +30,13 @@ export default function index() {
     discoverNearby,
     discoverPopular,
     discoverFavorite,
-    isLoadingDiscover
+    isLoadingDiscover,
+    filterNumber,
+    setFilterNumber,
   } = localData();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const [loadingMore, setLoadingMore] = useState(false);
-  const [filterNumber, setFilterNumber] = useState(0);
   const runAnimation = (value: number) => {
     Animated.timing(slideAnim, {
       toValue: value,
@@ -144,6 +145,7 @@ const ShopPreviews = ({
 }) => {
   const {
     isLoadingDiscover,
+    setIsLoadingDiscover,
     fetchDiscover,
     savedFilterSelection,
     setSavedFilterSelection,
@@ -162,6 +164,21 @@ const ShopPreviews = ({
       params: { parentPage: "Discover", shop_id },
     });
   };
+
+  const refreshAll = async () => {
+    setIsLoadingDiscover(true);
+    try{
+      await Promise.all([
+        fetchDiscover("nearby", true),
+         fetchDiscover("popular", true),
+        fetchDiscover("favorite", true),
+      ]);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    } finally {
+      setIsLoadingDiscover(false);
+    }
+  }
 
   if (discoverShops) {
     return (
@@ -185,9 +202,7 @@ const ShopPreviews = ({
           keyExtractor={(item) => item.shop_id}
           removeClippedSubviews={false}
           refreshing={isLoadingDiscover}
-          onRefresh={() => {
-            fetchDiscover(savedFilterSelection, true);
-          }}
+          onRefresh={refreshAll}
           windowSize={2}
           onScrollEndDrag={handleScroll}
           onEndReachedThreshold={0.8}

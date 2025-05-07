@@ -29,7 +29,7 @@ export default function TabLayout() {
   const [searchResults, setSearchResults] = useState<
     { id: string; name: string }[]
   >([]);
-  const { searchShop, setSavedFilterSelection } = localData();
+  const { searchShop, setSavedFilterSelection, setFilterNumber } = localData();
 
   const handleSearch = async (text: string) => {
     setSearchText(text);
@@ -62,6 +62,8 @@ export default function TabLayout() {
   };
 
   const fetchSearchResult = async (name: string) => {
+    setSavedFilterSelection("nearby");  
+    setFilterNumber(0);
     searchShop(name);
     setSearchText("");
     setSearchResults([]);

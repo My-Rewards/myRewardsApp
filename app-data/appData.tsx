@@ -43,6 +43,7 @@ type AppDataContextType = {
   isShopSearched: boolean;
   isLoadingProfile: boolean;
   isLoadingDiscover: boolean;
+  setIsLoadingDiscover: (loading: boolean) => void;
   isLoadingMap: boolean;
   isLoadingPlans: boolean;
   locateMe: (mapRef: React.RefObject<MapView>) => Promise<void>;
@@ -59,6 +60,8 @@ type AppDataContextType = {
   fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
   setSavedFilterSelection: (filter:  "nearby" | "popular" | "favorite") => void;
   savedFilterSelection: "nearby" | "popular" | "favorite";
+  setFilterNumber: (filter: 0 | 1 | 2) => void;
+  filterNumber: number;
 };
 
 const DataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -94,6 +97,7 @@ export function AppData({
     []
   );
   const [savedFilterSelection, setSavedFilterSelection] = useState<"nearby" | "popular" | "favorite">("nearby");
+  const [filterNumber, setFilterNumber] = useState<0 | 1 | 2>(0);
   const [plans, setPlans] = useState<PreviewPlanProp[]>([]);
   const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]>([]);
   const [isShopSearched, setIsShopSearched] = useState(false);
@@ -184,7 +188,6 @@ export function AppData({
     filter: "nearby" | "popular" | "favorite",
     refresh = false
   ) {
-    setIsLoadingDiscover(true);
     try {
       const coords = userLocation ?? (await getCurrentLocation());
       if (!coords) return;
@@ -193,20 +196,20 @@ export function AppData({
       if (filter === "nearby") {
         if(pagination.current.nearby === -1) return;
         resp = await fetchNearbyShops(coords.longitude, coords.latitude, page);
-        if(!resp && Array.isArray(resp)) {
+        if(!resp.value && Array.isArray(resp)) {
           console.error("No shops found");
         }
-        setDiscoverNearby((d) =>
-          refresh ? resp.value : [...d, ...resp.value]
+        setDiscoverNearby((prev) =>
+          refresh ? resp.value : [...prev, ...resp.value]
         );
       } else if (filter === "popular") {
         if(pagination.current.popular === -1) return;
         resp = await fetchPopularShops(coords.longitude, coords.latitude, page);
-        if(!resp && Array.isArray(resp)) {
+        if(!resp.value && Array.isArray(resp)) {
           console.error("No shops found");
         }
-        setDiscoverPopular((d) =>
-          refresh ? resp.value : [...d, ...resp.value]
+        setDiscoverPopular((prev) =>
+          refresh ? resp.value : [...prev, ...resp.value]
         );
       } else {
         if(pagination.current.favorite === -1) return;
@@ -215,18 +218,16 @@ export function AppData({
           coords.latitude,
           page
         );
-        if(!resp && Array.isArray(resp)) {
+        if(!resp.value && Array.isArray(resp)) {
           console.error("No shops found");
         }
-        setDiscoverFavorite((d) =>
-          refresh ? resp.value : [...d, ...resp.value]
+        setDiscoverFavorite((prev) =>
+          refresh ? resp.value : [...prev, ...resp.value]
         );
       }
       pagination.current[filter] = resp.pagination.nextPage ?? -1;
     } catch (e) {
       console.error(e);
-    } finally {
-      setIsLoadingDiscover(false);
     }
   }
 
@@ -267,7 +268,9 @@ export function AppData({
 
   async function fetchPlans(refresh = false) {
     if(pagination.current.plans === -1) return; 
-    setIsLoadingPlans(true);
+    if(refresh){
+      setIsLoadingPlans(true);
+    }
     try {
       const page = refresh ? 1 : pagination.current.plans;
       const resp = await fetchUserPlans(
@@ -276,7 +279,10 @@ export function AppData({
         10,
         page
       );
-      setPlans((p) => (refresh ? resp.value : [...p, ...resp.value]));
+      if(!resp.value && !Array.isArray(resp)) {
+        console.error("No plans found");
+      }
+      setPlans((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
       pagination.current.plans = resp.pagination.nextPage ?? -1;
     } catch (e) {
       console.error(e);
@@ -296,7 +302,10 @@ export function AppData({
         10,
         page
       );
-      setFavoritePlans((p) => (refresh ? resp.value : [...p, ...resp.value]));
+      if(!resp.value && !Array.isArray(resp)) {
+        console.error("No favorite plans found");
+      }
+      setFavoritePlans((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
       pagination.current.liked = resp.pagination.nextPage ?? -1;
     } catch (e) {
       console.error(e);
@@ -334,6 +343,9 @@ export function AppData({
         fetchFavoritePlans,
         setSavedFilterSelection,
         savedFilterSelection,
+        setIsLoadingDiscover,
+        filterNumber,
+        setFilterNumber,
       }}
     >
       {children}
