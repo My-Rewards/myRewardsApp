@@ -69,7 +69,7 @@ export function localData() {
   return ctx;
 }
 
-export function AppDataProvider({
+export function AppData({
   children,
   userSub,
 }: PropsWithChildren<{ userSub: string }>) {
@@ -191,21 +191,33 @@ export function AppDataProvider({
       const page = refresh ? 1 : pagination.current[filter];
       let resp: { value: ShopPreviewProps[]; pagination: { nextPage: number } };
       if (filter === "nearby") {
+        if(pagination.current.nearby === -1) return;
         resp = await fetchNearbyShops(coords.longitude, coords.latitude, page);
+        if(!resp && Array.isArray(resp)) {
+          console.error("No shops found");
+        }
         setDiscoverNearby((d) =>
           refresh ? resp.value : [...d, ...resp.value]
         );
       } else if (filter === "popular") {
+        if(pagination.current.popular === -1) return;
         resp = await fetchPopularShops(coords.longitude, coords.latitude, page);
+        if(!resp && Array.isArray(resp)) {
+          console.error("No shops found");
+        }
         setDiscoverPopular((d) =>
           refresh ? resp.value : [...d, ...resp.value]
         );
       } else {
+        if(pagination.current.favorite === -1) return;
         resp = await fetchFavoriteShops(
           coords.longitude,
           coords.latitude,
           page
         );
+        if(!resp && Array.isArray(resp)) {
+          console.error("No shops found");
+        }
         setDiscoverFavorite((d) =>
           refresh ? resp.value : [...d, ...resp.value]
         );
@@ -254,6 +266,7 @@ export function AppDataProvider({
   }
 
   async function fetchPlans(refresh = false) {
+    if(pagination.current.plans === -1) return; 
     setIsLoadingPlans(true);
     try {
       const page = refresh ? 1 : pagination.current.plans;
@@ -273,6 +286,7 @@ export function AppDataProvider({
   }
 
   async function fetchFavoritePlans(refresh = false) {
+    if(pagination.current.liked === -1) return;
     setIsLoadingPlans(true);
     try {
       const page = refresh ? 1 : pagination.current.liked;
