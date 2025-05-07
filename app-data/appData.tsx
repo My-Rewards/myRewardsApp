@@ -1,14 +1,15 @@
 import React, {
   useContext,
   createContext,
-  type PropsWithChildren,
+  PropsWithChildren,
   useState,
   useEffect,
+  useRef,
 } from "react";
 import * as Location from "expo-location";
+import MapView from "react-native-maps";
 import { useProps } from "@/app/LoadingProp/propsProvider";
-import {
-  Plan,
+import type {
   PreviewPlanProp,
   Profile,
   regionProp,
@@ -16,528 +17,304 @@ import {
   AppConfig,
   mapPinProps,
 } from "./data-types";
-import Map from "react-native-maps";
 import fetchUser from "@/APIs/ProfileAPIs/fetchUser";
-import { fetchAppConfig } from "@/APIs/ExternalAPIs/fetchConfig";
-import { set } from "zod";
-import { fetchNearbyShops } from "@/APIs/DiscoverAPIs/discoverShops";
-import { fetchRadiusShops } from "@/APIs/MapAPIs/fetchRadiusShops";
-import { fetchSearchedShop } from "@/APIs/DiscoverAPIs/fetchSearchedShop";
-import {fetchUserLikedPlans, fetchUserPlans} from "@/APIs/PlanAPIs/fetchUserPlans";
+import { fetchAppConfig as apiFetchAppConfig } from "@/APIs/ExternalAPIs/fetchConfig";
 import { fetchPopularShops } from "@/APIs/DiscoverAPIs/fetchPopularShops";
+import { fetchNearbyShops } from "@/APIs/DiscoverAPIs/discoverShops";
 import { fetchFavoriteShops } from "@/APIs/DiscoverAPIs/fetchFavoriteShops";
-import {AppState} from "react-native";
-const DataContext = createContext<{
-  fetchShopsByRadius: (currRegion: regionProp) => void;
-  fetchDiscoverShops: (filterOption: number, refresh: boolean) => void;
-  fetchNearestShopResult: (shop_name: string) => void;
-  fetchPlans: (filterOption: number, refresh: boolean) => void;
-  fetchProfile: () => void;
-  locateMe: (map: React.RefObject<Map>) => void;
-  setRegion: (location: regionProp) => void;
-  region: regionProp;
-  radiusShops?: mapPinProps[] | null;
-  discoverShopsFilter1?: ShopPreviewProps[] | null;
-  discoverShopsFilter2?: ShopPreviewProps[] | null;
-  discoverShopsFilter3?: ShopPreviewProps[] | null;
-  shopPreviewCache?: ShopPreviewProps | null;
-  profile?: Profile | null;
-  plans?: PreviewPlanProp[] | null;
-  favoritePlans?: PreviewPlanProp[] | null;
-  updateShopFavorite: (shop_id: string, isFav: boolean) => void;
-  isPage1Loading: boolean;
-  isPage2Loading: boolean;
-  isPage3Loading: boolean;
-  isPage4Loading: boolean;
-  userLocation: regionProp | null;
-  fetchAppConfig: () => Promise<AppConfig | null>;
+import { fetchSearchedShop } from "@/APIs/DiscoverAPIs/fetchSearchedShop";
+import { fetchRadiusShops } from "@/APIs/MapAPIs/fetchRadiusShops";
+import {
+  fetchUserPlans,
+  fetchUserLikedPlans,
+} from "@/APIs/PlanAPIs/fetchUserPlans";
+
+type AppDataContextType = {
+  profile: Profile | null;
   appConfig: AppConfig | null;
+  userLocation: regionProp | null;
+  region: regionProp;
+  radiusShops: mapPinProps[];
+  discoverNearby: ShopPreviewProps[];
+  discoverPopular: ShopPreviewProps[];
+  discoverFavorite: ShopPreviewProps[];
+  plans: PreviewPlanProp[];
+  favoritePlans: PreviewPlanProp[];
   isShopSearched: boolean;
-}>({
-  fetchShopsByRadius: async () => null,
-  fetchDiscoverShops: async () => null,
-  fetchPlans: async () => null,
-  fetchNearestShopResult: async () => null,
-  fetchProfile: async () => null,
-  locateMe: async () => null,
-  setRegion: async () => null,
-  radiusShops: null,
-  discoverShopsFilter1: null,
-  discoverShopsFilter2: null,
-  discoverShopsFilter3: null,
-  shopPreviewCache: null,
-  region: {
-    latitude: 28.5384,
-    longitude: -81.3789,
-    latitudeDelta: 0.008,
-    longitudeDelta: 0.008,
-  },
-  profile: null,
-  plans: null,
-  favoritePlans: null,
-  updateShopFavorite: () => null,
-  isPage1Loading: false,
-  isPage2Loading: false,
-  isPage3Loading: false,
-  isPage4Loading: false,
-  userLocation: null,
-  fetchAppConfig: async () => null,
-  appConfig: null,
-  isShopSearched: false,
-});
+  isLoadingProfile: boolean;
+  isLoadingDiscover: boolean;
+  isLoadingMap: boolean;
+  isLoadingPlans: boolean;
+  locateMe: (mapRef: React.RefObject<MapView>) => Promise<void>;
+  setRegion: (location: regionProp) => void;
+  fetchProfile: () => Promise<Profile>;
+  fetchAppConfig: () => Promise<AppConfig>;
+  fetchDiscover: (
+    filter: "nearby" | "popular" | "favorite",
+    refresh?: boolean
+  ) => Promise<void>;
+  searchShop: (shopName: string) => Promise<void>;
+  fetchMapShops: () => Promise<void>;
+  fetchPlans: (refresh?: boolean) => Promise<void>;
+  fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
+};
+
+const DataContext = createContext<AppDataContextType | undefined>(undefined);
 
 export function localData() {
-  return useContext(DataContext);
+  const ctx = useContext(DataContext);
+  if (!ctx) throw new Error("useAppData must be used within AppDataProvider");
+  return ctx;
 }
 
-export function AppData({
+export function AppDataProvider({
   children,
-}: PropsWithChildren & { userSub: string }) {
+  userSub,
+}: PropsWithChildren<{ userSub: string }>) {
   const { alert } = useProps();
-  const [radiusShops, setRadiusShops] = useState<mapPinProps[] | null>();
-  const [profile, setProfile] = useState<Profile | null>();
-  const [userLocation, setUserLocation] = useState<regionProp | null>(null);
+
+  //State
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [appConfig, setAppConfig] = useState<AppConfig | null>(null);
-  const [plans, setPlans] = useState<PreviewPlanProp[] | null>();
-  const [favoritePlans, setFavoritePlans] = useState<
-    PreviewPlanProp[] | null
-  >();
-
-  // Pagination attributes
-  const [discoverPage1, setDiscoverPage1] = useState(1);
-  const [discoverPage2, setDiscoverPage2] = useState(1);
-  const [discoverPage3, setDiscoverPage3] = useState(1);
-
-  const [plansPage1, setPlansPage1] = useState(1);
-  const [plansPage2, setPlansPage2] = useState(1);
-
+  const [userLocation, setUserLocation] = useState<regionProp | null>(null);
   const [region, setRegion] = useState<regionProp>({
     latitude: 28.5384,
     longitude: -81.3789,
-    latitudeDelta: userLocation?.latitudeDelta || 0.008,
-    longitudeDelta: userLocation?.longitudeDelta || 0.008,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
   });
-
-  const [fetchingPage1, setFetchingPage1] = useState(false);
-  const [fetchingPage2, setFetchingPage2] = useState(false);
-  const [fetchingPage3, setFetchingPage3] = useState(false);
-  const [fetchingPage4, setFetchingPage4] = useState(false);
+  const [radiusShops, setRadiusShops] = useState<mapPinProps[]>([]);
+  const [discoverNearby, setDiscoverNearby] = useState<ShopPreviewProps[]>([]);
+  const [discoverPopular, setDiscoverPopular] = useState<ShopPreviewProps[]>(
+    []
+  );
+  const [discoverFavorite, setDiscoverFavorite] = useState<ShopPreviewProps[]>(
+    []
+  );
+  const [plans, setPlans] = useState<PreviewPlanProp[]>([]);
+  const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]>([]);
   const [isShopSearched, setIsShopSearched] = useState(false);
 
-  const [discoverShopsFilter1, setDiscoverShopsFilter1] = useState<
-    ShopPreviewProps[] | null
-  >();
-  const [discoverShopsFilter2, setDiscoverShopsFilter2] = useState<
-    ShopPreviewProps[] | null
-  >();
-  const [discoverShopsFilter3, setDiscoverShopsFilter3] = useState<
-    ShopPreviewProps[] | null
-  >();
+  //Loading flags
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [isLoadingDiscover, setIsLoadingDiscover] = useState(false);
+  const [isLoadingMap, setIsLoadingMap] = useState(false);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
-  const bootstrap = async () => {
-    try {
-      if (!profile) {
-        const fetchedProfile = await fetchUser();
-        setProfile(fetchedProfile);
-        setFetchingPage4(false);
-      }
+  //Pagination tracker
+  const pagination = useRef({
+    nearby: 1,
+    popular: 1,
+    favorite: 1,
+    plans: 1,
+    liked: 1,
+  });
 
-      if (!appConfig) {
-        setAppConfig(appConfig);
-      }
-
-      if (
-          !(
-              discoverShopsFilter1 ||
-              discoverShopsFilter2 ||
-              discoverShopsFilter3
-          )
-      ) {
-
-        await fetchDiscoverPage1();
-        await fetchDiscoverPage2();
-        await fetchDiscoverPage3();
-      }
-
-      if (!radiusShops) {
-        await setMapPageShops();
-      }
-      if (!plans) {
-        setFetchingPage4(true);
-
-        await fetchPlansPage1();
-        await fetchPlansPage2();
-
-        setFetchingPage4(false);
-      }
-    } catch (error) {
-      console.error("Error in fetchData sequence:", error);
-    }
-  };
-
+  //Init
   useEffect(() => {
     getCurrentLocation().catch(console.error);
-
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') {
-        getCurrentLocation().catch(console.error);
-      }
-    });
-
-    return () => subscription.remove();
   }, []);
-
   useEffect(() => {
-    if(userLocation) bootstrap();
+    if (userLocation) bootstrap();
   }, [userLocation]);
 
-  async function getCurrentLocation() {
-    try {
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-        mayShowUserSettingsDialog: true,
-      });
-      setUserLocation({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      });
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      })
+  async function bootstrap() {
+    await Promise.all([
+      await fetchProfile(),
+      await fetchAppConfig(),
+      fetchDiscover("nearby"),
+      fetchDiscover("popular"),
+      fetchDiscover("favorite"),
+      fetchMapShops(),
+      fetchPlans(),
+      fetchFavoritePlans(),
+    ]);
+  }
 
-      return {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+  async function getCurrentLocation(): Promise<regionProp | undefined> {
+    try {
+      const loc = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+      const coords = {
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       };
-
-    } catch (error) {
+      setUserLocation(coords);
+      setRegion(coords);
+      return coords;
+    } catch {
       const { status } = await Location.getForegroundPermissionsAsync();
       if (status !== "granted") {
-        const permission = await Location.requestForegroundPermissionsAsync();
-        if (permission.status !== "granted") {
-          alert("", "Enable Access to your Location in Settings", "error");
-          return;
-        }
+        const perm = await Location.requestForegroundPermissionsAsync();
+        if (perm.status !== "granted")
+          alert("", "Enable access to your location in Settings", "error");
       }
-    } 
+    }
   }
 
-  async function rebaseUserLocation(map: React.RefObject<Map>) {
-    const coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords && map.current) {
-      map.current.animateToRegion(
-        {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: coords.latitudeDelta,
-          longitudeDelta: coords.longitudeDelta,
-        },
-        300
-      );
-    }
-
-    await getCurrentLocation();
+  async function locateMe(mapRef: React.RefObject<MapView>) {
+    const coords = userLocation ?? (await getCurrentLocation());
+    if (coords && mapRef.current) mapRef.current.animateToRegion(coords, 300);
   }
 
-  // Discover Shops requests
-  const fetchDiscoverPage1 = async (page: number = discoverPage1): Promise<void> => {
-    if(page === -1) return;
-
-    const coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      let currentShops = page>1? discoverShopsFilter1 || [] : [];
-
-      if(isShopSearched){
-        setIsShopSearched(false);
-        currentShops = [];
-      }
-      const response = await fetchNearbyShops(
-        coords.longitude,
-        coords.latitude,
-        page
-      );
-
-      if (!response || !Array.isArray(response.value)) return;
-
-      const shops = response.value;
-      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
-
-      setDiscoverShopsFilter1(updatedShops);
-      if(response.pagination.hasMore) {
-        setDiscoverPage1(response.pagination.nextPage);
-      } else {
-        setDiscoverPage1(-1);
-      }
+  async function fetchProfile(): Promise<Profile> {
+    setIsLoadingProfile(true);
+    try {
+      const data = await fetchUser();
+      setProfile(data);
+      return data;
+    } finally {
+      setIsLoadingProfile(false);
     }
-  };
+  }
 
-  const fetchDiscoverPage2 = async (page: number = discoverPage2): Promise<void> => {
-    if(page === -1) return;
+  async function fetchAppConfig(): Promise<AppConfig> {
+    const config = await apiFetchAppConfig();
+    setAppConfig(config);
+    return config;
+  }
 
-    const coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      let currentShops = page>1? discoverShopsFilter2 || [] : [];
-
-      if(isShopSearched){
-        setIsShopSearched(false);
-        currentShops = [];
-      }
-      const response = await fetchPopularShops(
-        coords.longitude,
-        coords.latitude,
-        page
-      );
-
-      if (!response || !Array.isArray(response.value)) return;
-
-      const shops = response.value;
-      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
-
-      setDiscoverShopsFilter2(updatedShops);
-      if(response.pagination.hasMore) {
-        setDiscoverPage2(response.pagination.nextPage);
+  async function fetchDiscover(
+    filter: "nearby" | "popular" | "favorite",
+    refresh = false
+  ) {
+    setIsLoadingDiscover(true);
+    try {
+      const coords = userLocation ?? (await getCurrentLocation());
+      if (!coords) return;
+      const page = refresh ? 1 : pagination.current[filter];
+      let resp: { value: ShopPreviewProps[]; pagination: { nextPage: number } };
+      if (filter === "nearby") {
+        resp = await fetchNearbyShops(coords.longitude, coords.latitude, page);
+        setDiscoverNearby((d) =>
+          refresh ? resp.value : [...d, ...resp.value]
+        );
+      } else if (filter === "popular") {
+        resp = await fetchPopularShops(coords.longitude, coords.latitude, page);
+        setDiscoverPopular((d) =>
+          refresh ? resp.value : [...d, ...resp.value]
+        );
       } else {
-        setDiscoverPage2(-1);
-      }
-    }
-  };
-
-  const fetchDiscoverPage3 = async (page: number = discoverPage3): Promise<void> => {
-    if(page === -1) return;
-    let coords = userLocation ? userLocation : await getCurrentLocation()
-
-    if (coords) {
-      let currentShops = page>1? discoverShopsFilter3 || [] : [];
-
-      if(isShopSearched){
-        setIsShopSearched(false);
-        currentShops = [];
-      }
-      const response = await fetchFavoriteShops(
+        resp = await fetchFavoriteShops(
           coords.longitude,
           coords.latitude,
           page
-      );
-
-      if (!response || !Array.isArray(response.value)) return;
-
-      const shops = response.value;
-      const updatedShops: ShopPreviewProps[] = [...currentShops, ...shops];
-
-      setDiscoverShopsFilter3(updatedShops);
-      if(response.pagination.hasMore) {
-        setDiscoverPage3(response.pagination.nextPage);
-      } else {
-        setDiscoverPage3(-1);
+        );
+        setDiscoverFavorite((d) =>
+          refresh ? resp.value : [...d, ...resp.value]
+        );
       }
+      pagination.current[filter] = resp.pagination.nextPage ?? -1;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingDiscover(false);
     }
-  };
-
-  // Fetch Map Shops
-  const setMapPageShops = async () => {
-      setFetchingPage2(true);
-      const response = await fetchRadiusShops(region.longitude, region.latitude);
-      setFetchingPage2(false);
-      if (!response) {
-        console.error("Invalid response: ", response);
-        return;
-      }
-      const shops = response.value;
-
-      setRadiusShops(shops);
-   }
-
-
-  // Active plans Request
-  const fetchPlansPage1 = async (page: number = plansPage1): Promise<void> => {
-    let currPlans = page>1? plans || [] : [];
-
-    const response = await fetchUserPlans(
-        userLocation?.latitude,
-        userLocation?.longitude,
-        10,
-        page
-    );
-
-    const updatedShops = [...currPlans, ...response.value];
-
-    setPlans(updatedShops)
-    setPlansPage1(response.pagination.nextPage || page)
   }
 
-  const fetchPlansPage2 = async (page: number = plansPage2): Promise<void> => {
-    let currFavPlans = page>1? favoritePlans || [] : [];
-
-    const response = await fetchUserLikedPlans(
-        userLocation?.latitude,
-        userLocation?.longitude,
-        10,
-        page
-    );
-
-    const updatedShops = [...currFavPlans, ...response.value];
-
-    setFavoritePlans(updatedShops)
-    setPlansPage2(response.pagination.nextPage || page)
-  }
-
-  const updateShopFavorite = (shop_id: string, isFav: boolean) => {
-    setDiscoverShopsFilter1(prev =>
-        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
-    );
-    setDiscoverShopsFilter2(prev =>
-        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
-    );
-    setDiscoverShopsFilter3(prev =>
-        prev ? prev.map(s => s.shop_id === shop_id ? { ...s, favorite: isFav } : s) : prev
-    );
-    setPlans(prev =>
-        prev
-            ? prev.map(p =>
-                p.shop_id === shop_id
-                    ? { ...p, favorite: isFav }
-                    : p
-            )
-            : prev
-    );
-    setFavoritePlans(prev => {
-      if (!prev) return prev;
-      if (isFav) {
-        const newlyFav = plans?.find(p => p.shop_id === shop_id ? { ...p, favorite: isFav } : p);
-        return newlyFav ? [...prev.filter(p => p.shop_id !== shop_id ? { ...p, favorite: isFav } : p), newlyFav] : prev;
+  async function searchShop(shopName: string) {
+    setIsLoadingDiscover(true);
+    try {
+      const coords = userLocation ?? (await getCurrentLocation());
+      if (!coords) return;
+      const resp = await fetchSearchedShop(
+        shopName,
+        coords.longitude,
+        coords.latitude
+      );
+      if (!resp.nearestShop) {
+        alert("", "Shop not found", "error");
       } else {
-        return prev.filter(p => p.shop_id !== shop_id);
+        setDiscoverNearby([resp.nearestShop]);
       }
-    });
-  };
+      setIsShopSearched(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingDiscover(false);
+    }
+  }
+
+  async function fetchMapShops() {
+    setIsLoadingMap(true);
+    try {
+      const resp = await fetchRadiusShops(region.longitude, region.latitude);
+      setRadiusShops(resp.value);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingMap(false);
+    }
+  }
+
+  async function fetchPlans(refresh = false) {
+    setIsLoadingPlans(true);
+    try {
+      const page = refresh ? 1 : pagination.current.plans;
+      const resp = await fetchUserPlans(
+        userLocation?.latitude,
+        userLocation?.longitude,
+        10,
+        page
+      );
+      setPlans((p) => (refresh ? resp.value : [...p, ...resp.value]));
+      pagination.current.plans = resp.pagination.nextPage ?? -1;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingPlans(false);
+    }
+  }
+
+  async function fetchFavoritePlans(refresh = false) {
+    setIsLoadingPlans(true);
+    try {
+      const page = refresh ? 1 : pagination.current.liked;
+      const resp = await fetchUserLikedPlans(
+        userLocation?.latitude,
+        userLocation?.longitude,
+        10,
+        page
+      );
+      setFavoritePlans((p) => (refresh ? resp.value : [...p, ...resp.value]));
+      pagination.current.liked = resp.pagination.nextPage ?? -1;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingPlans(false);
+    }
+  }
 
   return (
     <DataContext.Provider
       value={{
-        fetchShopsByRadius: async (currRegion: regionProp) => {
-          setRegion(currRegion);
-          await setMapPageShops();
-        },
-        fetchDiscoverShops: async (
-          filterOption: number,
-          refresh: boolean
-        ): Promise<void> => {
-
-          setFetchingPage1(true);
-
-          try {
-            switch (filterOption) {
-              case 0:
-                await fetchDiscoverPage1(refresh? 1 : undefined);
-                setFetchingPage1(false);
-                break;
-              case 1:
-                await fetchDiscoverPage2(refresh? 1 : undefined);
-                setFetchingPage2(false);
-                break;
-              case 2:
-                await fetchDiscoverPage3(refresh? 1 : undefined);
-                setFetchingPage3(false);
-                break;
-              default:
-                throw new Error("Invalid filter option");
-            }
-          } catch (error) {
-            console.error("Error fetching shops:", error);
-          }
-          setFetchingPage1(false);
-        },
-        fetchPlans: async (filterOption:number, refresh:boolean): Promise<void> => {
-          setFetchingPage3(true);
-          try {
-            switch (filterOption) {
-              case 0:
-                await fetchPlansPage1(refresh? 1 : undefined);
-                setFetchingPage1(false);
-                break;
-              case 1:
-                await fetchPlansPage2(refresh? 1 : undefined);
-                setFetchingPage1(false);
-                break;
-              default:
-                throw new Error("Invalid filter option");
-            }
-          } catch (error) {
-            console.error("Error fetching shops:", error);
-          }
-          setFetchingPage3(false);
-        },
-
-        fetchProfile: async () => {
-          const profile = await fetchUser();
-          setProfile(profile);
-          return profile;
-        },
-        setRegion: async (location: regionProp) => {
-          setRegion(location);
-        },
-        locateMe: async (map: React.RefObject<Map>) => {
-          await rebaseUserLocation(map);
-        },
-        radiusShops,
-        discoverShopsFilter1,
-        discoverShopsFilter2,
-        discoverShopsFilter3,
-        plans: plans,
-        favoritePlans: favoritePlans,
-        updateShopFavorite: async (shop_id, isFav) => updateShopFavorite(shop_id, isFav),
-        region,
         profile,
-        userLocation,
-        isPage1Loading: fetchingPage1,
-        isPage2Loading: fetchingPage2,
-        isPage3Loading: fetchingPage3,
-        isPage4Loading: fetchingPage4,
-        fetchAppConfig: async () => {
-          setAppConfig(appConfig);
-          return appConfig;
-        },
-        fetchNearestShopResult: async (shop_name: string) => {
-          let coords = userLocation;
-          if (!coords) {
-            const location = await getCurrentLocation();
-            if (location) {
-              coords = location;
-            }
-          }
-          if (coords) {
-            setFetchingPage1(true);
-            const prevShops = discoverShopsFilter1;
-            setDiscoverShopsFilter1([]);
-            const result = await fetchSearchedShop(
-              shop_name,
-              coords.longitude,
-              coords.latitude
-            );
-            setIsShopSearched(true);
-            setFetchingPage1(false);
-
-            const shop = result.nearestShop;
-            if (!shop) {
-              alert("", "Invalid shop", "error");
-              setDiscoverShopsFilter1(prevShops);
-              return;
-            }
-            setDiscoverShopsFilter1([shop]);
-          }
-        },
         appConfig,
-        isShopSearched
+        userLocation,
+        region,
+        radiusShops,
+        discoverNearby,
+        discoverPopular,
+        discoverFavorite,
+        plans,
+        favoritePlans,
+        isShopSearched,
+        isLoadingProfile,
+        isLoadingDiscover,
+        isLoadingMap,
+        isLoadingPlans,
+        locateMe,
+        setRegion,
+        fetchProfile,
+        fetchAppConfig,
+        fetchDiscover,
+        searchShop,
+        fetchMapShops,
+        fetchPlans,
+        fetchFavoritePlans,
       }}
     >
       {children}

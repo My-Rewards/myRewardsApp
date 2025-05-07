@@ -29,7 +29,7 @@ export default function TabLayout() {
   const [searchResults, setSearchResults] = useState<
     { id: string; name: string }[]
   >([]);
-  const { fetchNearestShopResult } = localData();
+  const { searchShop } = localData();
 
   const handleSearch = async (text: string) => {
     setSearchText(text);
@@ -62,7 +62,7 @@ export default function TabLayout() {
   };
 
   const fetchSearchResult = async (name: string) => {
-    fetchNearestShopResult(name);
+    searchShop(name);
     setSearchText("");
     setSearchResults([]);
   };

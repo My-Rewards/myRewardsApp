@@ -30,8 +30,15 @@ import { fetchPinnedShop } from "@/APIs/MapAPIs/fetchPinnedShop";
 import { FetchMapToast, NoShopsToast } from "@/components/loading-states/FetchMapToast";
 
 export default function mapPage() {
-  const { radiusShops, region, locateMe, fetchShopsByRadius, isPage2Loading, userLocation } =
-    localData();
+  const {
+    radiusShops,
+    setRegion,
+    region,
+    locateMe,
+    fetchMapShops,
+    isLoadingMap,
+    userLocation,
+  } = localData();
   const [containerHeight, setContainerHeight] = useState<number>(1);
   const { width } = Dimensions.get("window");
   const MODAL_COLLAPSED_HEIGHT = Math.max(containerHeight * 0.25, 150);
@@ -45,7 +52,6 @@ export default function mapPage() {
   const currentScrollX = useRef(0);
   const mapRef = React.useRef<Map>(null);
 
-
   useEffect(() => {
     if (radiusShops && radiusShops.length > 0) {
       setPinsRendered(true);
@@ -56,9 +62,7 @@ export default function mapPage() {
     translateY.setValue(containerHeight);
   }, [containerHeight]);
 
-  const fetchSelectedPinDetails = async (
-    pin: mapPinProps,
-  ) => {
+  const fetchSelectedPinDetails = async (pin: mapPinProps) => {
     if (pin?.id === currentPin?.id) {
       openModal();
       return;
@@ -214,17 +218,18 @@ export default function mapPage() {
         // );
 
         currentScrollX.current = newPos * width;
-       // setSelectedPin(radiusShops[newPos]);
+        // setSelectedPin(radiusShops[newPos]);
       }
     },
   });
 
-  function handleMapUpdate(region: regionProp) {
-    if (isPage2Loading) {
+  async function handleMapUpdate(region: regionProp) {
+    if (isLoadingMap) {
       return;
     }
     closeModal();
-    fetchShopsByRadius(region);
+    setRegion(region);
+    await fetchMapShops();
   }
 
   return (
@@ -270,38 +275,37 @@ export default function mapPage() {
             handleMapUpdate(region);
           }}
         >
-          {radiusShops && radiusShops.map((shop) => (
-            <Marker
-              coordinate={{
-                latitude: shop.latitude,
-                longitude: shop.longitude,
-              }}
-              onPress={() => fetchSelectedPinDetails(shop)}
-              key={shop.id}
-            >
-              <View style={styles.marker}>
-                <View
-                  style={
-                    currentPin?.id == shop.id
-                      ? styles.circleSelected
-                      : styles.circle
-                  }
-                >
-                  <SvgXml
-                    color={
+          {radiusShops &&
+            radiusShops.map((shop) => (
+              <Marker
+                coordinate={{
+                  latitude: shop.latitude,
+                  longitude: shop.longitude,
+                }}
+                onPress={() => fetchSelectedPinDetails(shop)}
+                key={shop.id}
+              >
+                <View style={styles.marker}>
+                  <View
+                    style={
                       currentPin?.id == shop.id
-                        ? color_pallete[1]
-                        : "white"
+                        ? styles.circleSelected
+                        : styles.circle
                     }
-                    xml={handStar}
-                    width="62%"
-                    height="62%"
-                  />
+                  >
+                    <SvgXml
+                      color={
+                        currentPin?.id == shop.id ? color_pallete[1] : "white"
+                      }
+                      xml={handStar}
+                      width="62%"
+                      height="62%"
+                    />
+                  </View>
+                  <View style={styles.pin} />
                 </View>
-                <View style={styles.pin} />
-              </View>
-            </Marker>
-          ))}
+              </Marker>
+            ))}
         </MapView>
         {!isExpanded && (
           <View style={styles.crossHairButton}>

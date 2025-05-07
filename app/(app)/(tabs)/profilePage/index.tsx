@@ -38,10 +38,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!profile) {
-      const newProfile = fetchProfile();
-      if (newProfile !== undefined && newProfile !== null) {
-        profile = newProfile;
-      }
+      fetchProfile().then((newProfile) => {
+        if (newProfile !== undefined && newProfile !== null) {
+          profile = newProfile;
+        }
+      });
     }
   }, [profile]);
 

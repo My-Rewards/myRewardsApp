@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Animated,
   Text,
@@ -10,105 +10,88 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import { color_pallete } from "@/constants/Colors";
-import { localData } from "@/app-data/appData";
-import { ShopPreview } from "@/components/shopPreview";
-import { ShopPreviewProps, shop } from "@/app-data/data-types";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { mediumLogo } from "@/assets/images/MR-logos";
 import { SvgXml } from "react-native-svg";
+import { localData } from "@/app-data/appData";
+import { ShopPreview } from "@/components/shopPreview";
+import { ShopPreviewProps } from "@/app-data/data-types";
+import { color_pallete } from "@/constants/Colors";
+import { mediumLogo } from "@/assets/images/MR-logos";
+
 const { width } = Dimensions.get("window");
 
-export default function index() {
-  const {
-    fetchDiscoverShops,
-    discoverShopsFilter1,
-    discoverShopsFilter2,
-    discoverShopsFilter3,
-  } = localData();
+export default function DiscoverScreen() {
+  const { fetchDiscover, discoverNearby, discoverPopular, discoverFavorite } =
+    localData();
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadingNewFilter, setLoadingNewFilter] = useState(false);
   const [savedFilterSelection, setSavedFilterSelection] = useState(0);
 
-  const runAnimation = (value: number) => {
+  const runAnimation = (value: number) =>
     Animated.timing(slideAnim, {
       toValue: value,
       duration: 150,
       useNativeDriver: true,
     }).start();
+
+  useEffect(() => {
+    runAnimation((width / 3) * savedFilterSelection);
+  }, [savedFilterSelection]);
+
+  const getCurrentList = () => {
+    if (savedFilterSelection === 0) return discoverNearby;
+    if (savedFilterSelection === 1) return discoverPopular;
+    return discoverFavorite;
   };
 
-  const sendShopOption = () => {
-    switch (savedFilterSelection) {
-      case 0:
-        return discoverShopsFilter1;
-      case 1:
-        return discoverShopsFilter2;
-      case 2:
-        return discoverShopsFilter3;
-    }
-  };
+  const getFilterKey =
+    savedFilterSelection === 0
+      ? "nearby"
+      : savedFilterSelection === 1
+      ? "popular"
+      : "favorite";
+  const handlePress = async (filterIndex: number) => {
+    setLoadingNewFilter(true);
+    setSavedFilterSelection(filterIndex);
+    runAnimation((width / 3) * filterIndex);
 
-  const handlePress = async (filterSelection: number) => {
-    try {
-      setLoadingNewFilter(true);
-      setSavedFilterSelection(filterSelection);
-
-      runAnimation(filterSelection * (width / 3));
-
-      setLoadingNewFilter(false);
-    } catch (error) {
-      console.error("Error fetching shops:", error);
-    }
+    await fetchDiscover(
+      filterIndex === 0 ? "nearby" : filterIndex === 1 ? "popular" : "favorite",
+      true
+    );
+    setLoadingNewFilter(false);
   };
 
   const loadMoreData = async () => {
-    if (!loadingMore) {
-      try {
-        setLoadingMore(true);
-        fetchDiscoverShops(savedFilterSelection, false);
-      } catch (error) {
-        console.error("Error fetching more shops:", error);
-      } finally {
-        setLoadingMore(false);
-      }
-    }
-  };
-
-  const resetShops = () => {
-    fetchDiscoverShops(0, true);
-    fetchDiscoverShops(1, true);
-    fetchDiscoverShops(2, true);
+    if (loadingMore) return;
+    setLoadingMore(true);
+    await fetchDiscover(getFilterKey, false);
+    setLoadingMore(false);
   };
 
   return (
     <View style={styles.page}>
       <FilterBar slideAnim={slideAnim} handlePress={handlePress} />
-      {!loadingNewFilter ? (
+
+      {loadingNewFilter ? (
+        <View style={styles.loading}>
+          <ActivityIndicator />
+        </View>
+      ) : (
         <ShopPreviews
-          discoverShops={sendShopOption()}
+          discoverShops={getCurrentList()}
           filterSelection={savedFilterSelection}
           loadMoreData={loadMoreData}
           loadingMore={loadingMore}
-          resetShops={resetShops}
         />
-      ) : (
-        <View style={{ flex: 1 }}>
-          <ActivityIndicator />
-        </View>
       )}
+
       <LinearGradient
         colors={["rgba(0, 0, 0, 0)", "rgba(0, 0, 0, .1)"]}
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: 5,
-          pointerEvents: "none",
-        }}
+        style={styles.gradient}
         locations={[0.3, 1]}
       />
     </View>
@@ -120,19 +103,10 @@ const FilterBar = React.memo(({ slideAnim, handlePress }: any) => (
     <Animated.View
       style={[styles.indicator, { transform: [{ translateX: slideAnim }] }]}
     />
-    {[0, 1, 2].map((filterSelection) => (
-      <TouchableWithoutFeedback
-        key={filterSelection}
-        onPress={() => handlePress(filterSelection)}
-      >
-        <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.filterText}>
-            {filterSelection === 0
-              ? "Nearby"
-              : filterSelection === 1
-              ? "Popular"
-              : "Favorites"}
-          </Text>
+    {["Nearby", "Popular", "Favorites"].map((label, i) => (
+      <TouchableWithoutFeedback key={i} onPress={() => handlePress(i)}>
+        <View style={styles.filterItem}>
+          <Text style={styles.filterText}>{label}</Text>
         </View>
       </TouchableWithoutFeedback>
     ))}
@@ -144,151 +118,101 @@ const ShopPreviews = ({
   filterSelection,
   loadMoreData,
   loadingMore,
-  resetShops,
 }: {
-  discoverShops: ShopPreviewProps[] | null | undefined;
+  discoverShops?: ShopPreviewProps[];
   filterSelection: number;
   loadMoreData: () => Promise<void>;
   loadingMore: boolean;
-  resetShops: () => void;
 }) => {
-  const { isPage1Loading, fetchDiscoverShops } = localData();
+  const { isLoadingDiscover, fetchDiscover } = localData();
 
-  const handleScroll = async () => {
-    await loadMoreData();
-  };
+  const keyForFilter =
+    filterSelection === 0
+      ? "nearby"
+      : filterSelection === 1
+      ? "popular"
+      : "favorite";
 
-  const openShopPage = (shop_id: string) => {
-    router.push({
-      pathname: "/shopPage",
-      params: { parentPage: "Discover", shop_id },
-    });
-  };
-
-  if (discoverShops) {
-    return (
-      <View style={{ flex: 1, width: "100%", height: "100%", zIndex: 100 }}>
-        <FlatList
-          data={discoverShops}
-          extraData={discoverShops}
-          horizontal={false}
-          renderItem={({ item }) => (
-            <View key={item.shop_id} style={{ marginHorizontal: 15 }}>
-              <TouchableOpacity onPress={() => openShopPage(item.shop_id)}>
-                <ShopPreview selectedPin={item} type={1} />
-              </TouchableOpacity>
-            </View>
-          )}
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1, width: "100%", height: "100%" }}
-          scrollEventThrottle={20}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
-          keyExtractor={(item) => item.shop_id}
-          removeClippedSubviews={false}
-          refreshing={isPage1Loading}
-          onRefresh={() => {
-            resetShops();
-          }}
-          windowSize={2}
-          onEndReachedThreshold={0.5}
-          onEndReached={handleScroll}
-          ListEmptyComponent={
-            filterSelection === 2 ? (
-                <View style={styles.empty}>
-                  <SvgXml
-                    xml={mediumLogo}
-                    height={width / 4}
-                    width={width * 0.7}
-                    color={color_pallete[1]}
-                  />
-                  <Text style={styles.emptyText}>
-                    Favorited Shops Will Appear Here
-                  </Text>
-                </View>
-            ) : null
-          }          
-          ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
-        />
-      </View>
-    );
-  } else {
+  if (!discoverShops) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator />
       </View>
     );
   }
+
+  return (
+    <FlatList
+      data={discoverShops}
+      keyExtractor={(item) => item.shop_id}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/shopPage",
+              params: { parentPage: "Discover", shop_id: item.shop_id },
+            })
+          }
+          style={{ margin: 15 }}
+        >
+          <ShopPreview selectedPin={item} type={1} />
+        </TouchableOpacity>
+      )}
+      refreshing={isLoadingDiscover}
+      onRefresh={() => fetchDiscover(keyForFilter, true)}
+      onEndReached={loadMoreData}
+      onEndReachedThreshold={0.5}
+      ListEmptyComponent={
+        filterSelection === 2 ? (
+          <View style={styles.empty}>
+            <SvgXml
+              xml={mediumLogo}
+              height={width / 4}
+              width={width * 0.7}
+              color={color_pallete[1]}
+            />
+            <Text style={styles.emptyText}>
+              Favorited Shops Will Appear Here
+            </Text>
+          </View>
+        ) : null
+      }
+      ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
-  loading: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  page: { flex: 1, backgroundColor: color_pallete[10] },
+  loading: { flex: 1, justifyContent: "center", alignItems: "center" },
   filterBar: {
-    position: "relative",
-    display: "flex",
-    width: "100%",
-    zIndex: 100,
-    backgroundColor: "transparent",
     flexDirection: "row",
-    justifyContent: "space-around",
-    borderBottomColor: color_pallete[0],
     borderBottomWidth: 2,
+    borderColor: color_pallete[0],
   },
-  page: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: color_pallete[10],
-  },
+  filterItem: { flex: 1, alignItems: "center", padding: 10 },
   filterText: {
-    fontFamily: "Avenir Next",
     fontWeight: "600",
-    color: color_pallete[2],
     fontSize: 13,
-    padding: 10,
+    color: color_pallete[2],
   },
   indicator: {
     position: "absolute",
     height: "100%",
-    left: -15,
-    width: width / 3 + 30,
+    width: width / 3,
     backgroundColor: color_pallete[0],
     borderRadius: 20,
   },
-  loadingMore: {
-    paddingVertical: 20,
-    alignItems: "center",
-  },
-  card: {
-    padding: 20,
-    backgroundColor: color_pallete[1],
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  cardText: {
-    color: color_pallete[2],
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  gradient: { ...StyleSheet.absoluteFillObject, pointerEvents: "none" },
   empty: {
     flex: 1,
-    width: "100%",
     justifyContent: "center",
-    alignItems: "center", 
-    paddingHorizontal: 20,
+    alignItems: "center",
+    padding: 20,
   },
   emptyText: {
     color: color_pallete[2],
-    fontFamily: "Avenir Next",
     fontWeight: "600",
-    flexWrap: "wrap",
     textAlign: "center",
-    width: "80%",
-    marginBottom: "8%",
   },
 });
