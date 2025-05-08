@@ -3,17 +3,17 @@ import { localData } from '@/app-data/appData';
 import { useEffect, useRef } from 'react';
 import { color_pallete } from '@/constants/Colors';
 export const FetchMapToast = () => {
-    const { isPage2Loading } = localData();
+    const { isLoadingMap } = localData();
 
     const fadeAnim = useRef(new Animated.Value(0)).current; 
 
     useEffect(() => {
-        if (isPage2Loading) {
+        if (isLoadingMap) {
           fadeIn();
         } else {
           fadeOut();
         }
-      }, [isPage2Loading]);
+      }, [isLoadingMap]);
 
     const fadeIn = () => {
         Animated.timing(fadeAnim, {
@@ -42,11 +42,11 @@ export const FetchMapToast = () => {
 };
 
 export const NoShopsToast = () => {
-  const { radiusShops, isPage2Loading } = localData();
+  const { radiusShops, isLoadingMap } = localData();
   const fadeAnim = useRef(new Animated.Value(0)).current; // useRef to persist the same Animated.Value across renders
 
   useEffect(() => {
-    if (!isPage2Loading && radiusShops && radiusShops.length === 0) {
+    if (!isLoadingMap && radiusShops && radiusShops.length === 0) {
       // Shops loaded but none nearby → show toast
       fadeIn();
 
@@ -61,7 +61,7 @@ export const NoShopsToast = () => {
       // Hide the toast during loading or if shops exist
       fadeOut();
     }
-  }, [isPage2Loading, radiusShops]);
+  }, [isLoadingMap, radiusShops]);
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {

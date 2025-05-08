@@ -117,7 +117,7 @@ export default function TabLayout() {
                   <FlatList
                     data={searchResults}
                     bounces={false}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item, index) => `${item.id}-${index}`}
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         style={styles.resultItem}

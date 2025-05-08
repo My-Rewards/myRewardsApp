@@ -187,8 +187,9 @@ const ShopPreviews = ({
           data={discoverShops}
           extraData={discoverShops}
           horizontal={false}
+          keyExtractor={item => item.shop_id}
           renderItem={({ item }) => (
-            <View key={item.shop_id} style={{ marginHorizontal: 15 }}>
+            <View style={{ marginHorizontal: 15 }}>
               <TouchableOpacity onPress={() => openShopPage(item.shop_id)}>
                 <ShopPreview selectedPin={item} type={1} />
               </TouchableOpacity>
@@ -199,7 +200,6 @@ const ShopPreviews = ({
           scrollEventThrottle={20}
           initialNumToRender={10}
           maxToRenderPerBatch={10}
-          keyExtractor={(item) => item.shop_id}
           removeClippedSubviews={false}
           refreshing={isLoadingDiscover}
           onRefresh={refreshAll}

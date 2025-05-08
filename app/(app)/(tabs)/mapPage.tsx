@@ -271,7 +271,7 @@ export default function mapPage() {
             handleMapUpdate(region);
           }}
         >
-          {radiusShops && radiusShops.map((shop) => (
+          {radiusShops && radiusShops.map((shop: mapPinProps) => (
             <Marker
               coordinate={{
                 latitude: shop.latitude,
@@ -331,7 +331,7 @@ export default function mapPage() {
           />
         ) : <ShopPreviewLoading/>}
       </Animated.View>
-      {isPage2Loading && 
+      {isLoadingMap && 
         <FetchMapToast/>
       }
       {

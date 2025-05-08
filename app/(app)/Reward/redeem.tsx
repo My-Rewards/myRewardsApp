@@ -19,7 +19,7 @@ import {localData} from "@/app-data/appData";
 import useAlert from "@/app/LoadingProp/alert";
 import {redeemRewardApi} from "@/APIs/reward/redeem";
 import {Plan} from "@/app-data/data-types";
-import {fetchPlan} from "@/APIs/fetchShopPlan";
+import {fetchPlan} from "@/APIs/PlanAPIs/fetchShopPlan";
 
 const { height, width } = Dimensions.get("window");
 
