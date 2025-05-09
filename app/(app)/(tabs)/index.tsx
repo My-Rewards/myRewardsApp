@@ -56,7 +56,7 @@ export default function index() {
     runAnimation(index * (width / 3));
     setFilterNumber(index);
 
-    await fetchDiscover(index, false);
+   // await fetchDiscover(index, false);
   };
 
   const loadMoreData = async () => {
@@ -183,7 +183,7 @@ const ShopPreviews = ({
           refreshing={isLoadingDiscover}
           onRefresh={onRefresh}
           windowSize={2}
-          onScrollEndDrag={onEndReached}
+          onEndReached={onEndReached}
           ListEmptyComponent={
             filterSelection === 2 ? (
               <View style={styles.empty}>
