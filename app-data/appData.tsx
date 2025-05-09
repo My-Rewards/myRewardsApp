@@ -31,16 +31,16 @@ import {
 
 const DataContext = createContext<AppDataContextType | undefined>(undefined);
 
-export function localData() {
+export const localData = () => {
   const ctx = useContext(DataContext);
   if (!ctx) throw new Error("useAppData must be used within AppDataProvider");
   return ctx;
 }
 
-export function AppData({
+export const AppData = ({
   children,
   userSub,
-}: PropsWithChildren<{ userSub: string }>) {
+}: PropsWithChildren<{ userSub: string }>) => {
   const { alert } = useProps();
 
   //State
@@ -89,7 +89,7 @@ export function AppData({
     if (userLocation) bootstrap();
   }, [userLocation]);
 
-  async function bootstrap() {
+  const bootstrap = async() => {
     await Promise.all([
       await fetchProfile(),
       await fetchAppConfig(),
@@ -102,7 +102,7 @@ export function AppData({
     ]);
   }
 
-  async function getCurrentLocation(): Promise<regionProp | undefined> {
+  const getCurrentLocation = async(): Promise<regionProp | undefined> => {
     try {
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
@@ -126,12 +126,12 @@ export function AppData({
     }
   }
 
-  async function locateMe(mapRef: React.RefObject<MapView>) {
+  const locateMe = async(mapRef: React.RefObject<MapView>) => {
     const coords = userLocation ?? (await getCurrentLocation());
     if (coords && mapRef.current) mapRef.current.animateToRegion(coords, 300);
   }
 
-  async function fetchProfile(): Promise<Profile | undefined> {
+  const fetchProfile = async(): Promise<Profile | undefined>  =>{
     setIsLoadingProfile(true);
     try {
       const data = await fetchUser();
@@ -145,7 +145,7 @@ export function AppData({
     }
   }
 
-  async function fetchAppConfig(): Promise<AppConfig | undefined> {
+  const fetchAppConfig = async(): Promise<AppConfig | undefined> =>{
    try{
      const config = await apiFetchAppConfig();
      setAppConfig(config);
@@ -155,10 +155,10 @@ export function AppData({
    }
   }
 
-  async function fetchDiscover(
+  const fetchDiscover = async(
     filter: 0 | 1 | 2,
     refresh = false
-  ) {
+  ) => {
     setIsLoadingDiscover(true);
     let page;
     let fn;
@@ -208,7 +208,7 @@ export function AppData({
   }
 }
 
-  async function searchShop(shopName: string) {
+  const searchShop = async(shopName: string) => {
     setIsLoadingDiscover(true);
     try {
       const coords = userLocation ?? (await getCurrentLocation());
@@ -231,7 +231,7 @@ export function AppData({
     }
   }
 
-  async function fetchMapShops() {
+  const fetchMapShops = async() => {
     setIsLoadingMap(true);
     try {
       const resp = await fetchRadiusShops(region.longitude, region.latitude);
@@ -243,7 +243,7 @@ export function AppData({
     }
   }
 
-  async function fetchPlans(refresh = false) {
+  const fetchPlans = async(refresh = false) => {
     if(pagination.current.plans === -1) return; 
     if(refresh){
       setIsLoadingPlans(true);
@@ -268,7 +268,7 @@ export function AppData({
     }
   }
 
-  async function fetchFavoritePlans(refresh = false) {
+  const fetchFavoritePlans = async(refresh = false) => {
     if(pagination.current.liked === -1) return;
     setIsLoadingPlans(true);
     try {
@@ -290,6 +290,40 @@ export function AppData({
       setIsLoadingPlans(false);
     }
   }
+
+  const updateShopFavorite = (shop_id: string, isFav: boolean) => {
+    setDiscoverNearby((prev) =>
+      prev.map((s) =>
+        s.shop_id === shop_id ? { ...s, favorite: isFav } : s
+      )
+    );
+    setDiscoverPopular((prev) =>
+      prev.map((s) =>
+        s.shop_id === shop_id ? { ...s, favorite: isFav } : s
+      )
+    );
+    setDiscoverFavorite((prev) =>
+      prev.map((s) =>
+        s.shop_id === shop_id ? { ...s, favorite: isFav } : s
+      )
+    );
+
+    setPlans((prev) =>
+      prev.map((p) =>
+        p.shop_id === shop_id ? { ...p, favorite: isFav } : p
+      )
+    );
+    setFavoritePlans((prev) => {
+      if (isFav) {
+        const newly = plans.find((p) => p.shop_id === shop_id);
+        return newly
+          ? [...prev.filter((p) => p.shop_id !== shop_id), { ...newly, favorite: true }]
+          : prev;
+      } else {
+        return prev.filter((p) => p.shop_id !== shop_id);
+      }
+    });
+  };
 
   return (
     <DataContext.Provider
@@ -319,6 +353,7 @@ export function AppData({
         fetchPlans,
         fetchFavoritePlans,
         setIsLoadingDiscover,
+        updateShopFavorite,
         filterNumber,
         setFilterNumber,
       }}
@@ -359,4 +394,5 @@ type AppDataContextType = {
   fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
   setFilterNumber: (filter: 0 | 1 | 2) => void;
   filterNumber: 0 | 1 | 2;
+  updateShopFavorite: (shop_id: string, isFav: boolean) => void;
 };

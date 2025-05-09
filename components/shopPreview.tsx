@@ -203,7 +203,7 @@ export const ExpandedShop = ({
 }: PreviewPropShops) => {
   const { redeemReward } = useRewardModal();
 
-  const { profile, userLocation, fetchFavoritePlans } = localData();
+  const { profile, userLocation, updateShopFavorite,  } = localData();
   const [busy, setBusy] = useState(false);
 
   const [shopDetails, setShopDetails] = useState<shop | null>(null);
@@ -368,13 +368,13 @@ export const ExpandedShop = ({
   const handleLike = async () => {
     if (busy || !shopDetails?.org_id) return;
     setBusy(true);
-    setLiked(!liked);
+  
+    setLiked(prev => !prev);
+    const { status: newFavStatus } = await toggleLike(shopDetails.org_id);
 
-    const { status } = await toggleLike(shopDetails.org_id);
-
-    if(status != !liked) setLiked(status)
-    fetchFavoritePlans(true);
-
+    setLiked(newFavStatus);
+    updateShopFavorite(shopDetails.org_id, newFavStatus);
+  
     setBusy(false);
   };
 
