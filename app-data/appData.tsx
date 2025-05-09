@@ -71,7 +71,6 @@ export const AppData = ({
   const [isLoadingDiscover, setIsLoadingDiscover] = useState(false);
   const [isLoadingMap, setIsLoadingMap] = useState(false);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
-
   //Pagination tracker
   const pagination = useRef({
     nearby: 1,
@@ -93,9 +92,9 @@ export const AppData = ({
     await Promise.all([
       await fetchProfile(),
       await fetchAppConfig(),
-      fetchDiscover(0),
-      fetchDiscover(1),
-      fetchDiscover(2),
+      fetchDiscover(0, true),
+      fetchDiscover(1, true),
+      fetchDiscover(2, true),
       fetchMapShops(),
       fetchPlans(),
       fetchFavoritePlans(),
@@ -159,7 +158,6 @@ export const AppData = ({
     filter: 0 | 1 | 2,
     refresh = false
   ) => {
-    setIsLoadingDiscover(true);
     let page;
     let fn;
     switch (filter) {
@@ -181,6 +179,9 @@ export const AppData = ({
     }
     try {
       if (page === -1) return;
+      if(refresh) {
+        setIsLoadingDiscover(true);
+      }
       const coords = userLocation ?? (await getCurrentLocation());
       if (!coords) return;
       const resp = await fn(
@@ -222,6 +223,7 @@ export const AppData = ({
         alert("", "Shop not found", "error");
       } else {
         setDiscoverNearby([resp.nearestShop]);
+        pagination.current.nearby = -1;
       }
       setIsShopSearched(true);
     } catch (e) {
