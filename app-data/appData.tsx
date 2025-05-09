@@ -61,7 +61,6 @@ export function AppData({
   const [discoverFavorite, setDiscoverFavorite] = useState<ShopPreviewProps[]>(
     []
   );
-  const [savedFilterSelection, setSavedFilterSelection] = useState<"nearby" | "popular" | "favorite">("nearby");
   const [filterNumber, setFilterNumber] = useState<0 | 1 | 2>(0);
   const [plans, setPlans] = useState<PreviewPlanProp[]>([]);
   const [favoritePlans, setFavoritePlans] = useState<PreviewPlanProp[]>([]);
@@ -94,9 +93,9 @@ export function AppData({
     await Promise.all([
       await fetchProfile(),
       await fetchAppConfig(),
-      fetchDiscover("nearby"),
-      fetchDiscover("popular"),
-      fetchDiscover("favorite"),
+      fetchDiscover(0),
+      fetchDiscover(1),
+      fetchDiscover(2),
       fetchMapShops(),
       fetchPlans(),
       fetchFavoritePlans(),
@@ -157,51 +156,57 @@ export function AppData({
   }
 
   async function fetchDiscover(
-    filter: "nearby" | "popular" | "favorite",
+    filter: 0 | 1 | 2,
     refresh = false
   ) {
+    setIsLoadingDiscover(true);
+    let page;
+    let fn;
+    switch (filter) {
+      case 0:
+        page = refresh ? 1 : pagination.current.nearby;
+        fn = fetchNearbyShops;
+        break;
+      case 1:
+        page = refresh ? 1 : pagination.current.popular;
+        fn = fetchPopularShops;
+        break;
+      case 2:
+        page = refresh ? 1 : pagination.current.favorite;
+        fn = fetchFavoriteShops;
+        break;
+      default:
+        console.error("Invalid filter");
+        return;
+    }
     try {
+      if (page === -1) return;
       const coords = userLocation ?? (await getCurrentLocation());
       if (!coords) return;
-      const page = refresh ? 1 : pagination.current[filter];
-      let resp: { value: ShopPreviewProps[]; pagination: { nextPage: number } };
-      if (filter === "nearby") {
-        if(pagination.current.nearby === -1) return;
-        resp = await fetchNearbyShops(coords.longitude, coords.latitude, page);
-        if(!resp.value && Array.isArray(resp)) {
-          console.error("No shops found");
-        }
-        setDiscoverNearby((prev) =>
-          refresh ? resp.value : [...prev, ...resp.value]
-        );
-      } else if (filter === "popular") {
-        if(pagination.current.popular === -1) return;
-        resp = await fetchPopularShops(coords.longitude, coords.latitude, page);
-        if(!resp.value && Array.isArray(resp)) {
-          console.error("No shops found");
-        }
-        setDiscoverPopular((prev) =>
-          refresh ? resp.value : [...prev, ...resp.value]
-        );
-      } else {
-        if(pagination.current.favorite === -1) return;
-        resp = await fetchFavoriteShops(
-          coords.longitude,
-          coords.latitude,
-          page
-        );
-        if(!resp.value && Array.isArray(resp)) {
-          console.error("No shops found");
-        }
-        setDiscoverFavorite((prev) =>
-          refresh ? resp.value : [...prev, ...resp.value]
-        );
+      const resp = await fn(
+        coords.longitude,
+        coords.latitude,
+        page,
+      );
+      if (!resp.value && !Array.isArray(resp)) {
+        console.error("No shops found");
       }
-      pagination.current[filter] = resp.pagination.nextPage ?? -1;
-    } catch (e) {
-      console.error(e);
-    }
+      if (filter === 0) {
+        setDiscoverNearby((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
+        pagination.current.nearby = resp.pagination.nextPage ?? -1;
+      } else if (filter === 1) {
+        setDiscoverPopular((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
+        pagination.current.popular = resp.pagination.nextPage ?? -1;
+      } else {
+        setDiscoverFavorite((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
+        pagination.current.favorite = resp.pagination.nextPage ?? -1;
+      }
+  } catch {
+    console.error("Error fetching discover data");
+  } finally {
+    setIsLoadingDiscover(false);
   }
+}
 
   async function searchShop(shopName: string) {
     setIsLoadingDiscover(true);
@@ -313,8 +318,6 @@ export function AppData({
         fetchMapShops,
         fetchPlans,
         fetchFavoritePlans,
-        setSavedFilterSelection,
-        savedFilterSelection,
         setIsLoadingDiscover,
         filterNumber,
         setFilterNumber,
@@ -347,15 +350,13 @@ type AppDataContextType = {
   fetchProfile: () => Promise<Profile | undefined>;
   fetchAppConfig: () => Promise<AppConfig | undefined>;
   fetchDiscover: (
-    filter: "nearby" | "popular" | "favorite",
+    filter: 0 | 1 | 2,
     refresh?: boolean
   ) => Promise<void>;
   searchShop: (shopName: string) => Promise<void>;
   fetchMapShops: () => Promise<void>;
   fetchPlans: (refresh?: boolean) => Promise<void>;
   fetchFavoritePlans: (refresh?: boolean) => Promise<void>;
-  setSavedFilterSelection: (filter:  "nearby" | "popular" | "favorite") => void;
-  savedFilterSelection: "nearby" | "popular" | "favorite";
   setFilterNumber: (filter: 0 | 1 | 2) => void;
-  filterNumber: number;
+  filterNumber: 0 | 1 | 2;
 };

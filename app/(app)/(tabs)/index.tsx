@@ -8,7 +8,6 @@ import {
   Dimensions,
   ActivityIndicator,
   TouchableOpacity,
-  ScrollView,
   FlatList,
 } from "react-native";
 import { color_pallete } from "@/constants/Colors";
@@ -25,8 +24,6 @@ const { width } = Dimensions.get("window");
 export default function index() {
   const {
     fetchDiscover,
-    setSavedFilterSelection,
-    savedFilterSelection,
     discoverNearby,
     discoverPopular,
     discoverFavorite,
@@ -47,7 +44,7 @@ export default function index() {
 
   useEffect(() => {
     runAnimation(filterNumber * (width / 3));
-  }, [savedFilterSelection]);
+  }, [filterNumber]);
 
   const getCurrentList = () => {
     if (filterNumber === 0) return discoverNearby;
@@ -59,18 +56,14 @@ export default function index() {
     runAnimation(index * (width / 3));
     setFilterNumber(index);
 
-    const key = index === 0 ? "nearby" : index === 1 ? "popular" : "favorite";
-
-    setSavedFilterSelection(key);
-
-    await fetchDiscover(key, false);
+    await fetchDiscover(index, false);
   };
 
   const loadMoreData = async () => {
     if (!loadingMore) {
       try {
         setLoadingMore(true);
-        fetchDiscover(savedFilterSelection, false);
+        fetchDiscover(filterNumber, false);
       } catch (error) {
         console.error("Error fetching more shops:", error);
       } finally {
@@ -139,7 +132,7 @@ const ShopPreviews = ({
   filterSelection,
 }: {
   discoverShops: ShopPreviewProps[] | null | undefined;
-  filterSelection: number;
+  filterSelection: 0 | 1 | 2;
   loadMoreData: () => Promise<void>;
   loadingMore: boolean;
 }) => {
@@ -147,16 +140,16 @@ const ShopPreviews = ({
     isLoadingDiscover,
     setIsLoadingDiscover,
     fetchDiscover,
-    savedFilterSelection,
-    setSavedFilterSelection,
   } = localData();
 
-  const handleScroll = async (event: any) => {
-    // const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    if (!isLoadingDiscover) {
-      await loadMoreData();
-    }
-  };
+
+    const onRefresh = React.useCallback(() => {
+      return fetchDiscover(filterSelection, true);
+    }, [fetchDiscover, filterSelection]);
+  
+    const onEndReached = React.useCallback(() => {
+      if (!isLoadingDiscover) loadMoreData();
+    }, [isLoadingDiscover, loadMoreData]);
 
   const openShopPage = (shop_id: string) => {
     router.push({
@@ -165,20 +158,6 @@ const ShopPreviews = ({
     });
   };
 
-  const refreshAll = async () => {
-    setIsLoadingDiscover(true);
-    try{
-      await Promise.all([
-        fetchDiscover("nearby", true),
-         fetchDiscover("popular", true),
-        fetchDiscover("favorite", true),
-      ]);
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    } finally {
-      setIsLoadingDiscover(false);
-    }
-  }
 
   if (discoverShops) {
     return (
@@ -202,11 +181,9 @@ const ShopPreviews = ({
           maxToRenderPerBatch={10}
           removeClippedSubviews={false}
           refreshing={isLoadingDiscover}
-          onRefresh={refreshAll}
+          onRefresh={onRefresh}
           windowSize={2}
-          onScrollEndDrag={handleScroll}
-          onEndReachedThreshold={0.8}
-          onEndReached={handleScroll}
+          onScrollEndDrag={onEndReached}
           ListEmptyComponent={
             filterSelection === 2 ? (
               <View style={styles.empty}>
