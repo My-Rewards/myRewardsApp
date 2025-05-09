@@ -132,21 +132,28 @@ export function AppData({
     if (coords && mapRef.current) mapRef.current.animateToRegion(coords, 300);
   }
 
-  async function fetchProfile(): Promise<Profile> {
+  async function fetchProfile(): Promise<Profile | undefined> {
     setIsLoadingProfile(true);
     try {
       const data = await fetchUser();
       setProfile(data);
       return data;
-    } finally {
+    }  catch {
+      console.error("Error fetching profile");
+    }
+      finally {
       setIsLoadingProfile(false);
     }
   }
 
-  async function fetchAppConfig(): Promise<AppConfig> {
-    const config = await apiFetchAppConfig();
-    setAppConfig(config);
-    return config;
+  async function fetchAppConfig(): Promise<AppConfig | undefined> {
+   try{
+     const config = await apiFetchAppConfig();
+     setAppConfig(config);
+     return config;
+   } catch {
+    console.error("Error fetching app config");
+   }
   }
 
   async function fetchDiscover(
@@ -224,8 +231,8 @@ export function AppData({
     try {
       const resp = await fetchRadiusShops(region.longitude, region.latitude);
       setRadiusShops(resp.value);
-    } catch (e) {
-      console.error(e);
+    } catch {
+      console.error("Error fetching map shops");
     } finally {
       setIsLoadingMap(false);
     }
@@ -249,8 +256,8 @@ export function AppData({
       }
       setPlans((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
       pagination.current.plans = resp.pagination.nextPage ?? -1;
-    } catch (e) {
-      console.error(e);
+    } catch {
+      console.error("Error fetching plans");
     } finally {
       setIsLoadingPlans(false);
     }
@@ -272,8 +279,8 @@ export function AppData({
       }
       setFavoritePlans((prev) => (refresh ? resp.value : [...prev, ...resp.value]));
       pagination.current.liked = resp.pagination.nextPage ?? -1;
-    } catch (e) {
-      console.error(e);
+    } catch {
+      console.error("Error fetching favorite plans");
     } finally {
       setIsLoadingPlans(false);
     }
@@ -337,8 +344,8 @@ type AppDataContextType = {
   isLoadingPlans: boolean;
   locateMe: (mapRef: React.RefObject<MapView>) => Promise<void>;
   setRegion: (location: regionProp) => void;
-  fetchProfile: () => Promise<Profile>;
-  fetchAppConfig: () => Promise<AppConfig>;
+  fetchProfile: () => Promise<Profile | undefined>;
+  fetchAppConfig: () => Promise<AppConfig | undefined>;
   fetchDiscover: (
     filter: "nearby" | "popular" | "favorite",
     refresh?: boolean
